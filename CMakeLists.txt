@@ -10,7 +10,6 @@ find_package(spdlog REQUIRED)
 unset(USE_GSTREAMER CACHE)
 option(USE_GSTREAMER "Use GStreamer for video capture (optional)" OFF)
 
-
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
@@ -23,16 +22,18 @@ set(VIDEOCAPTURE_SOURCES
 add_library(VideoCaptureLib SHARED ${VIDEOCAPTURE_SOURCES})
 
 # Include directories
-target_include_directories(VideoCaptureLib PRIVATE
+target_include_directories(VideoCaptureLib PUBLIC
     include
-    src
     ${OpenCV_INCLUDE_DIRS}
     ${spdlog_INCLUDE_DIRS}
 )
 
+target_include_directories(VideoCaptureLib PRIVATE
+    src
+)
+
 # Link against GStreamer libraries if USE_GSTREAMER is ON
 if (USE_GSTREAMER)
-# Include GStreamer-related settings and source files if USE_GSTREAMER is ON
     include(GStreamer)
     target_include_directories(VideoCaptureLib PRIVATE
         ${GSTREAMER_INCLUDE_DIRS}
