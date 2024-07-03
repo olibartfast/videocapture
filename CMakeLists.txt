@@ -15,7 +15,7 @@ message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
 # Add source files for video capture
 set(VIDEOCAPTURE_SOURCES
-    src/VideoCaptureInterface.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/VideoCaptureInterface.cpp
 )
 
 # Create the video capture library
@@ -23,13 +23,13 @@ add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 
 # Include directories
 target_include_directories(${PROJECT_NAME} PUBLIC
-    include
+    ${CMAKE_CURRENT_LIST_DIR}/include
     ${OpenCV_INCLUDE_DIRS}
     ${spdlog_INCLUDE_DIRS}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-    src
+    ${CMAKE_CURRENT_LIST_DIR}/src
 )
 
 # Link against GStreamer libraries if USE_GSTREAMER is ON
@@ -39,7 +39,7 @@ if (USE_GSTREAMER)
         ${GSTREAMER_INCLUDE_DIRS}
         ${GST_APP_INCLUDE_DIRS}
         ${GST_VIDEO_INCLUDE_DIRS}
-        src/gstreamer
+        ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer
     )
     target_link_libraries(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_LIBRARIES}
