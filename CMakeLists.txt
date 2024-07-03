@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(VideoCapture)
+project(VideoCaptureLib)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -19,29 +19,29 @@ set(VIDEOCAPTURE_SOURCES
 )
 
 # Create the video capture library
-add_library(VideoCaptureLib SHARED ${VIDEOCAPTURE_SOURCES})
+add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 
 # Include directories
-target_include_directories(VideoCaptureLib PUBLIC
+target_include_directories(${PROJECT_NAME} PUBLIC
     include
     ${OpenCV_INCLUDE_DIRS}
     ${spdlog_INCLUDE_DIRS}
 )
 
-target_include_directories(VideoCaptureLib PRIVATE
+target_include_directories(${PROJECT_NAME} PRIVATE
     src
 )
 
 # Link against GStreamer libraries if USE_GSTREAMER is ON
 if (USE_GSTREAMER)
     include(GStreamer)
-    target_include_directories(VideoCaptureLib PRIVATE
+    target_include_directories(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_INCLUDE_DIRS}
         ${GST_APP_INCLUDE_DIRS}
         ${GST_VIDEO_INCLUDE_DIRS}
         src/gstreamer
     )
-    target_link_libraries(VideoCaptureLib PRIVATE
+    target_link_libraries(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_LIBRARIES}
         ${GST_APP_LIBRARIES}
         ${GST_VIDEO_LIBRARIES}
@@ -49,7 +49,7 @@ if (USE_GSTREAMER)
 endif()
 
 # Link against other required libraries
-target_link_libraries(VideoCaptureLib PRIVATE
+target_link_libraries(${PROJECT_NAME} PRIVATE
     ${OpenCV_LIBS}
     spdlog::spdlog_header_only
 )
