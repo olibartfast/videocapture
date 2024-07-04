@@ -4,7 +4,6 @@ project(VideoCapture)
 set(CMAKE_CXX_STANDARD 17)
 
 find_package(OpenCV REQUIRED)
-find_package(spdlog REQUIRED)
 
 # Define an option to enable or disable GStreamer support
 unset(USE_GSTREAMER CACHE)
@@ -51,5 +50,7 @@ endif()
 # Link against other required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${OpenCV_LIBS}
-    spdlog::spdlog_header_only
 )
+
+# Add subdirectory for the application
+add_subdirectory(app)
