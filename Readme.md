@@ -13,7 +13,6 @@
 - CMake 3.10 or higher
 - C++17 compatible compiler
 - OpenCV
-- spdlog
 
 ## Optional
 
@@ -26,7 +25,6 @@
 Ensure you have the required dependencies installed:
 
 - [OpenCV](https://opencv.org/)
-- [spdlog](https://github.com/gabime/spdlog)
 - [GStreamer](https://gstreamer.freedesktop.org/) (optional)
 
 ### Build Instructions
@@ -57,4 +55,36 @@ Ensure you have the required dependencies installed:
     make
     ```
 
+### Running the Application
+
+After building the project, you can run the sample application to test the library:
+
+```sh
+./app/VideoCaptureApp
+
 ```
+
+### Linking to Your Project
+
+To use the `VideoCapture` library in your project, link it with CMake:
+
+1. Include the `VideoCapture` library using `FetchContent` or add it as a submodule.
+
+    ```cmake
+    include(FetchContent)
+    FetchContent_Declare(
+      VideoCapture
+      GIT_REPOSITORY https://github.com/olibartfast/VideoCapture.git
+      GIT_TAG        main  # or the specific tag/branch you want to use
+    )
+    FetchContent_MakeAvailable(VideoCapture)
+    ```
+
+2. Link the `VideoCapture` library in your CMakeLists.txt:
+
+    ```cmake
+    target_link_libraries(your_project_name PRIVATE VideoCapture)
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${VideoCapture_SOURCE_DIR}/include 
+        ${VideoCapture_SOURCE_DIR}/src)    
+    ```
