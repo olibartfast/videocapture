@@ -6,7 +6,7 @@
 
 - Capture video from different sources using OpenCV.
 - Optional support for GStreamer to enhance video capturing capabilities.
-- Integration with other C++ projects.
+- Integration with other C++ projects (The library is currently mainly used as component of the [Object Detection Inference Project](https://github.com/olibartfast/object-detection-inference)).
 
 ## Requirements
 
