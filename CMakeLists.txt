@@ -15,6 +15,7 @@ message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 # Add source files for video capture
 set(VIDEOCAPTURE_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/VideoCaptureInterface.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/VideoCaptureFactory.cpp
 )
 
 # Create the video capture library
