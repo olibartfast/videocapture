@@ -25,7 +25,6 @@ add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
     ${OpenCV_INCLUDE_DIRS}
-    ${spdlog_INCLUDE_DIRS}
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
