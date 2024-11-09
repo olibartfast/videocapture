@@ -50,7 +50,7 @@ Ensure you have the required dependencies installed:
 After building the project, you can run the sample application:
 
 ```bash
-./build/bin/VideoCaptureApp
+./build/bin/VideoCaptureApp <path/to/video>
 ```
 
 ## Using in Your Project
