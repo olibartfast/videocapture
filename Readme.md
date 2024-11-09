@@ -4,17 +4,17 @@
 
 ## Features
 
-- Capture video from different sources using OpenCV.
-- Optional support for GStreamer to enhance video capturing capabilities.
-- Integration with other C++ projects.
+- Capture video from different sources using OpenCV
+- Optional support for GStreamer to enhance video capturing capabilities
+- Integration with other C++ projects using modern CMake
 
 ## Requirements
 
-- CMake 3.10 or higher
+- CMake 3.20 or higher
 - C++17 compatible compiler
 - OpenCV
 
-## Optional
+### Optional
 
 - GStreamer (if `USE_GSTREAMER` is enabled)
 
@@ -36,55 +36,36 @@ Ensure you have the required dependencies installed:
     cd VideoCapture
     ```
 
-2. Create a build directory:
+2. Configure and build the project with CMake:
 
     ```bash
-    mkdir build
-    cd build
+    cmake -B build -S . -DUSE_GSTREAMER=ON
+    cmake --build build
     ```
 
-3. Configure the project with CMake:
-
-    ```bash
-    cmake .. -DUSE_GSTREAMER=ON  # Use -DUSE_GSTREAMER=OFF to disable GStreamer support
-    ```
-
-4. Build the project:
-
-    ```bash
-    make
-    ```
+   Use `-DUSE_GSTREAMER=OFF` to disable GStreamer support.
 
 ### Running the Application
 
-After building the project, you can run the sample application to test the library:
+After building the project, you can run the sample application:
 
-```sh
-./app/VideoCaptureApp
-
+```bash
+./build/bin/VideoCaptureApp
 ```
 
-### Linking to Your Project
+## Using in Your Project
 
-To use the `VideoCapture` library in your project, link it with CMake:
+To use `VideoCapture` in your project, you can use CMake's `FetchContent`:
 
-1. Include the `VideoCapture` library using `FetchContent` or add it as a submodule.
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  VideoCapture
+  GIT_REPOSITORY https://github.com/olibartfast/VideoCapture.git
+  GIT_TAG        main  # or the specific tag/branch you want to use
+)
+FetchContent_MakeAvailable(VideoCapture)
 
-    ```cmake
-    include(FetchContent)
-    FetchContent_Declare(
-      VideoCapture
-      GIT_REPOSITORY https://github.com/olibartfast/VideoCapture.git
-      GIT_TAG        main  # or the specific tag/branch you want to use
-    )
-    FetchContent_MakeAvailable(VideoCapture)
-    ```
+target_link_libraries(your_target PRIVATE VideoCapture)
+```
 
-2. Link the `VideoCapture` library in your CMakeLists.txt:
-
-    ```cmake
-    target_link_libraries(your_project_name PRIVATE VideoCapture)
-    target_include_directories(${PROJECT_NAME} PRIVATE
-        ${VideoCapture_SOURCE_DIR}/include 
-        ${VideoCapture_SOURCE_DIR}/src)    
-    ```

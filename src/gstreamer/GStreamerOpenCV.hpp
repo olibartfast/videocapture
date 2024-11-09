@@ -1,11 +1,11 @@
 #pragma once
-//#include "common.hpp"
 #include <gst/gst.h>
 #include <gst/app/gstappsink.h>
 #include <string>
 #include <memory>
 #include <condition_variable>
 #include <mutex>
+#include <opencv2/opencv.hpp>
 
 class GStreamerOpenCV {
 

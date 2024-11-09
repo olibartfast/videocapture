@@ -1,28 +1,18 @@
 #include "GStreamerOpenCV.hpp"
+#include <opencv2/imgproc.hpp>
 
 std::mutex GStreamerOpenCV::frameMutex_;
-std::condition_variable  GStreamerOpenCV::frameAvailable_; 
+std::condition_variable GStreamerOpenCV::frameAvailable_; 
 cv::Mat GStreamerOpenCV::frame_;
 bool GStreamerOpenCV::end_of_stream_ = false;
 bool GStreamerOpenCV::isFrameReady_ = false;
 
-
-GStreamerOpenCV::GStreamerOpenCV() {
-    error_ = nullptr;
-}
-
-void GStreamerOpenCV::setEndOfStream(bool value) {
-    end_of_stream_ = value;
-}
-
-bool GStreamerOpenCV::isEndOfStream() {
-    return end_of_stream_;
-}
+GStreamerOpenCV::GStreamerOpenCV() : error_(nullptr), pipeline_(nullptr), sink_(nullptr), bus_(nullptr) {}
 
 GStreamerOpenCV::~GStreamerOpenCV() {
     if (pipeline_) {
+        gst_element_set_state(GST_ELEMENT(pipeline_), GST_STATE_NULL);
         gst_object_unref(GST_OBJECT(pipeline_));
-        pipeline_ = nullptr;
     }
 }
 
@@ -35,30 +25,23 @@ void GStreamerOpenCV::runPipeline(const std::string& link) {
     gchar* descr = g_strdup(pipelineCmd.c_str());
     pipeline_ = gst_parse_launch(descr, &error_);
     g_free(descr);
+    checkError();
 }
 
 void GStreamerOpenCV::checkError() {
     if (error_ != nullptr) {
-        g_print("Could not construct pipeline: %s\n", error_->message);
+        g_printerr("Could not construct pipeline: %s\n", error_->message);
         g_error_free(error_);
         error_ = nullptr;
-        exit(-1);
+        throw std::runtime_error("Pipeline construction failed");
     }
-}
-
-cv::Mat GStreamerOpenCV::getFrame() const {
-    return frame_;
-}
-
-void GStreamerOpenCV::setFrame(const cv::Mat& frame) {
-    frame.copyTo(frame_);
 }
 
 std::string GStreamerOpenCV::getPipelineCommand(const std::string& link) const {
     if (link.find("rtsp") != std::string::npos)
-        return "rtspsrc location=" + link + " ! decodebin ! appsink name=autovideosink";
+        return "rtspsrc location=" + link + " ! decodebin ! videoconvert ! appsink name=autovideosink";
     else
-        return "filesrc location=" + link + " ! decodebin ! appsink name=autovideosink";
+        return "filesrc location=" + link + " ! decodebin ! videoconvert ! appsink name=autovideosink";
 }
 
 GstFlowReturn GStreamerOpenCV::newPreroll(GstAppSink* appsink, gpointer data) {
@@ -67,54 +50,37 @@ GstFlowReturn GStreamerOpenCV::newPreroll(GstAppSink* appsink, gpointer data) {
 }
 
 GstFlowReturn GStreamerOpenCV::newSample(GstAppSink* appsink, gpointer data) {
-    isFrameReady_ = false;
-    static int frameWidth = 0, frameHeight = 0;
     static int framecount = 0;
     framecount++;
 
     GstSample* sample = gst_app_sink_pull_sample(appsink);
     GstCaps* caps = gst_sample_get_caps(sample);
     GstBuffer* buffer = gst_sample_get_buffer(sample);
-    const GstStructure* info = gst_sample_get_info(sample);
-    const GstStructure* s = gst_caps_get_structure(caps, 0);
-
-    gboolean res = gst_structure_get_int(s, "width", &frameWidth);
-    res |= gst_structure_get_int(s, "height", &frameHeight);
-    if (!res) {
-        g_print("Could not get image width and height from filter caps\n");
-        return GST_FLOW_OK;
-    }
-
-    // Read frame and convert to OpenCV format
     GstMapInfo map;
     gst_buffer_map(buffer, &map, GST_MAP_READ);
 
-    // Convert GStreamer data to OpenCV Mat
-    cv::Mat mYUV(frameHeight + frameHeight / 2, frameWidth, CV_8UC1, map.data);
-    cv::Mat mRGB(frameHeight, frameWidth, CV_8UC3);
-    cvtColor(mYUV, mRGB, cv::COLOR_YUV2RGBA_YV12, 3);
-  
-    // Signal that a new frame is available
+    const GstStructure* s = gst_caps_get_structure(caps, 0);
+    int width, height;
+    gst_structure_get_int(s, "width", &width);
+    gst_structure_get_int(s, "height", &height);
+
+    cv::Mat mYUV(height + height / 2, width, CV_8UC1, (char*)map.data);
+    cv::Mat mBGR(height, width, CV_8UC3);
+    cv::cvtColor(mYUV, mBGR, cv::COLOR_YUV2BGR_NV12);
     {
         std::lock_guard<std::mutex> lock(frameMutex_);
-        mRGB.copyTo(GStreamerOpenCV::frame_);
+        mBGR.copyTo(GStreamerOpenCV::frame_);
         isFrameReady_ = true;
         frameAvailable_.notify_one();
     }
 
-    int frameSize = map.size;
     gst_buffer_unmap(buffer, &map);
 
-    // Show caps on the first frame
     if (framecount == 1) {
-        g_print("%s\n", gst_caps_to_string(caps));
+        g_print("Caps: %s\n", gst_caps_to_string(caps));
     }
 
     gst_sample_unref(sample);
-
-
-
-
     return GST_FLOW_OK;
 }
 
@@ -124,23 +90,18 @@ gboolean GStreamerOpenCV::myBusCallback(GstBus* bus, GstMessage* message, gpoint
             GError* err;
             gchar* debug;
             gst_message_parse_error(message, &err, &debug);
-            g_print("Error: %s\n", err->message);
+            g_printerr("Error: %s\n", err->message);
             g_error_free(err);
             g_free(debug);
             break;
         }
-        case GST_MESSAGE_EOS:{
-			g_message ("End of stream");
-            setEndOfStream(true); 
+        case GST_MESSAGE_EOS:
+            g_message("End of stream");
+            end_of_stream_ = true;
             break;
-        }
-
         default:
-            // Unhandled message
             break;
     }
-
-    // Return TRUE to be notified again the next time there is a message on the bus
     return TRUE;
 }
 
@@ -165,4 +126,12 @@ void GStreamerOpenCV::setState(GstState state) {
 
 void GStreamerOpenCV::setMainLoopEvent(bool event) {
     g_main_iteration(event);
+}
+
+bool GStreamerOpenCV::isEndOfStream() {
+    return end_of_stream_;
+}
+
+cv::Mat GStreamerOpenCV::getFrame() const {
+    return frame_;
 }
