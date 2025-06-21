@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 project(VideoCapture)
 
+# Include centralized version management first
+include(cmake/versions.cmake)
+
+# Include dependency validation
+include(cmake/DependencyValidation.cmake)
+
 # Unset cache variables
 unset(GSTREAMER_INCLUDE_DIRS CACHE)
 unset(GST_APP_INCLUDE_DIRS CACHE)
@@ -9,9 +15,11 @@ unset(GSTREAMER_LIBRARIES CACHE)
 unset(GST_APP_LIBRARIES CACHE)
 unset(GST_VIDEO_LIBRARIES CACHE)
 
-set(CMAKE_CXX_STANDARD 20)
+# Set C++ standard from centralized version management
+set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
 
-find_package(OpenCV REQUIRED)
+# Validate dependencies before proceeding
+validate_all_dependencies()
 
 # Define an option to enable or disable GStreamer support
 if(NOT DEFINED USE_GSTREAMER)
@@ -19,7 +27,7 @@ if(NOT DEFINED USE_GSTREAMER)
 endif()
 set(USE_GSTREAMER OFF CACHE BOOL "Use GStreamer for video capture (optional)")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake})
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
 # Add source files for video capture
@@ -65,6 +73,9 @@ if (USE_GSTREAMER)
         ${GST_VIDEO_LIBRARIES}
         ${GLIB_LIBRARIES}
     )
+    
+    # Test GStreamer compilation
+    test_gstreamer_compilation()
 endif()
 
 # Link against other required libraries
