@@ -14,6 +14,7 @@ NC='\033[0m' # No Color
 
 # Default values
 ENABLE_GSTREAMER=false
+ENABLE_FFMPEG=false
 DEPENDENCY_ROOT="$HOME/dependencies"
 FORCE=false
 VERBOSE=false
@@ -41,6 +42,7 @@ show_usage() {
     echo ""
     echo "Options:"
     echo "  --gstreamer              Enable GStreamer support"
+    echo "  --ffmpeg                 Enable FFmpeg support"
     echo "  -r, --root PATH          Set dependency installation root (default: $HOME/dependencies)"
     echo "  -f, --force              Force reinstallation of dependencies"
     echo "  -v, --verbose            Enable verbose output"
@@ -48,6 +50,8 @@ show_usage() {
     echo ""
     echo "Examples:"
     echo "  $0 --gstreamer"
+    echo "  $0 --ffmpeg"
+    echo "  $0 --gstreamer --ffmpeg"
     echo "  $0 --gstreamer --root /opt/dependencies"
     echo "  $0 --force"
 }
@@ -58,6 +62,10 @@ parse_args() {
         case $1 in
             --gstreamer)
                 ENABLE_GSTREAMER=true
+                shift
+                ;;
+            --ffmpeg)
+                ENABLE_FFMPEG=true
                 shift
                 ;;
             -r|--root)
@@ -190,6 +198,41 @@ setup_gstreamer() {
     print_success "GStreamer installed"
 }
 
+# Function to setup FFmpeg
+setup_ffmpeg() {
+    if [[ "$ENABLE_FFMPEG" != "true" ]]; then
+        return 0
+    fi
+    
+    print_status "Setting up FFmpeg..."
+    
+    local os=$(detect_os)
+    case $os in
+        ubuntu|debian)
+            sudo apt-get update
+            sudo apt-get install -y \
+                libavformat-dev \
+                libavcodec-dev \
+                libavutil-dev \
+                libswscale-dev \
+                libavdevice-dev \
+                libavfilter-dev \
+                pkg-config
+            ;;
+        centos|rhel|fedora)
+            sudo yum install -y \
+                ffmpeg-devel \
+                pkgconfig
+            ;;
+        *)
+            print_warning "FFmpeg installation not supported on $os. Please install manually."
+            return 1
+            ;;
+    esac
+    
+    print_success "FFmpeg installed"
+}
+
 # Function to validate OpenCV installation
 validate_opencv() {
     print_status "Validating OpenCV installation..."
@@ -242,6 +285,36 @@ validate_gstreamer() {
     fi
 }
 
+# Function to validate FFmpeg installation
+validate_ffmpeg() {
+    if [[ "$ENABLE_FFMPEG" != "true" ]]; then
+        return 0
+    fi
+    
+    print_status "Validating FFmpeg installation..."
+    
+    if command -v pkg-config &> /dev/null; then
+        if pkg-config --exists libavformat libavcodec libavutil libswscale; then
+            local version=$(pkg-config --modversion libavformat)
+            print_success "FFmpeg $version found via pkg-config"
+        else
+            print_error "FFmpeg not found via pkg-config. Please install FFmpeg development packages."
+            exit 1
+        fi
+    else
+        print_error "pkg-config not found. Cannot validate FFmpeg installation."
+        exit 1
+    fi
+    
+    # Check for FFmpeg development files
+    if [[ -f "/usr/include/libavformat/avformat.h" ]] || [[ -f "/usr/include/x86_64-linux-gnu/libavformat/avformat.h" ]]; then
+        print_success "FFmpeg development headers found"
+    else
+        print_error "FFmpeg development headers not found. Please install FFmpeg development packages."
+        exit 1
+    fi
+}
+
 # Function to create environment setup script
 create_env_setup() {
     local env_file="$DEPENDENCY_ROOT/setup_videocapture_env.sh"
@@ -285,6 +358,7 @@ main() {
     parse_args "$@"
     
     print_status "GStreamer enabled: $ENABLE_GSTREAMER"
+    print_status "FFmpeg enabled: $ENABLE_FFMPEG"
     print_status "Dependency root: $DEPENDENCY_ROOT"
     print_status "Force reinstall: $FORCE"
     
@@ -294,9 +368,13 @@ main() {
     # Setup GStreamer if requested
     setup_gstreamer
     
+    # Setup FFmpeg if requested
+    setup_ffmpeg
+    
     # Validate installations
     validate_opencv
     validate_gstreamer
+    validate_ffmpeg
     
     # Create environment setup script
     create_env_setup
