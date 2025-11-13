@@ -1,12 +1,13 @@
 # Dependency Management for VideoCapture
 
-This document describes the improved dependency management system for the VideoCapture library, which provides a unified approach to managing video processing dependencies.
+This document describes the improved dependency management system for the VideoCapture library, which provides a unified approach to managing video processing dependencies across multiple backends (OpenCV, GStreamer, FFmpeg).
 
 ## Overview
 
 The VideoCapture library has been enhanced with a centralized dependency management system that provides:
 
 - **Centralized Version Management**: All video processing library versions are managed in a single file
+- **Multiple Backend Support**: OpenCV (default), GStreamer, and FFmpeg backends
 - **Dependency Validation**: Automatic validation of installed dependencies
 - **Unified Setup Scripts**: Easy installation of video processing dependencies
 - **Backward Compatibility**: Existing scripts continue to work
@@ -21,6 +22,7 @@ All video processing library versions are centrally managed in `cmake/versions.c
 # Video Processing Library Versions
 set(GSTREAMER_VERSION "1.20.0" CACHE STRING "GStreamer version")
 set(OPENCV_MIN_VERSION "4.6.0" CACHE STRING "Minimum OpenCV version")
+set(FFMPEG_VERSION "4.0" CACHE STRING "Minimum FFmpeg version")
 
 # System Dependencies (minimum versions)
 set(CMAKE_MIN_VERSION "3.10" CACHE STRING "Minimum CMake version")
@@ -32,7 +34,7 @@ set(CXX_STANDARD "20" CACHE STRING "C++ standard version")
 The `cmake/DependencyValidation.cmake` module provides comprehensive validation:
 
 - **System Dependencies**: CMake version, C++ standard support
-- **Video Processing Libraries**: OpenCV, GStreamer
+- **Video Processing Libraries**: OpenCV, GStreamer, FFmpeg
 - **Installation Completeness**: Checks for required files and libraries
 - **Compilation Testing**: Tests GStreamer compilation if enabled
 
@@ -49,8 +51,14 @@ The main setup script `scripts/setup_dependencies.sh` supports all video process
 # Setup with GStreamer support
 ./scripts/setup_dependencies.sh --gstreamer
 
+# Setup with FFmpeg support
+./scripts/setup_dependencies.sh --ffmpeg
+
+# Setup with both GStreamer and FFmpeg
+./scripts/setup_dependencies.sh --gstreamer --ffmpeg
+
 # Setup with custom dependency root
-./scripts/setup_dependencies.sh --gstreamer --root /opt/dependencies
+./scripts/setup_dependencies.sh --gstreamer --ffmpeg --root /opt/dependencies
 ```
 
 #### Individual Backend Scripts
@@ -58,6 +66,7 @@ The main setup script `scripts/setup_dependencies.sh` supports all video process
 For backward compatibility, individual scripts are available:
 
 - `scripts/setup_gstreamer.sh`
+- `scripts/setup_ffmpeg.sh`
 
 ## Usage
 
@@ -88,15 +97,30 @@ validate_all_dependencies()
    ./scripts/setup_dependencies.sh --gstreamer
    ```
 
-3. **Set environment variables**:
+3. **Setup with FFmpeg**:
+   ```bash
+   ./scripts/setup_dependencies.sh --ffmpeg
+   ```
+
+4. **Setup with multiple backends**:
+   ```bash
+   ./scripts/setup_dependencies.sh --gstreamer --ffmpeg
+   ```
+
+5. **Set environment variables**:
    ```bash
    source $HOME/dependencies/setup_videocapture_env.sh
    ```
 
-4. **Build the library**:
+6. **Build the library**:
    ```bash
    mkdir build && cd build
+   # With FFmpeg (takes priority over GStreamer)
+   cmake .. -DUSE_FFMPEG=ON
+   # Or with GStreamer
    cmake .. -DUSE_GSTREAMER=ON
+   # Or with both (FFmpeg will be used)
+   cmake .. -DUSE_GSTREAMER=ON -DUSE_FFMPEG=ON
    make
    ```
 
@@ -171,6 +195,23 @@ When enabled, GStreamer provides additional capabilities:
 - **Hardware Acceleration**: Hardware-accelerated video processing
 - **Plugin Ecosystem**: Extensive plugin support for various formats
 
+### FFmpeg Support
+
+When enabled, FFmpeg provides maximum flexibility:
+
+- **Codec Coverage**: Supports virtually every codec and container format
+- **Streaming Protocols**: RTSP, RTMP, HLS, and more
+- **Direct Control**: Low-level API for fine-grained control
+- **Batch Processing**: Excellent for offline video processing
+- **Lightweight**: Simpler dependency stack than GStreamer
+
+### Backend Selection Priority
+
+When multiple backends are enabled, the factory uses this priority:
+1. **FFmpeg** - Maximum compatibility, best for diverse sources
+2. **GStreamer** - Advanced pipelines, hardware acceleration
+3. **OpenCV** - Simple and reliable default
+
 ## Troubleshooting
 
 ### Common Issues
@@ -188,10 +229,18 @@ When enabled, GStreamer provides additional capabilities:
    pkg-config --modversion gstreamer-1.0
    ```
 
-3. **Version Conflicts**:
+3. **FFmpeg Not Found**:
+   ```bash
+   # Check FFmpeg installation
+   pkg-config --modversion libavformat
+   # Or use standalone script
+   ./scripts/setup_ffmpeg.sh
+   ```
+
+4. **Version Conflicts**:
    ```bash
    # Override version in CMake
-   cmake .. -DGSTREAMER_VERSION=1.18.0
+   cmake .. -DGSTREAMER_VERSION=1.18.0 -DFFMPEG_VERSION=4.2
    ```
 
 ### Validation Errors
@@ -201,15 +250,16 @@ The validation system provides detailed error messages:
 ```
 [ERROR] OpenCV headers not found. Please install OpenCV development packages.
 [ERROR] GStreamer development headers not found. Please install GStreamer development packages.
+[ERROR] FFmpeg development headers not found. Please install FFmpeg development packages.
 ```
 
 ### Manual Installation
 
 For custom installations:
 
-1. Install OpenCV and GStreamer manually
+1. Install OpenCV, GStreamer, and/or FFmpeg manually
 2. Set environment variables to point to installation directories
-3. Run validation: `./scripts/setup_dependencies.sh --gstreamer`
+3. Run validation: `./scripts/setup_dependencies.sh --gstreamer --ffmpeg`
 
 ## Integration with Main Project
 
@@ -221,10 +271,11 @@ The VideoCapture library is designed to be integrated into the main object-detec
 
 ## Performance Considerations
 
-### OpenCV vs GStreamer
+### Backend Comparison
 
-- **OpenCV**: Better for simple video capture and image processing
-- **GStreamer**: Better for complex pipelines and streaming
+- **OpenCV**: Best for simple video capture and image processing
+- **GStreamer**: Best for complex pipelines, hardware acceleration, and streaming
+- **FFmpeg**: Best for maximum format compatibility and batch processing
 
 ### Hardware Acceleration
 

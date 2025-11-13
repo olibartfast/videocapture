@@ -3,7 +3,9 @@
 
  std::unique_ptr<VideoCaptureInterface> createVideoInterface() 
  {
-        #ifdef USE_GSTREAMER
+        #ifdef USE_FFMPEG
+            return std::make_unique<FFmpegCapture>();
+        #elif defined(USE_GSTREAMER)
             return std::make_unique<GStreamerCapture>();
         #else
             return std::make_unique<OpenCVCapture>();

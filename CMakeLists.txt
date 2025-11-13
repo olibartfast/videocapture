@@ -27,6 +27,12 @@ if(NOT DEFINED USE_GSTREAMER)
 endif()
 set(USE_GSTREAMER OFF CACHE BOOL "Use GStreamer for video capture (optional)")
 
+# Define an option to enable or disable FFmpeg support
+if(NOT DEFINED USE_FFMPEG)
+    unset(USE_FFMPEG CACHE)
+endif()
+set(USE_FFMPEG OFF CACHE BOOL "Use FFmpeg for video capture (optional)")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake})
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
@@ -39,6 +45,11 @@ if (USE_GSTREAMER)
     list(APPEND VIDEOCAPTURE_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerCapture.cpp
         ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerOpenCV.cpp
+    )
+endif()
+if (USE_FFMPEG)
+    list(APPEND VIDEOCAPTURE_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg/FFmpegCapture.cpp
     )
 endif()
 
@@ -76,6 +87,19 @@ if (USE_GSTREAMER)
     
     # Test GStreamer compilation
     test_gstreamer_compilation()
+endif()
+
+# Link against FFmpeg libraries if USE_FFMPEG is ON
+message(STATUS "USE_FFMPEG value: ${USE_FFMPEG}")
+if (USE_FFMPEG)
+    include(FFmpeg)
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${FFMPEG_INCLUDE_DIRS}
+        ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg
+    )
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        ${FFMPEG_LIBRARIES}
+    )
 endif()
 
 # Link against other required libraries

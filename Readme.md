@@ -1,11 +1,13 @@
 # VideoCapture
 
-`VideoCapture` is a C++ library for video capturing, supporting various backends such as OpenCV and optionally GStreamer.
+`VideoCapture` is a C++ library for video capturing, supporting multiple backends: OpenCV (default), GStreamer, and FFmpeg.
 
 ## Features
 
-- Capture video from different sources using OpenCV
-- Optional support for GStreamer to enhance video capturing capabilities
+- Capture video from different sources using OpenCV (default backend)
+- Optional support for GStreamer for advanced pipeline capabilities
+- Optional support for FFmpeg for maximum codec/format compatibility
+- Clean interface-based architecture for easy backend switching
 - Integration with other C++ projects using modern CMake
 
 ## Requirements
@@ -17,6 +19,7 @@
 ### Optional
 
 - GStreamer (if `USE_GSTREAMER` is enabled)
+- FFmpeg (if `USE_FFMPEG` is enabled)
 
 ## Installation
 
@@ -24,8 +27,25 @@
 
 Ensure you have the required dependencies installed:
 
-- [OpenCV](https://opencv.org/)
+- [OpenCV](https://opencv.org/) (required)
 - [GStreamer](https://gstreamer.freedesktop.org/) (optional)
+- [FFmpeg](https://ffmpeg.org/) (optional)
+
+You can use the provided setup scripts to install dependencies:
+
+```bash
+# Install base dependencies (OpenCV)
+./scripts/setup_dependencies.sh
+
+# Install with GStreamer support
+./scripts/setup_dependencies.sh --gstreamer
+
+# Install with FFmpeg support
+./scripts/setup_dependencies.sh --ffmpeg
+
+# Install both GStreamer and FFmpeg
+./scripts/setup_dependencies.sh --gstreamer --ffmpeg
+```
 
 ### Build Instructions
 
@@ -38,12 +58,36 @@ Ensure you have the required dependencies installed:
 
 2. Configure and build the project with CMake:
 
+    **Default (OpenCV only):**
+    ```bash
+    cmake -B build -S .
+    cmake --build build
+    ```
+
+    **With GStreamer:**
     ```bash
     cmake -B build -S . -DUSE_GSTREAMER=ON
     cmake --build build
     ```
 
-   Use `-DUSE_GSTREAMER=OFF` to disable GStreamer support.
+    **With FFmpeg:**
+    ```bash
+    cmake -B build -S . -DUSE_FFMPEG=ON
+    cmake --build build
+    ```
+
+    **With both GStreamer and FFmpeg (FFmpeg takes priority):**
+    ```bash
+    cmake -B build -S . -DUSE_GSTREAMER=ON -DUSE_FFMPEG=ON
+    cmake --build build
+    ```
+
+### Backend Priority
+
+When multiple backends are enabled, the library uses the following priority order:
+1. **FFmpeg** (if `USE_FFMPEG=ON`) - Maximum format/codec compatibility
+2. **GStreamer** (if `USE_GSTREAMER=ON`) - Advanced pipeline capabilities  
+3. **OpenCV** (default) - Simple and reliable
 
 ### Running the Application
 

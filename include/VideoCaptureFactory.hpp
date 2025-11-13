@@ -2,8 +2,10 @@
 #include "VideoCaptureInterface.hpp"
 #ifdef USE_GSTREAMER
 #include "GStreamerCapture.hpp"
-#else
-#include "OpenCVCapture.hpp"
 #endif
+#ifdef USE_FFMPEG
+#include "FFmpegCapture.hpp"
+#endif
+#include "OpenCVCapture.hpp"
 
  std::unique_ptr<VideoCaptureInterface> createVideoInterface(); 
