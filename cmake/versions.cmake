@@ -4,7 +4,7 @@
 # Video Processing Library Versions
 set(GSTREAMER_VERSION "1.20.0" CACHE STRING "GStreamer version")
 set(OPENCV_MIN_VERSION "4.6.0" CACHE STRING "Minimum OpenCV version")
-set(FFMPEG_VERSION "4.0" CACHE STRING "Minimum FFmpeg version")
+set(FFMPEG_VERSION "4.4" CACHE STRING "Minimum FFmpeg version")
 
 # System Dependencies (minimum versions)
 set(CMAKE_MIN_VERSION "3.10" CACHE STRING "Minimum CMake version")
