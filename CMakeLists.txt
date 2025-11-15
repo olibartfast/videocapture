@@ -18,6 +18,9 @@ unset(GST_VIDEO_LIBRARIES CACHE)
 # Set C++ standard from centralized version management
 set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
 
+# Find OpenCV
+find_package(OpenCV REQUIRED)
+
 # Validate dependencies before proceeding
 validate_all_dependencies()
 
@@ -56,12 +59,19 @@ endif()
 # Create the video capture library
 add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 
-# Include directories
+# Include directories - OpenCV4 uses opencv2 directory structure under opencv4/
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
     ${CMAKE_CURRENT_LIST_DIR}/src/opencv
-    ${OpenCV_INCLUDE_DIRS}
 )
+
+# Add OpenCV include directories from found package
+if(OpenCV_INCLUDE_DIRS)
+    target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
+else()
+    # Fallback for systems where OpenCV doesn't set this variable properly
+    target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/opencv4)
+endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src
@@ -70,19 +80,13 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # Link against GStreamer libraries if USE_GSTREAMER is ON
 message(STATUS "USE_GSTREAMER value: ${USE_GSTREAMER}")
 if (USE_GSTREAMER)
-    include(GStreamer)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/GStreamer.cmake)
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_INCLUDE_DIRS}
-        ${GST_APP_INCLUDE_DIRS}
-        ${GST_VIDEO_INCLUDE_DIRS}
-        ${GLIB_INCLUDE_DIRS}
         ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer
     )
-    target_link_libraries(${PROJECT_NAME} PRIVATE
+    target_link_libraries(${PROJECT_NAME} PUBLIC
         ${GSTREAMER_LIBRARIES}
-        ${GST_APP_LIBRARIES}
-        ${GST_VIDEO_LIBRARIES}
-        ${GLIB_LIBRARIES}
     )
     
     # Test GStreamer compilation
@@ -92,20 +96,27 @@ endif()
 # Link against FFmpeg libraries if USE_FFMPEG is ON
 message(STATUS "USE_FFMPEG value: ${USE_FFMPEG}")
 if (USE_FFMPEG)
-    include(FFmpeg)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/FFmpeg.cmake)
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${FFMPEG_INCLUDE_DIRS}
         ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg
     )
-    target_link_libraries(${PROJECT_NAME} PRIVATE
+    target_link_libraries(${PROJECT_NAME} PUBLIC
         ${FFMPEG_LIBRARIES}
     )
 endif()
 
 # Link against other required libraries
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_link_libraries(${PROJECT_NAME} PUBLIC
     ${OpenCV_LIBS}
 )
 
 # Add subdirectory for the application
 add_subdirectory(app)
+
+# Add testing support
+option(BUILD_TESTS "Build unit tests" ON)
+if(BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

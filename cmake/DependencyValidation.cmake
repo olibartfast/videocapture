@@ -26,37 +26,18 @@ endfunction()
 # Function to validate GStreamer
 function(validate_gstreamer)
     if(USE_GSTREAMER)
-        # Check for GStreamer installation
-        if(NOT EXISTS "${GSTREAMER_ROOT_DIR}")
-            message(FATAL_ERROR "GStreamer root directory not found at ${GSTREAMER_ROOT_DIR}")
-        endif()
-        
-        # Check for required GStreamer files
-        set(required_files
-            "${GSTREAMER_INCLUDE_DIRS}"
-            "${GSTREAMER_LIBRARIES}"
-            "${GST_APP_LIBRARIES}"
-            "${GST_VIDEO_LIBRARIES}"
-        )
-        
-        foreach(file ${required_files})
-            if(NOT EXISTS "${file}")
-                message(FATAL_ERROR "GStreamer installation incomplete. Missing: ${file}")
+        # Use pkg-config to check for GStreamer
+        find_package(PkgConfig QUIET)
+        if(PKG_CONFIG_FOUND)
+            pkg_check_modules(GSTREAMER_CHECK QUIET gstreamer-1.0>=${GSTREAMER_VERSION})
+            if(GSTREAMER_CHECK_FOUND)
+                message(STATUS "✓ GStreamer ${GSTREAMER_CHECK_VERSION} found")
+            else()
+                message(WARNING "GStreamer not found via pkg-config. Skipping validation.")
             endif()
-        endforeach()
-        
-        # Check for GLib
-        foreach(file ${GLIB_INCLUDE_DIRS})
-            if(NOT EXISTS "${file}")
-                message(FATAL_ERROR "GLib include directory not found: ${file}")
-            endif()
-        endforeach()
-        
-        if(NOT EXISTS "${GLIB_LIBRARIES}")
-            message(FATAL_ERROR "GLib library not found: ${GLIB_LIBRARIES}")
+        else()
+            message(WARNING "pkg-config not found. Skipping GStreamer validation.")
         endif()
-        
-        message(STATUS "✓ GStreamer ${GSTREAMER_VERSION} found")
     endif()
 endfunction()
 

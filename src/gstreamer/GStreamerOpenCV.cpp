@@ -38,10 +38,17 @@ void GStreamerOpenCV::checkError() {
 }
 
 std::string GStreamerOpenCV::getPipelineCommand(const std::string& link) const {
-    if (link.find("rtsp") != std::string::npos)
+    // If the input contains '!' it's a complete GStreamer pipeline, use it as-is
+    if (link.find('!') != std::string::npos) {
+        return link;
+    }
+    // Otherwise, treat as a source location and build the pipeline
+    else if (link.find("rtsp") != std::string::npos) {
         return "rtspsrc location=" + link + " ! decodebin ! videoconvert ! appsink name=autovideosink";
-    else
+    }
+    else {
         return "filesrc location=" + link + " ! decodebin ! videoconvert ! appsink name=autovideosink";
+    }
 }
 
 GstFlowReturn GStreamerOpenCV::newPreroll(GstAppSink* appsink, gpointer data) {

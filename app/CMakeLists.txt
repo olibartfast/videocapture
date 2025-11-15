@@ -17,14 +17,33 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${OpenCV_INCLUDE_DIRS}
 )
 
+# Add OpenCV include directories from found package
+if(OpenCV_INCLUDE_DIRS)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${OpenCV_INCLUDE_DIRS})
+else()
+    target_include_directories(${PROJECT_NAME} PRIVATE /usr/include/opencv4)
+endif()
+
 # GStreamer support (if enabled in the main project)
 if(USE_GSTREAMER)
+    pkg_check_modules(GSTREAMER REQUIRED gstreamer-1.0)
+    pkg_check_modules(GST_APP REQUIRED gstreamer-app-1.0)
+    pkg_check_modules(GST_VIDEO REQUIRED gstreamer-video-1.0)
+    pkg_check_modules(GLIB REQUIRED glib-2.0)
+    
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_INCLUDE_DIRS}
         ${GST_APP_INCLUDE_DIRS}
         ${GST_VIDEO_INCLUDE_DIRS}
         ${GLIB_INCLUDE_DIRS}
         ${PROJECT_SOURCE_DIR}/../src/gstreamer
+    )
+endif()
+
+# FFmpeg support (if enabled in the main project)
+if(USE_FFMPEG)
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${PROJECT_SOURCE_DIR}/../src/ffmpeg
     )
 endif()
 
