@@ -1,9 +1,11 @@
 <map id="src/ffmpeg/FFmpegCapture.cpp" name="src/ffmpeg/FFmpegCapture.cpp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="455,5,682,31"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="526,5,753,31"/>
 <area shape="rect" id="Node000002" href="$FFmpegCapture_8hpp.html" title=" " alt="" coords="421,79,575,104"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="559,33,521,71,517,67,555,29"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="618,33,534,75,532,70,615,28"/>
 <area shape="rect" id="Node000011" title=" " alt="" coords="599,79,679,104"/>
-<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="582,29,620,67,616,71,578,33"/>
+<area shape="poly" id="edge10_Node000001_Node000011" title=" " alt="" coords="642,31,642,65,637,65,637,31"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="703,79,789,104"/>
+<area shape="poly" id="edge11_Node000001_Node000012" title=" " alt="" coords="658,28,719,69,716,73,655,33"/>
 <area shape="rect" id="Node000003" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,152,201,177"/>
 <area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="435,107,181,152,180,147,434,101"/>
 <area shape="rect" id="Node000005" title=" " alt="" coords="226,152,285,177"/>
