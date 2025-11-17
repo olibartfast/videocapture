@@ -48,7 +48,8 @@ bool FFmpegCapture::initialize(const std::string& source) {
     cleanup();
 
     // Check if source is a file (not a URL or device) and if it exists
-    if (source.find("://") == std::string::npos && source.find("/dev/") != 0) {
+    if (source.find("://") == std::string::npos && 
+        source.substr(0, 5) != "/dev/") {
         // Looks like a file path, check if it exists
         struct stat buffer;
         if (stat(source.c_str(), &buffer) != 0) {
