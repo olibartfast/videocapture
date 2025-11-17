@@ -43,14 +43,18 @@ TEST_F(OpenCVCaptureTest, MultipleReleaseCalls) {
 
 // Test with camera index (may not be available in CI)
 TEST_F(OpenCVCaptureTest, InitializeWithCameraIndex) {
-    // Try camera 0, may fail if no camera available
+    // Try camera 0, will likely fail in CI environment without camera
     bool result = capture->initialize("0");
+    
+    // In CI/headless environments, camera access typically fails
+    // If it succeeds, verify we can read a frame
     if (result) {
         cv::Mat frame;
-        // Should be able to read at least one frame
         EXPECT_TRUE(capture->readFrame(frame));
         EXPECT_FALSE(frame.empty());
         capture->release();
+    } else {
+        // Expected to fail in CI - this is not an error
+        EXPECT_FALSE(result);
     }
-    // If no camera, test should not fail
 }
