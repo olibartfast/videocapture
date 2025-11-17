@@ -1,0 +1,6 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$classVideoCaptureInterface.html" title=" " alt="" coords="5,56,173,83"/>
+<area shape="rect" id="node2" href="$classFFmpegCapture.html" title=" " alt="" coords="229,5,356,32"/>
+<area shape="rect" id="node3" href="$classGStreamerCapture.html" title=" " alt="" coords="221,56,364,83"/>
+<area shape="rect" id="node4" href="$classOpenCVCapture.html" title=" " alt="" coords="230,107,355,133"/>
+</map>
