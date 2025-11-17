@@ -68,14 +68,14 @@ jobs:
     - name: Generate coverage report
       run: |
         cd build
-        lcov --directory . --capture --output-file coverage.info
-        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' --output-file coverage.info
+        lcov --directory . --capture --output-file coverage.info --ignore-errors mismatch --ignore-errors inconsistent
+        lcov --remove coverage.info '/usr/*' '*/tests/*' '*/build/*' --output-file coverage.info --ignore-errors mismatch
         lcov --list coverage.info
 
     - name: Generate HTML coverage report
       run: |
         cd build
-        genhtml coverage.info --output-directory coverage_html
+        genhtml coverage.info --output-directory coverage_html --ignore-errors mismatch
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
