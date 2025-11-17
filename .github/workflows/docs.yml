@@ -1,0 +1,114 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ master, main ]
+    paths:
+      - 'docs/**'
+      - '**.md'
+      - 'include/**'
+      - 'src/**'
+  pull_request:
+    branches: [ master, main ]
+    paths:
+      - 'docs/**'
+      - '**.md'
+  workflow_dispatch:
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Doxygen
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz
+
+    - name: Create Doxyfile if it doesn't exist
+      run: |
+        if [ ! -f Doxyfile ]; then
+          cat > Doxyfile <<'EOF'
+        PROJECT_NAME           = "VideoCapture"
+        PROJECT_BRIEF          = "Multi-backend video capture library"
+        OUTPUT_DIRECTORY       = docs/api
+        INPUT                  = include src README.md
+        RECURSIVE              = YES
+        EXTRACT_ALL            = YES
+        EXTRACT_PRIVATE        = NO
+        EXTRACT_STATIC         = YES
+        GENERATE_HTML          = YES
+        GENERATE_LATEX         = NO
+        HTML_OUTPUT            = html
+        USE_MDFILE_AS_MAINPAGE = README.md
+        EXCLUDE_PATTERNS       = */build/* */tests/*
+        EOF
+        fi
+
+    - name: Generate API documentation
+      run: doxygen Doxyfile
+
+    - name: Check for broken links in markdown
+      uses: gaurav-nelson/github-action-markdown-link-check@v1
+      with:
+        use-quiet-mode: 'yes'
+        config-file: '.github/markdown-link-check-config.json'
+      continue-on-error: true
+
+    - name: Upload documentation
+      uses: actions/upload-artifact@v4
+      with:
+        name: api-documentation
+        path: docs/api/html
+        retention-days: 30
+
+  deploy-docs:
+    name: Deploy Documentation to GitHub Pages
+    needs: build-docs
+    runs-on: ubuntu-22.04
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    permissions:
+      contents: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install Doxygen
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y doxygen graphviz
+
+    - name: Create Doxyfile if it doesn't exist
+      run: |
+        if [ ! -f Doxyfile ]; then
+          cat > Doxyfile <<'EOF'
+        PROJECT_NAME           = "VideoCapture"
+        PROJECT_BRIEF          = "Multi-backend video capture library"
+        OUTPUT_DIRECTORY       = docs/api
+        INPUT                  = include src README.md
+        RECURSIVE              = YES
+        EXTRACT_ALL            = YES
+        EXTRACT_PRIVATE        = NO
+        EXTRACT_STATIC         = YES
+        GENERATE_HTML          = YES
+        GENERATE_LATEX         = NO
+        HTML_OUTPUT            = html
+        USE_MDFILE_AS_MAINPAGE = README.md
+        EXCLUDE_PATTERNS       = */build/* */tests/*
+        EOF
+        fi
+
+    - name: Generate documentation
+      run: doxygen Doxyfile
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs/api/html
+        cname: # Add your custom domain if you have one
