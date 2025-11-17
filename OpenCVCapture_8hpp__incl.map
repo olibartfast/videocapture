@@ -1,6 +1,9 @@
 <map id="src/opencv/OpenCVCapture.hpp" name="src/opencv/OpenCVCapture.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="103,5,330,32"/>
-<area shape="rect" id="node2" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,80,201,107"/>
-<area shape="rect" id="node4" title=" " alt="" coords="225,80,435,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="35,155,172,181"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="103,5,330,31"/>
+<area shape="rect" id="Node000002" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,79,201,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="200,33,135,74,132,69,197,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="225,79,435,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="236,28,302,69,299,74,233,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="35,152,172,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,104,106,138,101,138,101,104"/>
 </map>

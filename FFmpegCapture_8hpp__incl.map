@@ -1,11 +1,19 @@
 <map id="src/ffmpeg/FFmpegCapture.hpp" name="src/ffmpeg/FFmpegCapture.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="385,5,611,32"/>
-<area shape="rect" id="node2" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,80,201,107"/>
-<area shape="rect" id="node4" title=" " alt="" coords="226,80,285,107"/>
-<area shape="rect" id="node5" title=" " alt="" coords="309,80,386,107"/>
-<area shape="rect" id="node6" title=" " alt="" coords="411,80,585,107"/>
-<area shape="rect" id="node7" title=" " alt="" coords="610,80,773,107"/>
-<area shape="rect" id="node8" title=" " alt="" coords="797,80,956,107"/>
-<area shape="rect" id="node9" title=" " alt="" coords="981,80,1125,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="35,155,172,181"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="385,5,611,31"/>
+<area shape="rect" id="Node000002" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,79,201,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="435,33,181,79,180,74,434,28"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="226,79,285,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="460,33,299,80,297,75,458,28"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="309,79,386,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="475,33,386,75,383,70,473,28"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="411,79,585,104"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="501,31,501,65,495,65,495,31"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="610,79,773,104"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="530,28,648,71,646,76,528,33"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="797,79,956,104"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="559,28,803,73,802,79,558,33"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="981,79,1125,104"/>
+<area shape="poly" id="edge8_Node000001_Node000009" title=" " alt="" coords="590,28,967,76,967,81,590,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="35,152,172,177"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,104,106,138,101,138,101,104"/>
 </map>

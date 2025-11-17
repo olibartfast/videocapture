@@ -1,4 +1,5 @@
 <map id="src/gstreamer/GStreamerCapture.hpp" name="src/gstreamer/GStreamerCapture.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="5,5,271,32"/>
-<area shape="rect" id="node2" href="$GStreamerCapture_8cpp.html" title=" " alt="" coords="6,80,270,107"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,271,31"/>
+<area shape="rect" id="Node000002" href="$GStreamerCapture_8cpp.html" title=" " alt="" coords="6,79,270,104"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="141,44,141,79,135,79,135,44"/>
 </map>

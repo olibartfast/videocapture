@@ -1,7 +1,12 @@
 <map id="include/VideoCaptureFactory.hpp" name="include/VideoCaptureFactory.hpp">
-<area shape="rect" id="node1" title=" " alt="" coords="43,5,278,32"/>
-<area shape="rect" id="node2" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,155,201,181"/>
-<area shape="rect" id="node4" href="$OpenCVCapture_8hpp.html" title=" " alt="" coords="141,80,295,107"/>
-<area shape="rect" id="node3" title=" " alt="" coords="35,229,172,256"/>
-<area shape="rect" id="node5" title=" " alt="" coords="225,155,435,181"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="43,5,278,31"/>
+<area shape="rect" id="Node000002" href="$VideoCaptureInterface_8hpp.html" title=" " alt="" coords="5,152,201,177"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="156,32,132,80,113,139,107,138,128,78,152,30"/>
+<area shape="rect" id="Node000004" href="$OpenCVCapture_8hpp.html" title=" " alt="" coords="141,79,295,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="172,29,202,66,198,70,168,33"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="35,225,172,251"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="106,178,106,212,101,212,101,178"/>
+<area shape="poly" id="edge4_Node000004_Node000002" title=" " alt="" coords="201,106,135,147,132,142,198,102"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="225,152,435,177"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="237,102,301,142,298,147,235,106"/>
 </map>
