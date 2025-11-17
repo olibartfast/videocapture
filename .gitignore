@@ -55,3 +55,8 @@ latex/
 *.tmp
 *.log
 *.bak
+
+# Docker temporary files
+Dockerfile
+!Dockerfile.opencv
+!Dockerfile.full
