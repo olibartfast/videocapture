@@ -1,1 +1,57 @@
-build
+# Build directories
+build/
+build-*/
+cmake-build-*/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Compiled files
+*.o
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.app
+
+# Coverage files
+*.gcda
+*.gcno
+*.gcov
+coverage.info
+coverage_html/
+
+# Test artifacts
+Testing/
+CTestTestfile.cmake
+
+# CMake files (keep CMakeLists.txt)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps
+
+# Package files
+*.deb
+*.rpm
+*.tar.gz
+*.zip
+
+# Documentation build
+docs/api/
+html/
+latex/
+
+# Temporary files
+*.tmp
+*.log
+*.bak

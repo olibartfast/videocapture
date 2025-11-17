@@ -1,0 +1,84 @@
+name: Format Check
+
+on:
+  pull_request:
+    branches: [ master, main, develop ]
+    paths:
+      - '**.cpp'
+      - '**.hpp'
+      - '**.h'
+      - '**.c'
+      - '.clang-format'
+
+jobs:
+  clang-format:
+    name: Check Code Formatting
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install clang-format
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y clang-format
+
+    - name: Check formatting
+      id: format_check
+      run: |
+        # Find all C++ source files
+        files=$(find src include tests app -name '*.cpp' -o -name '*.hpp' -o -name '*.h' -o -name '*.c')
+        
+        # Check each file
+        format_issues=0
+        for file in $files; do
+          if ! clang-format --dry-run -Werror "$file" 2>/dev/null; then
+            echo "::error file=$file::Formatting issue detected in $file"
+            format_issues=$((format_issues + 1))
+          fi
+        done
+        
+        if [ $format_issues -gt 0 ]; then
+          echo "::error::Found $format_issues file(s) with formatting issues"
+          exit 1
+        fi
+
+    - name: Generate formatting suggestions
+      if: failure()
+      run: |
+        echo "## Formatting Issues Found" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Please run the following command to fix formatting issues:" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo 'find src include tests app -name "*.cpp" -o -name "*.hpp" -o -name "*.h" -o -name "*.c" | xargs clang-format -i' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Or apply formatting to specific files:" >> $GITHUB_STEP_SUMMARY
+        echo '```bash' >> $GITHUB_STEP_SUMMARY
+        echo 'clang-format -i path/to/file.cpp' >> $GITHUB_STEP_SUMMARY
+        echo '```' >> $GITHUB_STEP_SUMMARY
+
+  cmake-format:
+    name: Check CMake Formatting
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install cmake-format
+      run: pip install cmakelang
+
+    - name: Check CMakeLists.txt formatting
+      run: |
+        files=$(find . -name CMakeLists.txt -o -name '*.cmake')
+        cmake-format --check $files || true
+      continue-on-error: true

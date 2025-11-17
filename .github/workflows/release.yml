@@ -1,0 +1,150 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g., v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  create-release:
+    name: Create Release
+    runs-on: ubuntu-22.04
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+      version: ${{ steps.get_version.outputs.version }}
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Get version
+      id: get_version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          VERSION="${{ github.event.inputs.tag }}"
+        else
+          VERSION=${GITHUB_REF#refs/tags/}
+        fi
+        echo "version=${VERSION}" >> $GITHUB_OUTPUT
+        echo "Version: ${VERSION}"
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.get_version.outputs.version }}
+        release_name: Release ${{ steps.get_version.outputs.version }}
+        draft: false
+        prerelease: false
+        body: |
+          ## VideoCapture ${{ steps.get_version.outputs.version }}
+          
+          ### Changes
+          See [CHANGELOG.md](https://github.com/${{ github.repository }}/blob/${{ steps.get_version.outputs.version }}/CHANGELOG.md) for details.
+          
+          ### Supported Backends
+          - OpenCV (default)
+          - GStreamer (optional)
+          - FFmpeg (optional)
+
+  build-release:
+    name: Build Release (${{ matrix.os }}, ${{ matrix.backend }})
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, ubuntu-24.04, macos-13, macos-latest]
+        backend: [opencv, all]
+        
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install dependencies (Ubuntu)
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          build-essential \
+          cmake \
+          ninja-build \
+          libopencv-dev \
+          libgtest-dev \
+          libcurl4-openssl-dev
+
+    - name: Install all backends (Ubuntu)
+      if: startsWith(matrix.os, 'ubuntu') && matrix.backend == 'all'
+      run: |
+        sudo apt-get install -y \
+          libgstreamer1.0-dev \
+          libgstreamer-plugins-base1.0-dev \
+          libgstreamer-plugins-bad1.0-dev \
+          libavcodec-dev \
+          libavformat-dev \
+          libavutil-dev \
+          libswscale-dev \
+          libavdevice-dev
+
+    - name: Install dependencies (macOS)
+      if: startsWith(matrix.os, 'macos')
+      run: |
+        brew update
+        brew install cmake ninja opencv googletest
+
+    - name: Install all backends (macOS)
+      if: startsWith(matrix.os, 'macos') && matrix.backend == 'all'
+      run: |
+        brew install gstreamer gst-plugins-base gst-plugins-good ffmpeg
+
+    - name: Configure CMake (OpenCV only)
+      if: matrix.backend == 'opencv'
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS=OFF
+
+    - name: Configure CMake (All backends)
+      if: matrix.backend == 'all'
+      run: |
+        cmake -B build -G Ninja \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_TESTS=OFF \
+          -DUSE_GSTREAMER=ON \
+          -DUSE_FFMPEG=ON
+
+    - name: Build
+      run: cmake --build build --config Release
+
+    - name: Package artifacts
+      run: |
+        cd build
+        mkdir -p package/lib package/include package/bin
+        cp -r ../include/* package/include/
+        if [ -f bin/VideoCaptureApp ]; then
+          cp bin/VideoCaptureApp package/bin/
+        fi
+        if [ -f libVideoCapture.so ]; then
+          cp libVideoCapture.so package/lib/
+        elif [ -f libVideoCapture.dylib ]; then
+          cp libVideoCapture.dylib package/lib/
+        fi
+        tar -czf VideoCapture-${{ needs.create-release.outputs.version }}-${{ matrix.os }}-${{ matrix.backend }}.tar.gz package/
+
+    - name: Upload Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ needs.create-release.outputs.upload_url }}
+        asset_path: build/VideoCapture-${{ needs.create-release.outputs.version }}-${{ matrix.os }}-${{ matrix.backend }}.tar.gz
+        asset_name: VideoCapture-${{ needs.create-release.outputs.version }}-${{ matrix.os }}-${{ matrix.backend }}.tar.gz
+        asset_content_type: application/gzip

@@ -1,0 +1,102 @@
+name: Dependency Update Check
+
+on:
+  schedule:
+    # Run weekly on Monday at 00:00 UTC
+    - cron: '0 0 * * 1'
+  workflow_dispatch:
+
+jobs:
+  check-dependencies:
+    name: Check for Dependency Updates
+    runs-on: ubuntu-22.04
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check OpenCV version
+      id: opencv
+      run: |
+        sudo apt-get update
+        apt-cache policy libopencv-dev | grep Candidate | awk '{print $2}' > opencv_version.txt
+        echo "Latest available OpenCV version:"
+        cat opencv_version.txt
+
+    - name: Check GStreamer version
+      id: gstreamer
+      run: |
+        apt-cache policy libgstreamer1.0-dev | grep Candidate | awk '{print $2}' > gstreamer_version.txt
+        echo "Latest available GStreamer version:"
+        cat gstreamer_version.txt
+
+    - name: Check FFmpeg version
+      id: ffmpeg
+      run: |
+        apt-cache policy libavcodec-dev | grep Candidate | awk '{print $2}' > ffmpeg_version.txt
+        echo "Latest available FFmpeg version:"
+        cat ffmpeg_version.txt
+
+    - name: Check CMake version
+      id: cmake
+      run: |
+        apt-cache policy cmake | grep Candidate | awk '{print $2}' > cmake_version.txt
+        echo "Latest available CMake version:"
+        cat cmake_version.txt
+
+    - name: Compare with versions.env
+      run: |
+        echo "=== Current versions in versions.env ==="
+        cat versions.env
+        echo ""
+        echo "=== Latest available versions ==="
+        echo "OpenCV: $(cat opencv_version.txt)"
+        echo "GStreamer: $(cat gstreamer_version.txt)"
+        echo "FFmpeg: $(cat ffmpeg_version.txt)"
+        echo "CMake: $(cat cmake_version.txt)"
+
+    - name: Create issue if updates available
+      if: success()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const opencv = fs.readFileSync('opencv_version.txt', 'utf8').trim();
+          const gstreamer = fs.readFileSync('gstreamer_version.txt', 'utf8').trim();
+          const ffmpeg = fs.readFileSync('ffmpeg_version.txt', 'utf8').trim();
+          const cmake = fs.readFileSync('cmake_version.txt', 'utf8').trim();
+          
+          const body = `## Dependency Update Check
+          
+          The following versions are currently available in Ubuntu 22.04 repositories:
+          
+          - **OpenCV**: ${opencv}
+          - **GStreamer**: ${gstreamer}
+          - **FFmpeg**: ${ffmpeg}
+          - **CMake**: ${cmake}
+          
+          Please review \`versions.env\` and update if necessary.
+          
+          This issue was automatically created by the dependency update check workflow.`;
+          
+          // Check if a similar issue already exists
+          const issues = await github.rest.issues.listForRepo({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'open',
+            labels: ['dependencies']
+          });
+          
+          const existingIssue = issues.data.find(issue => 
+            issue.title.includes('Dependency Update Check')
+          );
+          
+          if (!existingIssue) {
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Dependency Update Check - ${new Date().toISOString().split('T')[0]}`,
+              body: body,
+              labels: ['dependencies', 'automated']
+            });
+          }
