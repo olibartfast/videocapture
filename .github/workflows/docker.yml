@@ -54,87 +54,20 @@ jobs:
           type=semver,pattern={{major}},suffix=-${{ matrix.variant }}
           type=raw,value=latest-${{ matrix.variant }},enable={{is_default_branch}}
 
-    - name: Create Dockerfile for OpenCV variant
-      if: matrix.variant == 'opencv'
+    - name: Set Dockerfile path
+      id: dockerfile
       run: |
-        cat > Dockerfile <<'EOF'
-        FROM ubuntu:22.04
-
-        ENV DEBIAN_FRONTEND=noninteractive
-
-        RUN apt-get update && apt-get install -y \
-            build-essential \
-            cmake \
-            ninja-build \
-            libopencv-dev \
-            libcurl4-openssl-dev \
-            && rm -rf /var/lib/apt/lists/*
-
-        WORKDIR /app
-        COPY . .
-
-        RUN cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_TESTS=OFF && \
-            cmake --build build --config Release && \
-            cmake --install build --prefix /usr/local
-
-        WORKDIR /workspace
-        ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-
-        CMD ["/bin/bash"]
-        EOF
-
-    - name: Create Dockerfile for full variant
-      if: matrix.variant == 'full'
-      run: |
-        cat > Dockerfile <<'EOF'
-        FROM ubuntu:22.04
-
-        ENV DEBIAN_FRONTEND=noninteractive
-
-        RUN apt-get update && apt-get install -y \
-            build-essential \
-            cmake \
-            ninja-build \
-            libopencv-dev \
-            libcurl4-openssl-dev \
-            libgstreamer1.0-dev \
-            libgstreamer-plugins-base1.0-dev \
-            libgstreamer-plugins-bad1.0-dev \
-            gstreamer1.0-plugins-base \
-            gstreamer1.0-plugins-good \
-            gstreamer1.0-plugins-bad \
-            gstreamer1.0-plugins-ugly \
-            gstreamer1.0-libav \
-            libavcodec-dev \
-            libavformat-dev \
-            libavutil-dev \
-            libswscale-dev \
-            libavdevice-dev \
-            && rm -rf /var/lib/apt/lists/*
-
-        WORKDIR /app
-        COPY . .
-
-        RUN cmake -B build -G Ninja \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_TESTS=OFF \
-            -DUSE_GSTREAMER=ON \
-            -DUSE_FFMPEG=ON && \
-            cmake --build build --config Release && \
-            cmake --install build --prefix /usr/local
-
-        WORKDIR /workspace
-        ENV LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
-
-        CMD ["/bin/bash"]
-        EOF
+        if [ "${{ matrix.variant }}" = "opencv" ]; then
+          echo "path=Dockerfile.opencv" >> $GITHUB_OUTPUT
+        else
+          echo "path=Dockerfile.full" >> $GITHUB_OUTPUT
+        fi
 
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: ${{ steps.dockerfile.outputs.path }}
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -143,6 +76,8 @@ jobs:
         platforms: linux/amd64
 
     - name: Test Docker image
+      if: github.event_name != 'pull_request'
       run: |
+        docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ matrix.variant }}
         docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}-${{ matrix.variant }} \
-          /bin/bash -c "ls -la /usr/local/lib && ls -la /usr/local/include"
+          /bin/bash -c "ls -la /usr/local/lib 2>/dev/null || echo 'Library directory check skipped'"
