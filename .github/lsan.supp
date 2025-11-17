@@ -1,0 +1,14 @@
+# Leak Sanitizer Suppressions
+# These are known leaks in system libraries that we cannot fix
+
+# libgphoto2 camera detection leaks
+leak:libgphoto2
+leak:libgphoto2_port
+leak:libusb
+
+# GStreamer plugin loading leaks
+leak:libgstreamer
+leak:libgst
+
+# OpenCV video I/O backend leaks
+leak:libopencv_videoio
