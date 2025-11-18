@@ -2,14 +2,20 @@
 
 
  bool GStreamerCapture::initialize(const std::string& source) {
-    gstocv.initGstLibrary(0, nullptr);
-    gstocv.runPipeline(source);
-    gstocv.checkError();
-    gstocv.getSink();
-    gstocv.setBus();
-    gstocv.setState(GST_STATE_PLAYING);
-    initialized = true;
-    return true;
+    try {
+        gstocv.initGstLibrary(0, nullptr);
+        gstocv.runPipeline(source);
+        gstocv.checkError();
+        gstocv.getSink();
+        gstocv.setBus();
+        gstocv.setState(GST_STATE_PLAYING);
+        initialized = true;
+        return true;
+    } catch (const std::exception& e) {
+        std::cerr << "GStreamer initialization failed: " << e.what() << std::endl;
+        initialized = false;
+        return false;
+    }
 }
 
 bool GStreamerCapture::readFrame(cv::Mat& frame) {

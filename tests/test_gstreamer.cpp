@@ -21,8 +21,8 @@ protected:
 
 // GStreamerCapture Tests
 TEST_F(GStreamerCaptureTest, InitializeWithInvalidPipeline) {
-    // GStreamer throws exception for invalid pipeline
-    EXPECT_THROW(capture->initialize("invalid ! pipeline ! elements"), std::runtime_error);
+    // GStreamer should return false for invalid pipeline
+    EXPECT_FALSE(capture->initialize("invalid ! pipeline ! elements"));
 }
 
 TEST_F(GStreamerCaptureTest, ReadFrameBeforeInitialize) {
