@@ -128,7 +128,14 @@ void GStreamerOpenCV::setBus() {
 }
 
 void GStreamerOpenCV::setState(GstState state) {
-    gst_element_set_state(GST_ELEMENT(pipeline_), state);
+    if (!pipeline_) {
+        // Pipeline doesn't exist, nothing to do
+        return;
+    }
+    GstStateChangeReturn ret = gst_element_set_state(GST_ELEMENT(pipeline_), state);
+    if (ret == GST_STATE_CHANGE_FAILURE) {
+        throw std::runtime_error("Failed to change pipeline state");
+    }
 }
 
 void GStreamerOpenCV::setMainLoopEvent(bool event) {
