@@ -1,8 +1,8 @@
 # VideoCapture
 
-[![CI](https://github.com/olibartfast/videocapture/workflows/CI/badge.svg)](https://github.com/olibartfast/videocapture/actions/workflows/ci.yml)
-[![Coverage](https://github.com/olibartfast/videocapture/workflows/Code%20Coverage/badge.svg)](https://github.com/olibartfast/videocapture/actions/workflows/coverage.yml)
-[![Docker](https://github.com/olibartfast/videocapture/workflows/Docker/badge.svg)](https://github.com/olibartfast/videocapture/actions/workflows/docker.yml)
+[![CI](https://github.com/olibartfast/videocapture/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/olibartfast/videocapture/actions/workflows/ci.yml)
+[![Coverage](https://github.com/olibartfast/videocapture/actions/workflows/coverage.yml/badge.svg?branch=master)](https://github.com/olibartfast/videocapture/actions/workflows/coverage.yml)
+[![Docker](https://github.com/olibartfast/videocapture/actions/workflows/docker.yml/badge.svg?branch=master)](https://github.com/olibartfast/videocapture/actions/workflows/docker.yml)
 [![License](https://img.shields.io/github/license/olibartfast/videocapture)](LICENSE)
 
 `VideoCapture` is a C++ library for video capturing, supporting multiple backends: OpenCV (default), GStreamer, and FFmpeg.
