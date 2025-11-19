@@ -40,16 +40,16 @@ target_link_libraries(VideoCaptureTests
 # Add include directories
 target_include_directories(VideoCaptureTests
     PRIVATE
-        ${CMAKE_SOURCE_DIR}/include
-        ${CMAKE_SOURCE_DIR}/src
-        ${CMAKE_SOURCE_DIR}/src/opencv
+        ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/src
+        ${PROJECT_SOURCE_DIR}/src/opencv
 )
 
 # Add backend-specific include directories
 if(USE_GSTREAMER)
     target_include_directories(VideoCaptureTests
         PRIVATE
-            ${CMAKE_SOURCE_DIR}/src/gstreamer
+            ${PROJECT_SOURCE_DIR}/src/gstreamer
             ${GSTREAMER_INCLUDE_DIRS}
     )
     target_link_libraries(VideoCaptureTests
@@ -62,7 +62,7 @@ endif()
 if(USE_FFMPEG)
     target_include_directories(VideoCaptureTests
         PRIVATE
-            ${CMAKE_SOURCE_DIR}/src/ffmpeg
+            ${PROJECT_SOURCE_DIR}/src/ffmpeg
             ${FFMPEG_INCLUDE_DIRS}
     )
     target_link_libraries(VideoCaptureTests
