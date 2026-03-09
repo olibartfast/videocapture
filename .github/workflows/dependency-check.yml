@@ -6,6 +6,10 @@ on:
     - cron: '0 0 * * 1'
   workflow_dispatch:
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   check-dependencies:
     name: Check for Dependency Updates
