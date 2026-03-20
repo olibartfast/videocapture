@@ -1,36 +1,45 @@
 #include "GStreamerCapture.hpp"
 
-
- bool GStreamerCapture::initialize(const std::string& source) {
-    gstocv.initGstLibrary(0, nullptr);
-    gstocv.runPipeline(source);
-    gstocv.checkError();
-    gstocv.getSink();
-    gstocv.setBus();
-    gstocv.setState(GST_STATE_PLAYING);
-    initialized = true;
-    return true;
+bool GStreamerCapture::initialize(const std::string& source) {
+    try {
+        gstocv.initGstLibrary(0, nullptr);
+        gstocv.runPipeline(source);
+        gstocv.getSink();
+        gstocv.setBus();
+        gstocv.setState(GST_STATE_PLAYING);
+        GStreamerOpenCV::setEndOfStream(false);
+        GStreamerOpenCV::isFrameReady_ = false;
+        initialized = true;
+        return true;
+    } catch (...) {
+        initialized = false;
+        return false;
+    }
 }
 
 bool GStreamerCapture::readFrame(cv::Mat& frame) {
-    if (!initialized ||   GStreamerOpenCV::isEndOfStream()) {
-        // Handle attempts to read frames without proper initialization
+    if (!initialized) {
         return false;
-    }   
+    }
+
     gstocv.setMainLoopEvent(false);
 
-    {
-        std::unique_lock<std::mutex> lock(GStreamerOpenCV::frameMutex_);
-        GStreamerOpenCV::frameAvailable_.wait(lock, [this] { return GStreamerOpenCV::isFrameReady_; });
-        frame = gstocv.getFrame().clone();
-    }   
+    std::unique_lock<std::mutex> lock(GStreamerOpenCV::frameMutex_);
+    GStreamerOpenCV::frameAvailable_.wait(lock, [] {
+        return GStreamerOpenCV::isFrameReady_ || GStreamerOpenCV::isEndOfStream();
+    });
+
+    if (!GStreamerOpenCV::isFrameReady_) {
+        return false;
+    }
+
+    frame = gstocv.getFrame().clone();
+    GStreamerOpenCV::isFrameReady_ = false;
     return !frame.empty();
 }
 
 void GStreamerCapture::release() {
-    // Release GStreamer resources
     gstocv.setState(GST_STATE_NULL);
-
-    // Reset the initialization status
+    GStreamerOpenCV::setEndOfStream(true);
     initialized = false;
 }

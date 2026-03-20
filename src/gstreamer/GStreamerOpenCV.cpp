@@ -1,8 +1,11 @@
 #include "GStreamerOpenCV.hpp"
-#include <opencv2/imgproc.hpp>
+
+#include <gst/video/video.h>
+
+#include <stdexcept>
 
 std::mutex GStreamerOpenCV::frameMutex_;
-std::condition_variable GStreamerOpenCV::frameAvailable_; 
+std::condition_variable GStreamerOpenCV::frameAvailable_;
 cv::Mat GStreamerOpenCV::frame_;
 bool GStreamerOpenCV::end_of_stream_ = false;
 bool GStreamerOpenCV::isFrameReady_ = false;
@@ -18,10 +21,16 @@ GStreamerOpenCV::~GStreamerOpenCV() {
 
 void GStreamerOpenCV::initGstLibrary(int argc, char* argv[]) {
     gst_init(&argc, &argv);
+    setEndOfStream(false);
+    isFrameReady_ = false;
 }
 
 void GStreamerOpenCV::runPipeline(const std::string& link) {
     const std::string pipelineCmd = getPipelineCommand(link);
+    if (pipelineCmd.empty()) {
+        throw std::runtime_error("Unable to translate the input source into a GStreamer pipeline");
+    }
+
     gchar* descr = g_strdup(pipelineCmd.c_str());
     pipeline_ = gst_parse_launch(descr, &error_);
     g_free(descr);
@@ -38,53 +47,83 @@ void GStreamerOpenCV::checkError() {
 }
 
 std::string GStreamerOpenCV::getPipelineCommand(const std::string& link) const {
-    if (link.find("rtsp") != std::string::npos)
-        return "rtspsrc location=" + link + " ! decodebin ! videoconvert ! appsink name=autovideosink";
-    else
-        return "filesrc location=" + link + " ! decodebin ! videoconvert ! appsink name=autovideosink";
+    gchar* uri = nullptr;
+
+    if (link.find("://") != std::string::npos) {
+        uri = g_strdup(link.c_str());
+    } else {
+        uri = g_filename_to_uri(link.c_str(), nullptr, nullptr);
+    }
+
+    if (uri == nullptr) {
+        return {};
+    }
+
+    std::string pipeline = "uridecodebin uri=\"";
+    pipeline += uri;
+    pipeline += "\" ! videoconvert ! video/x-raw,format=BGR ! appsink name=autovideosink";
+    g_free(uri);
+    return pipeline;
 }
 
 GstFlowReturn GStreamerOpenCV::newPreroll(GstAppSink* appsink, gpointer data) {
-    g_print("Got preroll!\n");
+    (void)appsink;
+    (void)data;
     return GST_FLOW_OK;
 }
 
 GstFlowReturn GStreamerOpenCV::newSample(GstAppSink* appsink, gpointer data) {
-    static int framecount = 0;
-    framecount++;
+    (void)data;
 
     GstSample* sample = gst_app_sink_pull_sample(appsink);
+    if (sample == nullptr) {
+        return GST_FLOW_ERROR;
+    }
+
     GstCaps* caps = gst_sample_get_caps(sample);
     GstBuffer* buffer = gst_sample_get_buffer(sample);
-    GstMapInfo map;
-    gst_buffer_map(buffer, &map, GST_MAP_READ);
+    if (caps == nullptr || buffer == nullptr) {
+        gst_sample_unref(sample);
+        return GST_FLOW_ERROR;
+    }
 
-    const GstStructure* s = gst_caps_get_structure(caps, 0);
-    int width, height;
-    gst_structure_get_int(s, "width", &width);
-    gst_structure_get_int(s, "height", &height);
+    GstVideoInfo videoInfo;
+    if (!gst_video_info_from_caps(&videoInfo, caps)) {
+        gst_sample_unref(sample);
+        return GST_FLOW_ERROR;
+    }
 
-    cv::Mat mYUV(height + height / 2, width, CV_8UC1, (char*)map.data);
-    cv::Mat mBGR(height, width, CV_8UC3);
-    cv::cvtColor(mYUV, mBGR, cv::COLOR_YUV2BGR_NV12);
+    GstVideoFrame videoFrame;
+    if (!gst_video_frame_map(&videoFrame, &videoInfo, buffer, GST_MAP_READ)) {
+        gst_sample_unref(sample);
+        return GST_FLOW_ERROR;
+    }
+
+    const int width = GST_VIDEO_INFO_WIDTH(&videoInfo);
+    const int height = GST_VIDEO_INFO_HEIGHT(&videoInfo);
+    cv::Mat bgrFrame(
+        height,
+        width,
+        CV_8UC3,
+        GST_VIDEO_FRAME_PLANE_DATA(&videoFrame, 0),
+        GST_VIDEO_FRAME_PLANE_STRIDE(&videoFrame, 0));
+
     {
         std::lock_guard<std::mutex> lock(frameMutex_);
-        mBGR.copyTo(GStreamerOpenCV::frame_);
+        bgrFrame.copyTo(GStreamerOpenCV::frame_);
         isFrameReady_ = true;
         frameAvailable_.notify_one();
     }
 
-    gst_buffer_unmap(buffer, &map);
-
-    if (framecount == 1) {
-        g_print("Caps: %s\n", gst_caps_to_string(caps));
-    }
-
+    gst_video_frame_unmap(&videoFrame);
     gst_sample_unref(sample);
     return GST_FLOW_OK;
 }
 
 gboolean GStreamerOpenCV::myBusCallback(GstBus* bus, GstMessage* message, gpointer data) {
+    (void)bus;
+    (void)data;
+
     switch (GST_MESSAGE_TYPE(message)) {
         case GST_MESSAGE_ERROR: {
             GError* err;
@@ -97,7 +136,7 @@ gboolean GStreamerOpenCV::myBusCallback(GstBus* bus, GstMessage* message, gpoint
         }
         case GST_MESSAGE_EOS:
             g_message("End of stream");
-            end_of_stream_ = true;
+            setEndOfStream(true);
             break;
         default:
             break;
@@ -110,7 +149,9 @@ void GStreamerOpenCV::getSink() {
     gst_app_sink_set_emit_signals(GST_APP_SINK(sink_), true);
     gst_app_sink_set_drop(GST_APP_SINK(sink_), true);
     gst_app_sink_set_max_buffers(GST_APP_SINK(sink_), 1);
-    GstAppSinkCallbacks callbacks = { nullptr, newPreroll, newSample };
+    GstAppSinkCallbacks callbacks{};
+    callbacks.new_preroll = newPreroll;
+    callbacks.new_sample = newSample;
     gst_app_sink_set_callbacks(GST_APP_SINK(sink_), &callbacks, nullptr, nullptr);
 }
 
@@ -126,6 +167,17 @@ void GStreamerOpenCV::setState(GstState state) {
 
 void GStreamerOpenCV::setMainLoopEvent(bool event) {
     g_main_iteration(event);
+}
+
+void GStreamerOpenCV::setEndOfStream(bool value) {
+    end_of_stream_ = value;
+    if (value) {
+        frameAvailable_.notify_all();
+    }
+}
+
+void GStreamerOpenCV::setFrame(const cv::Mat& frame) {
+    frame_ = frame.clone();
 }
 
 bool GStreamerOpenCV::isEndOfStream() {

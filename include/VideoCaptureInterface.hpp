@@ -1,5 +1,7 @@
 #pragma once
-#include <opencv2/core/core.hpp>
+#include <string>
+
+#include <opencv2/core.hpp>
 
 class VideoCaptureInterface {
 public:
