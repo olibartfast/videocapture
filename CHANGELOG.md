@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-03-31
+
 ### Added
 - Comprehensive CI/CD pipeline with GitHub Actions
 - Multiple workflows: CI, Release, Coverage, Docker, Documentation
@@ -45,5 +47,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with Google Test
 - Example application
 
-[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/olibartfast/videocapture/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/olibartfast/videocapture/releases/tag/v0.1.0
