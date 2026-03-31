@@ -1,0 +1,46 @@
+name: videocapture
+role: video-io
+
+default_branches:
+  integration: develop
+  release: master
+
+entrypoints:
+  configure_default:
+    - cmake -S . -B build
+  configure_gstreamer:
+    - cmake -S . -B build -DUSE_GSTREAMER=ON
+  configure_ffmpeg:
+    - cmake -S . -B build -DUSE_FFMPEG=ON
+  build:
+    - cmake --build build
+  test:
+    - ctest --test-dir build --output-on-failure
+
+owned_paths:
+  - include/
+  - src/
+  - app/
+  - tests/
+  - cmake/
+  - docs/
+  - scripts/
+  - CMakeLists.txt
+  - Readme.md
+  - AGENTS.md
+
+allowed_change_classes:
+  - ci-triage
+  - dependency-sync
+  - io-regression-fix
+  - docs-sync
+
+forbidden_change_classes:
+  - packaging-release-change
+  - large-refactor
+  - new-dependency
+
+constraints:
+  preserve_source_semantics: true
+  preserve_backend_priority: true
+  review_stream_behavior_changes: mandatory

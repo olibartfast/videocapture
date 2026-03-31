@@ -18,8 +18,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - API documentation generation with Doxygen
 - Issue and PR templates
 - EditorConfig and clang-format configurations
+- repo-local `AGENTS.md` guidance for maintenance agents
+- `REPO_META.yaml` with local build, ownership, and automation policy metadata
+- `VERSION` file as the canonical project version source
 
 ### Changed
+- `CMakeLists.txt` now reads the project version from `VERSION`
 
 ### Deprecated
 
@@ -29,7 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Security
 
-## [1.0.0] - YYYY-MM-DD
+## [0.1.0] - 2026-03-02
 
 ### Added
 - Initial release
@@ -41,5 +45,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with Google Test
 - Example application
 
-[Unreleased]: https://github.com/olibartfast/videocapture/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/olibartfast/videocapture/releases/tag/v1.0.0
+[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/olibartfast/videocapture/releases/tag/v0.1.0
