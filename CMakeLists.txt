@@ -8,6 +8,8 @@ string(REGEX MATCH "^[0-9]+\\.[0-9]+\\.[0-9]+" PROJECT_SEMVER "${PROJECT_VERSION
 
 project(VideoCapture VERSION ${PROJECT_SEMVER})
 
+include(cmake/CompileSpeed.cmake)
+
 # Include centralized version management first
 include(cmake/versions.cmake)
 
@@ -43,7 +45,7 @@ if(NOT DEFINED USE_FFMPEG)
 endif()
 set(USE_FFMPEG OFF CACHE BOOL "Use FFmpeg for video capture (optional)")
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake})
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
 # Add source files for video capture
@@ -118,12 +120,13 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     ${OpenCV_LIBS}
 )
 
-# Add subdirectory for the application
-add_subdirectory(app)
+# Sample app and tests are only built when videocapture is the top-level project.
+if(PROJECT_IS_TOP_LEVEL)
+    add_subdirectory(app)
 
-# Add testing support
-option(BUILD_TESTS "Build unit tests" ON)
-if(BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
+    option(BUILD_TESTS "Build unit tests" ON)
+    if(BUILD_TESTS)
+        enable_testing()
+        add_subdirectory(tests)
+    endif()
 endif()
