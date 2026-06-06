@@ -91,7 +91,7 @@ jobs:
           -DUSE_FFMPEG=ON
 
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build build --config Release --parallel
 
     - name: Run tests
       run: |
@@ -184,7 +184,7 @@ jobs:
           -DBUILD_TESTS=ON
 
     - name: Build
-      run: cmake --build build --config Debug
+      run: cmake --build build --config Debug --parallel
 
     - name: Run tests with ${{ matrix.sanitizer }} sanitizer
       run: |
@@ -220,7 +220,7 @@ jobs:
           -DBUILD_TESTS=ON
 
     - name: Build
-      run: cmake --build build --config Release
+      run: cmake --build build --config Release --parallel
 
     - name: Run tests
       run: |
