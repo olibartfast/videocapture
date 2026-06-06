@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-07
+
+### Added
+- Optional `ccache` support to speed up rebuilds (`cmake/CompileSpeed.cmake`)
+- Parallel build jobs in the CI workflow for faster pipelines
+
+### Changed
+- Build the sample app and tests only when videocapture is the top-level
+  project, reducing build time for FetchContent consumers
+- Enabled parallel CI builds for top-level and fetched consumers
+
+### Fixed
+- Corrected the CMake module path so FetchContent consumers resolve modules
+  reliably
+
 ## [0.2.0] - 2026-03-31
 
 ### Added
@@ -47,6 +62,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with Google Test
 - Example application
 
-[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/olibartfast/videocapture/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/olibartfast/videocapture/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/olibartfast/videocapture/releases/tag/v0.1.0
