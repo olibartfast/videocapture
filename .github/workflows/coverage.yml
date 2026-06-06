@@ -14,7 +14,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
@@ -78,7 +78,7 @@ jobs:
         genhtml coverage.info --output-directory coverage_html --ignore-errors mismatch
 
     - name: Upload coverage to Codecov
-      uses: codecov/codecov-action@v4
+      uses: codecov/codecov-action@v6
       with:
         files: build/coverage.info
         flags: unittests
@@ -87,7 +87,7 @@ jobs:
         verbose: true
 
     - name: Upload coverage report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: coverage-report
         path: build/coverage_html

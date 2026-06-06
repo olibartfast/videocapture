@@ -10,39 +10,17 @@ set(FFMPEG_VERSION "4.4" CACHE STRING "Minimum FFmpeg version")
 set(CMAKE_MIN_VERSION "3.10" CACHE STRING "Minimum CMake version")
 set(CXX_STANDARD "20" CACHE STRING "C++ standard version")
 
-# Platform-specific paths (with fallbacks)
+# Default dependency installation root (used by setup scripts)
 if(WIN32)
     set(DEFAULT_DEPENDENCY_ROOT "$ENV{USERPROFILE}/dependencies" CACHE PATH "Default dependency installation root")
-    set(GSTREAMER_ROOT_DIR "C:/gstreamer/1.0/msvc_x86_64" CACHE PATH "GStreamer root directory")
 else()
     set(DEFAULT_DEPENDENCY_ROOT "$ENV{HOME}/dependencies" CACHE PATH "Default dependency installation root")
-    set(GSTREAMER_ROOT_DIR "/usr" CACHE PATH "GStreamer root directory")
 endif()
 
-# GStreamer-specific paths
-set(GSTREAMER_INCLUDE_DIRS "${GSTREAMER_ROOT_DIR}/include/gstreamer-1.0" CACHE PATH "GStreamer include directories")
-set(GST_APP_INCLUDE_DIRS "${GSTREAMER_ROOT_DIR}/include/gstreamer-1.0" CACHE PATH "GStreamer App include directories")
-set(GST_VIDEO_INCLUDE_DIRS "${GSTREAMER_ROOT_DIR}/include/gstreamer-1.0" CACHE PATH "GStreamer Video include directories")
-
-# GLib paths
-set(GLIB_INCLUDE_DIRS 
-    "${GSTREAMER_ROOT_DIR}/include/glib-2.0"
-    "${GSTREAMER_ROOT_DIR}/lib/x86_64-linux-gnu/glib-2.0/include"
-    CACHE PATH "GLib include directories"
-)
-
-# Library paths (platform-specific)
-if(WIN32)
-    set(GSTREAMER_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/libgstreamer-1.0.lib" CACHE PATH "GStreamer libraries")
-    set(GST_APP_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/libgstapp-1.0.lib" CACHE PATH "GStreamer App libraries")
-    set(GST_VIDEO_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/libgstvideo-1.0.lib" CACHE PATH "GStreamer Video libraries")
-    set(GLIB_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/libglib-2.0.lib" CACHE PATH "GLib libraries")
-else()
-    set(GSTREAMER_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/x86_64-linux-gnu/libgstreamer-1.0.so" CACHE PATH "GStreamer libraries")
-    set(GST_APP_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/x86_64-linux-gnu/libgstapp-1.0.so" CACHE PATH "GStreamer App libraries")
-    set(GST_VIDEO_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/x86_64-linux-gnu/libgstvideo-1.0.so" CACHE PATH "GStreamer Video libraries")
-    set(GLIB_LIBRARIES "${GSTREAMER_ROOT_DIR}/lib/x86_64-linux-gnu/libglib-2.0.so" CACHE PATH "GLib libraries")
-endif()
+# NOTE: GStreamer / FFmpeg include and library paths are discovered at
+# configure time via pkg-config (see cmake/GStreamer.cmake and cmake/FFmpeg.cmake).
+# They are intentionally NOT hardcoded here so the build is portable across
+# Linux and macOS (Intel /usr/local and Apple Silicon /opt/homebrew).
 
 # Print version information for debugging
 message(STATUS "=== VideoCapture Dependency Versions ===")
@@ -51,5 +29,4 @@ message(STATUS "OpenCV (min): ${OPENCV_MIN_VERSION}")
 message(STATUS "FFmpeg (min): ${FFMPEG_VERSION}")
 message(STATUS "CMake (min): ${CMAKE_MIN_VERSION}")
 message(STATUS "C++ Standard: ${CXX_STANDARD}")
-message(STATUS "GStreamer Root: ${GSTREAMER_ROOT_DIR}")
 message(STATUS "Dependency Root: ${DEFAULT_DEPENDENCY_ROOT}") 

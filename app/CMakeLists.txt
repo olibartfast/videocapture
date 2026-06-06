@@ -43,6 +43,7 @@ endif()
 # FFmpeg support (if enabled in the main project)
 if(USE_FFMPEG)
     target_include_directories(${PROJECT_NAME} PRIVATE
+        ${FFMPEG_INCLUDE_DIRS}
         ${PROJECT_SOURCE_DIR}/../src/ffmpeg
     )
 endif()

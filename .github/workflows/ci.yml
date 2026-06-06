@@ -19,7 +19,7 @@ jobs:
         
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install base dependencies
       run: |
@@ -100,7 +100,7 @@ jobs:
 
     - name: Upload build artifacts
       if: failure()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: build-logs-${{ matrix.os }}-${{ matrix.backend }}
         path: |
@@ -115,7 +115,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
@@ -141,7 +141,7 @@ jobs:
           src/ app/ tests/ 2>&1 | tee cppcheck-report.txt
 
     - name: Upload cppcheck report
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: cppcheck-report
         path: cppcheck-report.txt
@@ -157,7 +157,7 @@ jobs:
         
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies
       run: |
@@ -206,7 +206,7 @@ jobs:
         
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Install dependencies (macOS)
       run: |
