@@ -17,7 +17,7 @@ jobs:
     
     steps:
     - name: Checkout code
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Check OpenCV version
       id: opencv
@@ -61,7 +61,7 @@ jobs:
 
     - name: Create issue if updates available
       if: success()
-      uses: actions/github-script@v7
+      uses: actions/github-script@v9
       with:
         script: |
           const fs = require('fs');

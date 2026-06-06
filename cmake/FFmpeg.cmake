@@ -4,13 +4,15 @@
 # Find FFmpeg packages
 find_package(PkgConfig REQUIRED)
 
-# Find FFmpeg libraries
-pkg_check_modules(AVFORMAT REQUIRED libavformat>=${FFMPEG_VERSION})
-pkg_check_modules(AVCODEC REQUIRED libavcodec>=${FFMPEG_VERSION})
-pkg_check_modules(AVUTIL REQUIRED libavutil>=${FFMPEG_VERSION})
-pkg_check_modules(SWSCALE REQUIRED libswscale>=${FFMPEG_VERSION})
+# Find FFmpeg libraries as imported targets. The targets carry pkg-config's
+# include dirs and library search paths, so headers and libs resolve on Linux
+# and on macOS Homebrew (/usr/local or /opt/homebrew) without manual paths.
+pkg_check_modules(AVFORMAT REQUIRED IMPORTED_TARGET libavformat>=${FFMPEG_VERSION})
+pkg_check_modules(AVCODEC REQUIRED IMPORTED_TARGET libavcodec>=${FFMPEG_VERSION})
+pkg_check_modules(AVUTIL REQUIRED IMPORTED_TARGET libavutil>=${FFMPEG_VERSION})
+pkg_check_modules(SWSCALE REQUIRED IMPORTED_TARGET libswscale>=${FFMPEG_VERSION})
 
-# Combine all FFmpeg include directories and libraries
+# Combine all FFmpeg include directories (also exposed transitively by targets)
 set(FFMPEG_INCLUDE_DIRS
     ${AVFORMAT_INCLUDE_DIRS}
     ${AVCODEC_INCLUDE_DIRS}
@@ -18,11 +20,12 @@ set(FFMPEG_INCLUDE_DIRS
     ${SWSCALE_INCLUDE_DIRS}
 )
 
+# Link against the imported targets so library search paths resolve everywhere
 set(FFMPEG_LIBRARIES
-    ${AVFORMAT_LIBRARIES}
-    ${AVCODEC_LIBRARIES}
-    ${AVUTIL_LIBRARIES}
-    ${SWSCALE_LIBRARIES}
+    PkgConfig::AVFORMAT
+    PkgConfig::AVCODEC
+    PkgConfig::AVUTIL
+    PkgConfig::SWSCALE
 )
 
 # Print the include directories and libraries for debugging

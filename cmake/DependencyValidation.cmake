@@ -94,8 +94,11 @@ endfunction()
 # Function to test GStreamer compilation
 function(test_gstreamer_compilation)
     if(USE_GSTREAMER)
-        set(CMAKE_REQUIRED_INCLUDES ${GSTREAMER_INCLUDE_DIRS} ${GLIB_INCLUDE_DIRS})
-        set(CMAKE_REQUIRED_LIBRARIES ${GSTREAMER_LIBRARIES} ${GLIB_LIBRARIES})
+        # GSTREAMER_LIBRARIES are imported pkg-config targets that already
+        # include glib and the correct library search paths (portable across
+        # Linux and macOS), so no separate GLIB_* entries are needed here.
+        set(CMAKE_REQUIRED_INCLUDES ${GSTREAMER_INCLUDE_DIRS})
+        set(CMAKE_REQUIRED_LIBRARIES ${GSTREAMER_LIBRARIES})
         
         check_cxx_source_compiles(
             "#include <gstreamer-1.0/gst/gst.h>
