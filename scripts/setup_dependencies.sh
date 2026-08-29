@@ -15,6 +15,7 @@ NC='\033[0m' # No Color
 # Default values
 ENABLE_GSTREAMER=false
 ENABLE_FFMPEG=false
+ENABLE_OPENCV=true
 DEPENDENCY_ROOT="$HOME/dependencies"
 FORCE=false
 VERBOSE=false
@@ -114,7 +115,7 @@ detect_os() {
     fi
 }
 
-# Function to install system dependencies
+# Function to install common system dependencies
 install_system_dependencies() {
     local os=$(detect_os)
     print_status "Installing system dependencies for $os..."
@@ -128,9 +129,7 @@ install_system_dependencies() {
                 git \
                 wget \
                 curl \
-                pkg-config \
-                libopencv-dev \
-                libopencv-contrib-dev
+                pkg-config
             ;;
         centos|rhel|fedora)
             sudo yum groupinstall -y "Development Tools"
@@ -139,14 +138,37 @@ install_system_dependencies() {
                 git \
                 wget \
                 curl \
-                pkg-config \
-                opencv-devel \
-                opencv-contrib-devel
+                pkg-config
             ;;
         *)
             print_warning "Unsupported OS: $os. Please install dependencies manually."
             ;;
     esac
+}
+
+# Function to setup OpenCV for the default backend
+setup_opencv() {
+    if [[ "$ENABLE_OPENCV" != "true" ]]; then
+        return 0
+    fi
+
+    print_status "Setting up OpenCV..."
+    local os=$(detect_os)
+    case $os in
+        ubuntu|debian)
+            sudo apt-get update
+            sudo apt-get install -y libopencv-dev libopencv-contrib-dev
+            ;;
+        centos|rhel|fedora)
+            sudo yum install -y opencv-devel opencv-contrib-devel
+            ;;
+        *)
+            print_warning "OpenCV installation not supported on $os. Please install manually."
+            return 1
+            ;;
+    esac
+
+    print_success "OpenCV installed"
 }
 
 # Function to setup GStreamer
@@ -235,6 +257,10 @@ setup_ffmpeg() {
 
 # Function to validate OpenCV installation
 validate_opencv() {
+    if [[ "$ENABLE_OPENCV" != "true" ]]; then
+        return 0
+    fi
+
     print_status "Validating OpenCV installation..."
     
     if command -v pkg-config &> /dev/null; then
@@ -356,7 +382,13 @@ main() {
     
     # Parse command line arguments
     parse_args "$@"
+
+    # Optional backend builds do not compile or link the OpenCV backend.
+    if [[ "$ENABLE_GSTREAMER" == "true" || "$ENABLE_FFMPEG" == "true" ]]; then
+        ENABLE_OPENCV=false
+    fi
     
+    print_status "OpenCV enabled: $ENABLE_OPENCV"
     print_status "GStreamer enabled: $ENABLE_GSTREAMER"
     print_status "FFmpeg enabled: $ENABLE_FFMPEG"
     print_status "Dependency root: $DEPENDENCY_ROOT"
@@ -364,6 +396,9 @@ main() {
     
     # Install system dependencies
     install_system_dependencies
+
+    # Setup OpenCV for the default backend
+    setup_opencv
     
     # Setup GStreamer if requested
     setup_gstreamer
@@ -385,4 +420,4 @@ main() {
 }
 
 # Run main function with all arguments
-main "$@" 
+main "$@"

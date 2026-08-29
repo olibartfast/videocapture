@@ -1,6 +1,6 @@
 #include "FFmpegCapture.hpp"
-#include <iostream>
 #include <sys/stat.h>
+#include <iostream>
 
 FFmpegCapture::FFmpegCapture() {
     // Allocate packet once
@@ -15,14 +15,6 @@ FFmpegCapture::~FFmpegCapture() {
 }
 
 void FFmpegCapture::cleanup() {
-    if (buffer) {
-        av_free(buffer);
-        buffer = nullptr;
-    }
-    if (frameRGB) {
-        av_frame_free(&frameRGB);
-        frameRGB = nullptr;
-    }
     if (frame) {
         av_frame_free(&frame);
         frame = nullptr;
@@ -50,7 +42,7 @@ bool FFmpegCapture::initialize(const std::string& source) {
     // Check if source is a file (not a URL or device) and if it exists
     bool hasProtocol = (source.find("://") != std::string::npos);
     bool isDevice = (source.length() >= 5 && source.substr(0, 5) == "/dev/");
-    
+
     if (!hasProtocol && !isDevice) {
         // Looks like a file path, check if it exists
         struct stat buffer;
@@ -123,32 +115,16 @@ bool FFmpegCapture::initialize(const std::string& source) {
 
     // Allocate video frames
     frame = av_frame_alloc();
-    frameRGB = av_frame_alloc();
-    if (!frame || !frameRGB) {
-        std::cerr << "FFmpeg: Could not allocate frames" << std::endl;
+    if (!frame) {
+        std::cerr << "FFmpeg: Could not allocate frame" << std::endl;
         cleanup();
         return false;
     }
-
-    // Determine required buffer size and allocate buffer
-    int numBytes = av_image_get_buffer_size(AV_PIX_FMT_BGR24, codecContext->width,
-                                            codecContext->height, 1);
-    buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
-    if (!buffer) {
-        std::cerr << "FFmpeg: Could not allocate buffer" << std::endl;
-        cleanup();
-        return false;
-    }
-
-    // Assign buffer to frameRGB
-    av_image_fill_arrays(frameRGB->data, frameRGB->linesize, buffer, AV_PIX_FMT_BGR24,
-                        codecContext->width, codecContext->height, 1);
 
     // Initialize SWS context for software scaling
-    swsContext = sws_getContext(codecContext->width, codecContext->height,
-                               codecContext->pix_fmt, codecContext->width,
-                               codecContext->height, AV_PIX_FMT_BGR24,
-                               SWS_BILINEAR, nullptr, nullptr, nullptr);
+    swsContext = sws_getContext(codecContext->width, codecContext->height, codecContext->pix_fmt,
+                                codecContext->width, codecContext->height, AV_PIX_FMT_BGR24,
+                                SWS_BILINEAR, nullptr, nullptr, nullptr);
     if (!swsContext) {
         std::cerr << "FFmpeg: Could not initialize SWS context" << std::endl;
         cleanup();
@@ -159,8 +135,9 @@ bool FFmpegCapture::initialize(const std::string& source) {
     return true;
 }
 
-bool FFmpegCapture::readFrame(cv::Mat& outFrame) {
+bool FFmpegCapture::readFrame(VideoFrame& outFrame) {
     if (!initialized) {
+        outFrame.clear();
         return false;
     }
 
@@ -187,13 +164,13 @@ bool FFmpegCapture::readFrame(cv::Mat& outFrame) {
                 continue;
             }
 
-            // Convert the frame from native format to BGR24
-            sws_scale(swsContext, frame->data, frame->linesize, 0,
-                     codecContext->height, frameRGB->data, frameRGB->linesize);
+            outFrame.resize(codecContext->width, codecContext->height);
+            std::uint8_t* outputData[] = {outFrame.data.data(), nullptr, nullptr, nullptr};
+            int outputLinesize[] = {static_cast<int>(outFrame.stride), 0, 0, 0};
 
-            // Create cv::Mat from the converted frame
-            outFrame = cv::Mat(codecContext->height, codecContext->width, CV_8UC3,
-                              frameRGB->data[0], frameRGB->linesize[0]).clone();
+            // Convert the frame from its native format to packed BGR24.
+            sws_scale(swsContext, frame->data, frame->linesize, 0, codecContext->height, outputData,
+                      outputLinesize);
 
             av_packet_unref(packet);
             return true;
@@ -203,6 +180,7 @@ bool FFmpegCapture::readFrame(cv::Mat& outFrame) {
     }
 
     // End of stream
+    outFrame.clear();
     return false;
 }
 

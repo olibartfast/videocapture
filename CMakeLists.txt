@@ -27,12 +27,6 @@ unset(GST_VIDEO_LIBRARIES CACHE)
 # Set C++ standard from centralized version management
 set(CMAKE_CXX_STANDARD ${CXX_STANDARD})
 
-# Find OpenCV
-find_package(OpenCV REQUIRED)
-
-# Validate dependencies before proceeding
-validate_all_dependencies()
-
 # Define an option to enable or disable GStreamer support
 if(NOT DEFINED USE_GSTREAMER)
     unset(USE_GSTREAMER CACHE)
@@ -48,15 +42,44 @@ set(USE_FFMPEG OFF CACHE BOOL "Use FFmpeg for video capture (optional)")
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
+# FFmpeg retains priority over GStreamer, and OpenCV remains the default when
+# neither optional backend is enabled.
+if(USE_FFMPEG)
+    set(VIDEOCAPTURE_BACKEND "FFmpeg")
+elseif(USE_GSTREAMER)
+    set(VIDEOCAPTURE_BACKEND "GStreamer")
+else()
+    set(VIDEOCAPTURE_BACKEND "OpenCV")
+endif()
+message(STATUS "VideoCapture backend: ${VIDEOCAPTURE_BACKEND}")
+
+# Discover only the dependencies used by enabled backends. OpenCV is not part
+# of the public frame API and is needed only by the OpenCV backend and demo.
+if(USE_GSTREAMER)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/GStreamer.cmake)
+endif()
+if(USE_FFMPEG)
+    include(${CMAKE_CURRENT_LIST_DIR}/cmake/FFmpeg.cmake)
+endif()
+if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    set(OPENCV_COMPONENTS core imgproc videoio)
+    if(PROJECT_IS_TOP_LEVEL)
+        list(APPEND OPENCV_COMPONENTS highgui)
+    endif()
+    find_package(OpenCV ${OPENCV_MIN_VERSION} REQUIRED COMPONENTS ${OPENCV_COMPONENTS})
+endif()
+
+# Validate dependencies before proceeding
+validate_all_dependencies()
+
 # Add source files for video capture
 set(VIDEOCAPTURE_SOURCES
     ${CMAKE_CURRENT_LIST_DIR}/src/VideoCaptureFactory.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/opencv/OpenCVCapture.cpp
 )
 if (USE_GSTREAMER)
     list(APPEND VIDEOCAPTURE_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerCapture.cpp
-        ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerOpenCV.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerPipeline.cpp
     )
 endif()
 if (USE_FFMPEG)
@@ -64,23 +87,18 @@ if (USE_FFMPEG)
         ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg/FFmpegCapture.cpp
     )
 endif()
+if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    list(APPEND VIDEOCAPTURE_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/src/opencv/OpenCVCapture.cpp
+    )
+endif()
 
 # Create the video capture library
 add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 
-# Include directories - OpenCV4 uses opencv2 directory structure under opencv4/
 target_include_directories(${PROJECT_NAME} PUBLIC
     ${CMAKE_CURRENT_LIST_DIR}/include
-    ${CMAKE_CURRENT_LIST_DIR}/src/opencv
 )
-
-# Add OpenCV include directories from found package
-if(OpenCV_INCLUDE_DIRS)
-    target_include_directories(${PROJECT_NAME} PUBLIC ${OpenCV_INCLUDE_DIRS})
-else()
-    # Fallback for systems where OpenCV doesn't set this variable properly
-    target_include_directories(${PROJECT_NAME} PUBLIC /usr/include/opencv4)
-endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src
@@ -89,14 +107,14 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # Link against GStreamer libraries if USE_GSTREAMER is ON
 message(STATUS "USE_GSTREAMER value: ${USE_GSTREAMER}")
 if (USE_GSTREAMER)
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/GStreamer.cmake)
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_INCLUDE_DIRS}
         ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer
     )
-    target_link_libraries(${PROJECT_NAME} PUBLIC
+    target_link_libraries(${PROJECT_NAME} PRIVATE
         ${GSTREAMER_LIBRARIES}
     )
+    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_GSTREAMER)
     
     # Test GStreamer compilation
     test_gstreamer_compilation()
@@ -105,20 +123,23 @@ endif()
 # Link against FFmpeg libraries if USE_FFMPEG is ON
 message(STATUS "USE_FFMPEG value: ${USE_FFMPEG}")
 if (USE_FFMPEG)
-    include(${CMAKE_CURRENT_LIST_DIR}/cmake/FFmpeg.cmake)
     target_include_directories(${PROJECT_NAME} PRIVATE
         ${FFMPEG_INCLUDE_DIRS}
         ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg
     )
-    target_link_libraries(${PROJECT_NAME} PUBLIC
+    target_link_libraries(${PROJECT_NAME} PRIVATE
         ${FFMPEG_LIBRARIES}
     )
+    target_compile_definitions(${PROJECT_NAME} PRIVATE USE_FFMPEG)
 endif()
 
-# Link against other required libraries
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    ${OpenCV_LIBS}
-)
+if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    target_include_directories(${PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_LIST_DIR}/src/opencv
+        ${OpenCV_INCLUDE_DIRS}
+    )
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
+endif()
 
 # Sample app and tests are only built when videocapture is the top-level project.
 if(PROJECT_IS_TOP_LEVEL)

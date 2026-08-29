@@ -19,12 +19,14 @@
 
 - CMake 3.20 or higher
 - C++17 compatible compiler
-- OpenCV
 
-### Optional
+Install the dependency for the backend you select:
 
-- GStreamer (if `USE_GSTREAMER` is enabled)
-- FFmpeg (if `USE_FFMPEG` is enabled)
+- OpenCV for the default backend
+- GStreamer if `USE_GSTREAMER=ON`
+- FFmpeg if `USE_FFMPEG=ON`
+
+OpenCV is not required by GStreamer or FFmpeg builds.
 
 ## Installation
 
@@ -32,9 +34,9 @@
 
 Ensure you have the required dependencies installed:
 
-- [OpenCV](https://opencv.org/) (required)
-- [GStreamer](https://gstreamer.freedesktop.org/) (optional)
-- [FFmpeg](https://ffmpeg.org/) (optional)
+- [OpenCV](https://opencv.org/) for the default backend
+- [GStreamer](https://gstreamer.freedesktop.org/) for the GStreamer backend
+- [FFmpeg](https://ffmpeg.org/) for the FFmpeg backend
 
 You can use the provided setup scripts to install dependencies:
 
@@ -42,13 +44,13 @@ You can use the provided setup scripts to install dependencies:
 # Install base dependencies (OpenCV)
 ./scripts/setup_dependencies.sh
 
-# Install with GStreamer support
+# Install GStreamer dependencies (without OpenCV)
 ./scripts/setup_dependencies.sh --gstreamer
 
-# Install with FFmpeg support
+# Install FFmpeg dependencies (without OpenCV)
 ./scripts/setup_dependencies.sh --ffmpeg
 
-# Install both GStreamer and FFmpeg
+# Install both GStreamer and FFmpeg dependencies (without OpenCV)
 ./scripts/setup_dependencies.sh --gstreamer --ffmpeg
 ```
 
@@ -102,6 +104,18 @@ After building the project, you can run the sample application:
 ./build/bin/VideoCaptureApp <path/to/video>
 ```
 
+All backends return packed BGR24 data through `VideoFrame`. The OpenCV build
+displays those frames; GStreamer and FFmpeg builds decode the input and report
+the number of frames without linking OpenCV.
+
+```cpp
+auto capture = createVideoInterface();
+VideoFrame frame;
+if (capture->initialize(source) && capture->readFrame(frame)) {
+    // frame.data contains height rows of stride-byte packed BGR24 pixels.
+}
+```
+
 ## Using in Your Project
 
 To use `VideoCapture` in your project, you can use CMake's `FetchContent`:
@@ -138,4 +152,3 @@ Contributions are welcome! Please feel free to submit a Pull Request. See our [c
 ## License
 
 This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
-

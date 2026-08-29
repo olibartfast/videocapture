@@ -2,15 +2,12 @@
 
 #include <gtest/gtest.h>
 #include "gstreamer/GStreamerCapture.hpp"
-#include <opencv2/core.hpp>
 
 class GStreamerCaptureTest : public ::testing::Test {
 protected:
     std::unique_ptr<GStreamerCapture> capture;
 
-    void SetUp() override {
-        capture = std::make_unique<GStreamerCapture>();
-    }
+    void SetUp() override { capture = std::make_unique<GStreamerCapture>(); }
 
     void TearDown() override {
         if (capture) {
@@ -26,7 +23,7 @@ TEST_F(GStreamerCaptureTest, InitializeWithInvalidPipeline) {
 }
 
 TEST_F(GStreamerCaptureTest, ReadFrameBeforeInitialize) {
-    cv::Mat frame;
+    VideoFrame frame;
     EXPECT_FALSE(capture->readFrame(frame));
     EXPECT_TRUE(frame.empty());
 }
@@ -36,16 +33,21 @@ TEST_F(GStreamerCaptureTest, ReleaseWithoutInitialize) {
 }
 
 TEST_F(GStreamerCaptureTest, ValidTestPipeline) {
-    // GStreamer test pipeline with videotestsrc
-    // The backend's blocking readFrame() can hang with test sources
-    // so we just test pipeline construction
-    std::string pipeline = "videotestsrc num-buffers=10 ! video/x-raw,format=BGR,width=640,height=480 ! appsink";
-    
+    std::string pipeline = "videotestsrc num-buffers=1 ! "
+                           "video/x-raw,format=BGR,width=64,height=48 ! appsink";
+
     try {
         bool result = capture->initialize(pipeline);
         EXPECT_TRUE(result);
-        // Don't call readFrame() as it blocks waiting for frames in a separate thread
-        // which the test harness doesn't run
+        if (result) {
+            VideoFrame frame;
+            ASSERT_TRUE(capture->readFrame(frame));
+            EXPECT_EQ(frame.width, 64);
+            EXPECT_EQ(frame.height, 48);
+            EXPECT_EQ(frame.channels(), 3);
+            EXPECT_EQ(frame.stride, 192U);
+            EXPECT_EQ(frame.data.size(), 9216U);
+        }
     } catch (const std::exception& e) {
         // Pipeline construction may fail in some environments
         GTEST_SKIP() << "GStreamer pipeline construction failed: " << e.what();
@@ -60,4 +62,4 @@ TEST_F(GStreamerCaptureTest, MultipleReleaseCalls) {
     });
 }
 
-#endif // USE_GSTREAMER
+#endif  // USE_GSTREAMER

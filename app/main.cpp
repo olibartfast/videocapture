@@ -1,6 +1,11 @@
 #include <iostream>
-#include <opencv2/opencv.hpp>
+
 #include "VideoCaptureFactory.hpp"
+
+#ifdef VIDEOCAPTURE_USE_OPENCV
+#include <opencv2/core.hpp>
+#include <opencv2/highgui.hpp>
+#endif
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -10,26 +15,30 @@ int main(int argc, char* argv[]) {
 
     std::unique_ptr<VideoCaptureInterface> videoInterface = createVideoInterface();
     const std::string source = argv[1];
-    if (!videoInterface->initialize(source)) 
-    {
+    if (!videoInterface->initialize(source)) {
         std::cerr << "Failed to initialize video capture for input: " << source << std::endl;
         return 1;
-    }    
+    }
 
-    cv::Mat frame;
+    VideoFrame frame;
+    std::size_t frameCount = 0;
     while (true) {
         if (!videoInterface->readFrame(frame) || frame.empty()) {
-            std::cerr << "Error: Could not read a frame from the video capture device." << std::endl;
             break;
         }
 
-        cv::imshow("Frame", frame);
+        ++frameCount;
 
+#ifdef VIDEOCAPTURE_USE_OPENCV
+        cv::Mat displayFrame(frame.height, frame.width, CV_8UC3, frame.data.data(), frame.stride);
+        cv::imshow("Frame", displayFrame);
         if (cv::waitKey(10) >= 0) {
             break;
         }
+#endif
     }
 
     videoInterface->release();
+    std::cout << "Decoded " << frameCount << " frame(s)." << std::endl;
     return 0;
 }

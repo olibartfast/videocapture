@@ -1,14 +1,15 @@
 #include "GStreamerCapture.hpp"
 
+#include <iostream>
 
- bool GStreamerCapture::initialize(const std::string& source) {
+bool GStreamerCapture::initialize(const std::string& source) {
     try {
-        gstocv.initGstLibrary(0, nullptr);
-        gstocv.runPipeline(source);
-        gstocv.checkError();
-        gstocv.getSink();
-        gstocv.setBus();
-        gstocv.setState(GST_STATE_PLAYING);
+        pipeline.initGstLibrary(0, nullptr);
+        pipeline.runPipeline(source);
+        pipeline.checkError();
+        pipeline.getSink();
+        pipeline.setBus();
+        pipeline.setState(GST_STATE_PLAYING);
         initialized = true;
         return true;
     } catch (const std::exception& e) {
@@ -18,24 +19,31 @@
     }
 }
 
-bool GStreamerCapture::readFrame(cv::Mat& frame) {
-    if (!initialized ||   GStreamerOpenCV::isEndOfStream()) {
-        // Handle attempts to read frames without proper initialization
+bool GStreamerCapture::readFrame(VideoFrame& frame) {
+    if (!initialized || GStreamerPipeline::isEndOfStream()) {
+        frame.clear();
         return false;
-    }   
-    gstocv.setMainLoopEvent(false);
+    }
+    pipeline.setMainLoopEvent(false);
 
     {
-        std::unique_lock<std::mutex> lock(GStreamerOpenCV::frameMutex_);
-        GStreamerOpenCV::frameAvailable_.wait(lock, [this] { return GStreamerOpenCV::isFrameReady_; });
-        frame = gstocv.getFrame().clone();
-    }   
+        std::unique_lock<std::mutex> lock(GStreamerPipeline::frameMutex_);
+        GStreamerPipeline::frameAvailable_.wait(lock, [] {
+            return GStreamerPipeline::isFrameReady_ || GStreamerPipeline::isEndOfStream();
+        });
+        if (GStreamerPipeline::isEndOfStream()) {
+            frame.clear();
+            return false;
+        }
+        frame = pipeline.getFrame();
+        GStreamerPipeline::isFrameReady_ = false;
+    }
     return !frame.empty();
 }
 
 void GStreamerCapture::release() {
     // Release GStreamer resources
-    gstocv.setState(GST_STATE_NULL);
+    pipeline.setState(GST_STATE_NULL);
 
     // Reset the initialization status
     initialized = false;

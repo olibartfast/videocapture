@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Replaced the public `cv::Mat` frame type with backend-neutral packed BGR24
+  `VideoFrame` storage.
+- Restricted OpenCV discovery, compilation, and linkage to the OpenCV backend;
+  FFmpeg and GStreamer builds no longer require OpenCV.
+
 ## [0.3.0] - 2026-06-07
 
 ### Added
