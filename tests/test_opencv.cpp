@@ -1,14 +1,11 @@
 #include <gtest/gtest.h>
 #include "opencv/OpenCVCapture.hpp"
-#include <opencv2/core.hpp>
 
 class OpenCVCaptureTest : public ::testing::Test {
 protected:
     std::unique_ptr<OpenCVCapture> capture;
 
-    void SetUp() override {
-        capture = std::make_unique<OpenCVCapture>();
-    }
+    void SetUp() override { capture = std::make_unique<OpenCVCapture>(); }
 
     void TearDown() override {
         if (capture) {
@@ -22,7 +19,7 @@ TEST_F(OpenCVCaptureTest, InitializeWithInvalidSource) {
 }
 
 TEST_F(OpenCVCaptureTest, ReadFrameBeforeInitialize) {
-    cv::Mat frame;
+    VideoFrame frame;
     EXPECT_FALSE(capture->readFrame(frame));
     EXPECT_TRUE(frame.empty());
 }
@@ -45,11 +42,11 @@ TEST_F(OpenCVCaptureTest, MultipleReleaseCalls) {
 TEST_F(OpenCVCaptureTest, InitializeWithCameraIndex) {
     // Try camera 0, will likely fail in CI environment without camera
     bool result = capture->initialize("0");
-    
+
     // In CI/headless environments, camera access typically fails
     // If it succeeds, verify we can read a frame
     if (result) {
-        cv::Mat frame;
+        VideoFrame frame;
         EXPECT_TRUE(capture->readFrame(frame));
         EXPECT_FALSE(frame.empty());
         capture->release();

@@ -1,18 +1,15 @@
 #pragma once
+
+#include "GStreamerPipeline.hpp"
 #include "VideoCaptureInterface.hpp"
-#include "GStreamerOpenCV.hpp"
-#include <condition_variable>
-#include <mutex>
 
 class GStreamerCapture : public VideoCaptureInterface {
 private:
-    GStreamerOpenCV gstocv;
-    bool initialized = false; // Track initialization status
-    std::mutex frameMutex_; // Mutex to protect frame access
-    std::condition_variable frameAvailable_; // Condition variable to signal new frames
+    GStreamerPipeline pipeline;
+    bool initialized = false;  // Track initialization status
 
 public:
-    bool initialize(const std::string& source);
-    bool readFrame(cv::Mat& frame) override;
+    bool initialize(const std::string& source) override;
+    bool readFrame(VideoFrame& frame) override;
     void release() override;
 };

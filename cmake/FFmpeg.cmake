@@ -32,6 +32,3 @@ set(FFMPEG_LIBRARIES
 message(STATUS "FFmpeg version: ${FFMPEG_VERSION}")
 message(STATUS "FFMPEG_INCLUDE_DIRS: ${FFMPEG_INCLUDE_DIRS}")
 message(STATUS "FFMPEG_LIBRARIES: ${FFMPEG_LIBRARIES}")
-
-# Define a compile definition to indicate FFmpeg usage
-add_compile_definitions(USE_FFMPEG)
