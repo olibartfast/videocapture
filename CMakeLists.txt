@@ -66,7 +66,11 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     if(PROJECT_IS_TOP_LEVEL)
         list(APPEND OPENCV_COMPONENTS highgui)
     endif()
-    find_package(OpenCV ${OPENCV_MIN_VERSION} REQUIRED COMPONENTS ${OPENCV_COMPONENTS})
+    # Do not pass the minimum version to find_package: OpenCV's package
+    # compatibility file rejects newer major versions (for example OpenCV 5
+    # for a 4.6 request). validate_opencv() performs the intended numeric
+    # minimum-version check after discovery.
+    find_package(OpenCV REQUIRED COMPONENTS ${OPENCV_COMPONENTS})
 endif()
 
 # Validate dependencies before proceeding
