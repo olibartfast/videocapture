@@ -10,12 +10,17 @@ include(GoogleTest)
 
 # Common test sources
 set(TEST_SOURCES
-    ${PROJECT_SOURCE_DIR}/app/TerminalRenderer.cpp
     test_main.cpp
     test_factory.cpp
-    test_terminal_renderer.cpp
     test_video_frame.cpp
 )
+
+if(NOT VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    list(APPEND TEST_SOURCES
+        ${PROJECT_SOURCE_DIR}/app/SdlRenderer.cpp
+        test_sdl_renderer.cpp
+    )
+endif()
 
 # Add backend-specific tests if enabled
 if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
@@ -55,6 +60,8 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
         ${OpenCV_INCLUDE_DIRS}
     )
     target_link_libraries(VideoCaptureTests PRIVATE ${OpenCV_LIBS})
+else()
+    target_link_libraries(VideoCaptureTests PRIVATE VideoCaptureSDL2)
 endif()
 
 # Add backend-specific include directories

@@ -25,6 +25,7 @@ Install the dependency for the backend you select:
 - OpenCV for the default backend
 - GStreamer if `USE_GSTREAMER=ON`
 - FFmpeg if `USE_FFMPEG=ON`
+- SDL2 for the sample application's GStreamer and FFmpeg preview window
 
 OpenCV is not required by GStreamer or FFmpeg builds.
 
@@ -37,6 +38,7 @@ Ensure you have the required dependencies installed:
 - [OpenCV](https://opencv.org/) for the default backend
 - [GStreamer](https://gstreamer.freedesktop.org/) for the GStreamer backend
 - [FFmpeg](https://ffmpeg.org/) for the FFmpeg backend
+- [SDL2](https://www.libsdl.org/) for the alternate-backend sample application
 
 You can use the provided setup scripts to install dependencies:
 
@@ -108,9 +110,9 @@ All backends currently return packed BGR8 data through the dependency-free
 `videocapture::Frame` API. `Frame` owns reusable host storage and exposes the
 pixel format, plane dimensions, row stride, optional timestamp, and sequence
 number without leaking backend-specific types. The OpenCV build displays frames
-in a native window. GStreamer and FFmpeg builds provide a downscaled true-color
-terminal preview when stdout is interactive, without linking OpenCV; headless or
-redirected runs still decode the input and report the frame count. Timestamps,
+with HighGUI. GStreamer and FFmpeg builds use an SDL2 window backed by a streaming
+BGR24 texture, without linking OpenCV; if SDL cannot create a video window, the
+application still decodes the input and reports the frame count. Timestamps,
 when a backend can provide them, are presentation times on the source media
 timeline rather than wall-clock times; sequence numbers start at zero for each
 successful initialization.

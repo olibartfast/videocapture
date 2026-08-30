@@ -4,10 +4,7 @@ project(VideoCaptureApp)
 set(CMAKE_CXX_STANDARD 17)
 
 # Add executable
-add_executable(${PROJECT_NAME}
-    main.cpp
-    TerminalRenderer.cpp
-)
+add_executable(${PROJECT_NAME} main.cpp)
 
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -20,6 +17,9 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     )
     target_link_libraries(${PROJECT_NAME} PRIVATE ${OpenCV_LIBS})
     target_compile_definitions(${PROJECT_NAME} PRIVATE VIDEOCAPTURE_USE_OPENCV)
+else()
+    target_sources(${PROJECT_NAME} PRIVATE SdlRenderer.cpp)
+    target_link_libraries(${PROJECT_NAME} PRIVATE VideoCaptureSDL2)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
