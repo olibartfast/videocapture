@@ -19,7 +19,7 @@ TEST_F(OpenCVCaptureTest, InitializeWithInvalidSource) {
 }
 
 TEST_F(OpenCVCaptureTest, ReadFrameBeforeInitialize) {
-    VideoFrame frame;
+    videocapture::Frame frame;
     EXPECT_FALSE(capture->readFrame(frame));
     EXPECT_TRUE(frame.empty());
 }
@@ -46,7 +46,7 @@ TEST_F(OpenCVCaptureTest, InitializeWithCameraIndex) {
     // In CI/headless environments, camera access typically fails
     // If it succeeds, verify we can read a frame
     if (result) {
-        VideoFrame frame;
+        videocapture::Frame frame;
         EXPECT_TRUE(capture->readFrame(frame));
         EXPECT_FALSE(frame.empty());
         capture->release();

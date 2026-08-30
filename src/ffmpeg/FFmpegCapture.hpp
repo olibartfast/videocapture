@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <memory>
 #include <string>
 #include "VideoCaptureInterface.hpp"
@@ -19,6 +20,7 @@ private:
     AVPacket* packet = nullptr;
     int videoStreamIndex = -1;
     bool initialized = false;
+    std::uint64_t nextSequence = 0;
 
     void cleanup();
 
@@ -27,6 +29,6 @@ public:
     ~FFmpegCapture();
 
     bool initialize(const std::string& source) override;
-    bool readFrame(VideoFrame& frame) override;
+    bool readFrame(videocapture::Frame& frame) override;
     void release() override;
 };

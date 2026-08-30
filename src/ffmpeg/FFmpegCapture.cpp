@@ -32,6 +32,7 @@ void FFmpegCapture::cleanup() {
         formatContext = nullptr;
     }
     videoStreamIndex = -1;
+    nextSequence = 0;
     initialized = false;
 }
 
@@ -135,7 +136,7 @@ bool FFmpegCapture::initialize(const std::string& source) {
     return true;
 }
 
-bool FFmpegCapture::readFrame(VideoFrame& outFrame) {
+bool FFmpegCapture::readFrame(videocapture::Frame& outFrame) {
     if (!initialized) {
         outFrame.clear();
         return false;
@@ -164,13 +165,23 @@ bool FFmpegCapture::readFrame(VideoFrame& outFrame) {
                 continue;
             }
 
-            outFrame.resize(codecContext->width, codecContext->height);
-            std::uint8_t* outputData[] = {outFrame.data.data(), nullptr, nullptr, nullptr};
-            int outputLinesize[] = {static_cast<int>(outFrame.stride), 0, 0, 0};
+            outFrame.resize(codecContext->width, codecContext->height,
+                            videocapture::PixelFormat::BGR8);
+            std::uint8_t* outputData[] = {outFrame.data(), nullptr, nullptr, nullptr};
+            int outputLinesize[] = {static_cast<int>(outFrame.rowStride()), 0, 0, 0};
 
-            // Convert the frame from its native format to packed BGR24.
+            // Convert the frame from its native format to packed BGR8.
             sws_scale(swsContext, frame->data, frame->linesize, 0, codecContext->height, outputData,
                       outputLinesize);
+
+            outFrame.setSequence(nextSequence++);
+            if (frame->best_effort_timestamp != AV_NOPTS_VALUE) {
+                constexpr AVRational nanosecondsTimeBase{1, 1000000000};
+                const AVRational streamTimeBase =
+                    formatContext->streams[videoStreamIndex]->time_base;
+                outFrame.setTimestamp(std::chrono::nanoseconds(av_rescale_q(
+                    frame->best_effort_timestamp, streamTimeBase, nanosecondsTimeBase)));
+            }
 
             av_packet_unref(packet);
             return true;

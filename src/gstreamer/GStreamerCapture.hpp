@@ -10,6 +10,6 @@ private:
 
 public:
     bool initialize(const std::string& source) override;
-    bool readFrame(VideoFrame& frame) override;
+    bool readFrame(videocapture::Frame& frame) override;
     void release() override;
 };

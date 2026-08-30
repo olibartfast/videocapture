@@ -9,8 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Replaced the public `cv::Mat` frame type with backend-neutral packed BGR24
-  `VideoFrame` storage.
+- Replaced the public `cv::Mat` frame type with the dependency-free
+  `videocapture::Frame` abstraction. Capture backends currently return packed
+  BGR8 while the frame contract also represents explicit pixel formats,
+  multi-plane layouts, row strides, timestamps, and sequence numbers.
 - Restricted OpenCV discovery, compilation, and linkage to the OpenCV backend;
   FFmpeg and GStreamer builds no longer require OpenCV.
 

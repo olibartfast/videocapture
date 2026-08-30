@@ -22,7 +22,7 @@ public:
     void setBus();
     void setState(GstState state);
     void setMainLoopEvent(bool event);
-    VideoFrame getFrame() const;
+    videocapture::Frame takeFrame();
 
     static bool isEndOfStream();
 
@@ -40,6 +40,7 @@ private:
     GError* error_ = nullptr;
     GstElement* pipeline_ = nullptr;
     GstElement* sink_ = nullptr;
-    static VideoFrame frame_;
+    static videocapture::Frame frame_;
     static std::atomic_bool endOfStream_;
+    static std::atomic_uint64_t nextSequence_;
 };

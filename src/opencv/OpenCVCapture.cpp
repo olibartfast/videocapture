@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <cctype>
+#include <chrono>
+#include <cmath>
 #include <cstring>
 
 #include <opencv2/imgproc.hpp>
@@ -31,11 +33,12 @@ bool OpenCVCapture::initialize(const std::string& source) {
         return false;
     }
 
+    nextSequence = 0;
     initialized = true;
     return true;
 }
 
-bool OpenCVCapture::readFrame(VideoFrame& frame) {
+bool OpenCVCapture::readFrame(videocapture::Frame& frame) {
     if (!initialized) {
         frame.clear();
         return false;
@@ -59,10 +62,17 @@ bool OpenCVCapture::readFrame(VideoFrame& frame) {
         return false;
     }
 
-    frame.resize(bgr.cols, bgr.rows);
+    frame.resize(bgr.cols, bgr.rows, videocapture::PixelFormat::BGR8);
     for (int row = 0; row < bgr.rows; ++row) {
-        std::memcpy(frame.data.data() + static_cast<std::size_t>(row) * frame.stride, bgr.ptr(row),
-                    frame.stride);
+        std::memcpy(frame.data() + static_cast<std::size_t>(row) * frame.rowStride(), bgr.ptr(row),
+                    frame.rowStride());
+    }
+
+    frame.setSequence(nextSequence++);
+    const double positionMs = capture.get(cv::CAP_PROP_POS_MSEC);
+    if (std::isfinite(positionMs) && positionMs >= 0.0) {
+        frame.setTimestamp(std::chrono::duration_cast<std::chrono::nanoseconds>(
+            std::chrono::duration<double, std::milli>(positionMs)));
     }
     return true;
 }
@@ -72,5 +82,6 @@ void OpenCVCapture::release() {
     capture.release();
 
     // Reset the initialization status
+    nextSequence = 0;
     initialized = false;
 }

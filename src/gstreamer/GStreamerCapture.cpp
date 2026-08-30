@@ -19,7 +19,7 @@ bool GStreamerCapture::initialize(const std::string& source) {
     }
 }
 
-bool GStreamerCapture::readFrame(VideoFrame& frame) {
+bool GStreamerCapture::readFrame(videocapture::Frame& frame) {
     if (!initialized || GStreamerPipeline::isEndOfStream()) {
         frame.clear();
         return false;
@@ -35,7 +35,7 @@ bool GStreamerCapture::readFrame(VideoFrame& frame) {
             frame.clear();
             return false;
         }
-        frame = pipeline.getFrame();
+        frame = pipeline.takeFrame();
         GStreamerPipeline::isFrameReady_ = false;
     }
     return !frame.empty();
