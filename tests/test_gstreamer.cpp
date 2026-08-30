@@ -1,6 +1,7 @@
 #ifdef USE_GSTREAMER
 
 #include <chrono>
+#include <future>
 #include <thread>
 
 #include <gtest/gtest.h>
@@ -80,6 +81,28 @@ TEST_F(GStreamerCaptureTest, DrainsBufferedFinalFrameBeforeEndOfStream) {
 
     EXPECT_FALSE(capture->readFrame(frame));
     EXPECT_TRUE(frame.empty());
+}
+
+TEST_F(GStreamerCaptureTest, ReportsEndOfStreamWithoutAnExternalMainLoop) {
+    // Nothing in the demo application iterates the GLib main context while it
+    // waits for a frame, so end of stream has to reach the reader on its own.
+    std::string pipeline = "videotestsrc num-buffers=2 ! "
+                           "video/x-raw,format=BGR,width=64,height=48 ! appsink";
+
+    ASSERT_TRUE(capture->initialize(pipeline));
+
+    auto drain = std::async(std::launch::async, [this] {
+        videocapture::Frame frame;
+        std::size_t frameCount = 0;
+        while (capture->readFrame(frame) && !frame.empty()) {
+            ++frameCount;
+        }
+        return frameCount;
+    });
+
+    ASSERT_EQ(drain.wait_for(std::chrono::seconds(10)), std::future_status::ready)
+        << "readFrame() never observed end of stream";
+    EXPECT_EQ(drain.get(), 2U);
 }
 
 TEST_F(GStreamerCaptureTest, MultipleReleaseCalls) {

@@ -17,6 +17,7 @@ bool GStreamerPipeline::isFrameReady_ = false;
 GStreamerPipeline::GStreamerPipeline() = default;
 
 GStreamerPipeline::~GStreamerPipeline() {
+    removeBusWatch();
     if (pipeline_) {
         gst_element_set_state(pipeline_, GST_STATE_NULL);
     }
@@ -65,6 +66,16 @@ std::string GStreamerPipeline::getPipelineCommand(const std::string& link) const
     return "filesrc location=" + link +
            " ! decodebin ! videoconvert ! video/x-raw,format=BGR"
            " ! appsink name=videocapture_sink";
+}
+
+void GStreamerPipeline::endOfStream(GstAppSink*, gpointer) {
+    // The appsink reports end of stream on the streaming thread, so consumers
+    // learn about it without depending on anyone iterating the main context.
+    {
+        std::lock_guard<std::mutex> lock(frameMutex_);
+        endOfStream_.store(true);
+    }
+    frameAvailable_.notify_all();
 }
 
 GstFlowReturn GStreamerPipeline::newPreroll(GstAppSink*, gpointer) {
@@ -140,7 +151,10 @@ gboolean GStreamerPipeline::myBusCallback(GstBus*, GstMessage* message, gpointer
             g_printerr("GStreamer error: %s\n", error->message);
             g_error_free(error);
             g_free(debug);
-            endOfStream_.store(true);
+            {
+                std::lock_guard<std::mutex> lock(frameMutex_);
+                endOfStream_.store(true);
+            }
             frameAvailable_.notify_all();
             break;
         }
@@ -187,14 +201,22 @@ void GStreamerPipeline::getSink() {
     gst_app_sink_set_emit_signals(GST_APP_SINK(sink_), true);
     gst_app_sink_set_drop(GST_APP_SINK(sink_), true);
     gst_app_sink_set_max_buffers(GST_APP_SINK(sink_), 1);
-    GstAppSinkCallbacks callbacks = {nullptr, newPreroll, newSample};
+    GstAppSinkCallbacks callbacks = {endOfStream, newPreroll, newSample};
     gst_app_sink_set_callbacks(GST_APP_SINK(sink_), &callbacks, nullptr, nullptr);
 }
 
 void GStreamerPipeline::setBus() {
+    removeBusWatch();
     GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
-    gst_bus_add_watch(bus, myBusCallback, nullptr);
+    busWatchId_ = gst_bus_add_watch(bus, myBusCallback, nullptr);
     gst_object_unref(bus);
+}
+
+void GStreamerPipeline::removeBusWatch() {
+    if (busWatchId_ != 0) {
+        g_source_remove(busWatchId_);
+        busWatchId_ = 0;
+    }
 }
 
 void GStreamerPipeline::setState(GstState state) {
