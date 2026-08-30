@@ -107,11 +107,13 @@ After building the project, you can run the sample application:
 All backends currently return packed BGR8 data through the dependency-free
 `videocapture::Frame` API. `Frame` owns reusable host storage and exposes the
 pixel format, plane dimensions, row stride, optional timestamp, and sequence
-number without leaking backend-specific types. The OpenCV build displays those
-frames; GStreamer and FFmpeg builds decode the input and report the number of
-frames without linking OpenCV. Timestamps, when a backend can provide them, are
-presentation times on the source media timeline rather than wall-clock times;
-sequence numbers start at zero for each successful initialization.
+number without leaking backend-specific types. The OpenCV build displays frames
+in a native window. GStreamer and FFmpeg builds provide a downscaled true-color
+terminal preview when stdout is interactive, without linking OpenCV; headless or
+redirected runs still decode the input and report the frame count. Timestamps,
+when a backend can provide them, are presentation times on the source media
+timeline rather than wall-clock times; sequence numbers start at zero for each
+successful initialization.
 
 ```cpp
 auto capture = createVideoInterface();

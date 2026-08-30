@@ -4,7 +4,10 @@ project(VideoCaptureApp)
 set(CMAKE_CXX_STANDARD 17)
 
 # Add executable
-add_executable(${PROJECT_NAME} main.cpp)
+add_executable(${PROJECT_NAME}
+    main.cpp
+    TerminalRenderer.cpp
+)
 
 # Include directories
 target_include_directories(${PROJECT_NAME} PRIVATE
