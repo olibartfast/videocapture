@@ -2,15 +2,12 @@
 
 #include <gtest/gtest.h>
 #include "ffmpeg/FFmpegCapture.hpp"
-#include <opencv2/core.hpp>
 
 class FFmpegCaptureTest : public ::testing::Test {
 protected:
     std::unique_ptr<FFmpegCapture> capture;
 
-    void SetUp() override {
-        capture = std::make_unique<FFmpegCapture>();
-    }
+    void SetUp() override { capture = std::make_unique<FFmpegCapture>(); }
 
     void TearDown() override {
         if (capture) {
@@ -28,7 +25,7 @@ TEST_F(FFmpegCaptureTest, InitializeWithEmptySource) {
 }
 
 TEST_F(FFmpegCaptureTest, ReadFrameBeforeInitialize) {
-    cv::Mat frame;
+    videocapture::Frame frame;
     EXPECT_FALSE(capture->readFrame(frame));
     EXPECT_TRUE(frame.empty());
 }
@@ -59,38 +56,40 @@ TEST_F(FFmpegCaptureTest, InitializeWithTestSource) {
     // Use FFmpeg's lavfi (Libavfilter) test source
     std::string testSource = "lavfi:testsrc=duration=1:size=640x480:rate=30";
     bool result = capture->initialize(testSource);
-    
+
     if (result) {
-        cv::Mat frame;
+        videocapture::Frame frame;
         EXPECT_TRUE(capture->readFrame(frame));
         EXPECT_FALSE(frame.empty());
-        EXPECT_EQ(frame.cols, 640);
-        EXPECT_EQ(frame.rows, 480);
-        EXPECT_EQ(frame.channels(), 3); // RGB
-        
+        EXPECT_EQ(frame.width(), 640);
+        EXPECT_EQ(frame.height(), 480);
+        EXPECT_EQ(frame.channelCount(), 3);
+        EXPECT_EQ(frame.format(), videocapture::PixelFormat::BGR8);
+        EXPECT_EQ(frame.sequence(), 0U);
+
         capture->release();
     }
 }
 
 TEST_F(FFmpegCaptureTest, MultipleFrameReads) {
     std::string testSource = "lavfi:testsrc=duration=1:size=320x240:rate=10";
-    
+
     if (capture->initialize(testSource)) {
-        cv::Mat frame;
+        videocapture::Frame frame;
         int successfulReads = 0;
-        
+
         // Try to read multiple frames
         for (int i = 0; i < 5; i++) {
             if (capture->readFrame(frame)) {
                 successfulReads++;
                 EXPECT_FALSE(frame.empty());
-                EXPECT_EQ(frame.cols, 320);
-                EXPECT_EQ(frame.rows, 240);
+                EXPECT_EQ(frame.width(), 320);
+                EXPECT_EQ(frame.height(), 240);
             }
         }
-        
+
         EXPECT_GT(successfulReads, 0);
     }
 }
 
-#endif // USE_FFMPEG
+#endif  // USE_FFMPEG

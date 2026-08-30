@@ -19,12 +19,15 @@
 
 - CMake 3.20 or higher
 - C++17 compatible compiler
-- OpenCV
 
-### Optional
+Install the dependency for the backend you select:
 
-- GStreamer (if `USE_GSTREAMER` is enabled)
-- FFmpeg (if `USE_FFMPEG` is enabled)
+- OpenCV for the default backend
+- GStreamer if `USE_GSTREAMER=ON`
+- FFmpeg if `USE_FFMPEG=ON`
+- SDL2 for the sample application's GStreamer and FFmpeg preview window
+
+OpenCV is not required by GStreamer or FFmpeg builds.
 
 ## Installation
 
@@ -32,9 +35,10 @@
 
 Ensure you have the required dependencies installed:
 
-- [OpenCV](https://opencv.org/) (required)
-- [GStreamer](https://gstreamer.freedesktop.org/) (optional)
-- [FFmpeg](https://ffmpeg.org/) (optional)
+- [OpenCV](https://opencv.org/) for the default backend
+- [GStreamer](https://gstreamer.freedesktop.org/) for the GStreamer backend
+- [FFmpeg](https://ffmpeg.org/) for the FFmpeg backend
+- [SDL2](https://www.libsdl.org/) for the alternate-backend sample application
 
 You can use the provided setup scripts to install dependencies:
 
@@ -42,13 +46,13 @@ You can use the provided setup scripts to install dependencies:
 # Install base dependencies (OpenCV)
 ./scripts/setup_dependencies.sh
 
-# Install with GStreamer support
+# Install GStreamer dependencies (without OpenCV)
 ./scripts/setup_dependencies.sh --gstreamer
 
-# Install with FFmpeg support
+# Install FFmpeg dependencies (without OpenCV)
 ./scripts/setup_dependencies.sh --ffmpeg
 
-# Install both GStreamer and FFmpeg
+# Install both GStreamer and FFmpeg dependencies (without OpenCV)
 ./scripts/setup_dependencies.sh --gstreamer --ffmpeg
 ```
 
@@ -102,6 +106,32 @@ After building the project, you can run the sample application:
 ./build/bin/VideoCaptureApp <path/to/video>
 ```
 
+All backends currently return packed BGR8 data through the dependency-free
+`videocapture::Frame` API. `Frame` owns reusable host storage and exposes the
+pixel format, plane dimensions, row stride, optional timestamp, and sequence
+number without leaking backend-specific types. The OpenCV build displays frames
+with HighGUI. GStreamer and FFmpeg builds use an SDL2 window backed by a streaming
+BGR24 texture, without linking OpenCV; if SDL cannot create a video window, the
+application still decodes the input and reports the frame count. Timestamps,
+when a backend can provide them, are presentation times on the source media
+timeline rather than wall-clock times; sequence numbers start at zero for each
+successful initialization.
+
+```cpp
+auto capture = createVideoInterface();
+videocapture::Frame frame;
+if (capture->initialize(source) && capture->readFrame(frame)) {
+    const std::uint8_t* pixels = frame.data();
+    const std::size_t stride = frame.rowStride();
+    // Process frame.height() rows of packed BGR8 pixels.
+}
+```
+
+`Frame.hpp` uses only the C++17 standard library. Standalone consumers do not
+need OpenCV, FFmpeg, GStreamer, or any Neuriplo project to use the returned
+frame. Optional interop layers can adapt its explicit pixel and plane metadata
+to framework-specific image objects.
+
 ## Using in Your Project
 
 To use `VideoCapture` in your project, you can use CMake's `FetchContent`:
@@ -138,4 +168,3 @@ Contributions are welcome! Please feel free to submit a Pull Request. See our [c
 ## License
 
 This project is licensed under the terms specified in the [LICENSE](LICENSE) file.
-

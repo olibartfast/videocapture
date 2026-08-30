@@ -94,12 +94,12 @@ This document describes the continuous integration and continuous deployment (CI
 
 **Triggers:**
 - Weekly schedule (Mondays at 00:00 UTC)
-- Manual workflow dispatch
+- Manual workflow dispatch (report-only unless `create_issue` is selected)
 
 **Steps:**
-- Checks latest available versions of OpenCV, GStreamer, FFmpeg, and CMake
-- Compares with versions in `versions.env`
-- Creates GitHub issue if updates are available
+- Checks Ubuntu 24.04 package candidates for OpenCV, GStreamer, FFmpeg, and CMake
+- Compares candidates with the last reviewed package versions in `versions.env`
+- Creates or updates one GitHub issue only when newer packages are available
 - Helps maintain up-to-date dependencies
 
 ### 6. Documentation Workflow (`.github/workflows/docs.yml`)
@@ -209,9 +209,10 @@ All workflows can be manually triggered from the GitHub Actions tab:
 
 ### Adding New Dependencies
 
-1. Update `versions.env` with minimum version requirements
+1. Add the minimum version requirement to `cmake/versions.cmake`
 2. Update dependency installation steps in all relevant workflows
-3. Update `docs/DEPENDENCY_MANAGEMENT.md`
+3. Add the Ubuntu package baseline to `versions.env` if it should be monitored
+4. Update `docs/DEPENDENCY_MANAGEMENT.md`
 
 ### Adding New Tests
 

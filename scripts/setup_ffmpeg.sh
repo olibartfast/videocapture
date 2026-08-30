@@ -62,6 +62,7 @@ install_ffmpeg_ubuntu() {
         libswscale-dev \
         libavdevice-dev \
         libavfilter-dev \
+        libsdl2-dev \
         pkg-config
     
     print_success "FFmpeg installed successfully"
@@ -73,6 +74,7 @@ install_ffmpeg_fedora() {
     
     sudo dnf install -y \
         ffmpeg-devel \
+        SDL2-devel \
         pkgconfig
     
     print_success "FFmpeg installed successfully"
@@ -84,6 +86,7 @@ install_ffmpeg_arch() {
     
     sudo pacman -S --needed --noconfirm \
         ffmpeg \
+        sdl2 \
         pkgconf
     
     print_success "FFmpeg installed successfully"
@@ -99,7 +102,7 @@ install_ffmpeg_macos() {
         exit 1
     fi
     
-    brew install ffmpeg pkg-config
+    brew install ffmpeg pkg-config sdl2
     
     print_success "FFmpeg installed successfully"
 }
@@ -134,10 +137,10 @@ main() {
         *)
             print_error "Unsupported OS: $OS"
             print_error "Please install FFmpeg manually:"
-            print_error "  - Ubuntu/Debian: sudo apt-get install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev"
-            print_error "  - Fedora/RHEL: sudo dnf install ffmpeg-devel"
-            print_error "  - Arch: sudo pacman -S ffmpeg"
-            print_error "  - macOS: brew install ffmpeg"
+            print_error "  - Ubuntu/Debian: sudo apt-get install libavformat-dev libavcodec-dev libavutil-dev libswscale-dev libsdl2-dev"
+            print_error "  - Fedora/RHEL: sudo dnf install ffmpeg-devel SDL2-devel"
+            print_error "  - Arch: sudo pacman -S ffmpeg sdl2"
+            print_error "  - macOS: brew install ffmpeg sdl2"
             exit 1
             ;;
     esac
