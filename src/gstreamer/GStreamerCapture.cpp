@@ -1,14 +1,22 @@
 #include "GStreamerCapture.hpp"
 
+#include <chrono>
+#include <iostream>
 
- bool GStreamerCapture::initialize(const std::string& source) {
+namespace {
+// Upper bound on how long a wait sits idle before the GLib main context is
+// pumped again for bus messages.
+constexpr std::chrono::milliseconds kBusPollInterval{5};
+}  // namespace
+
+bool GStreamerCapture::initialize(const std::string& source) {
     try {
-        gstocv.initGstLibrary(0, nullptr);
-        gstocv.runPipeline(source);
-        gstocv.checkError();
-        gstocv.getSink();
-        gstocv.setBus();
-        gstocv.setState(GST_STATE_PLAYING);
+        pipeline.initGstLibrary(0, nullptr);
+        pipeline.runPipeline(source);
+        pipeline.checkError();
+        pipeline.getSink();
+        pipeline.setBus();
+        pipeline.setState(GST_STATE_PLAYING);
         initialized = true;
         return true;
     } catch (const std::exception& e) {
@@ -18,24 +26,42 @@
     }
 }
 
-bool GStreamerCapture::readFrame(cv::Mat& frame) {
-    if (!initialized ||   GStreamerOpenCV::isEndOfStream()) {
-        // Handle attempts to read frames without proper initialization
+bool GStreamerCapture::readFrame(videocapture::Frame& frame) {
+    if (!initialized) {
+        frame.clear();
         return false;
-    }   
-    gstocv.setMainLoopEvent(false);
+    }
+    pipeline.setMainLoopEvent(false);
 
     {
-        std::unique_lock<std::mutex> lock(GStreamerOpenCV::frameMutex_);
-        GStreamerOpenCV::frameAvailable_.wait(lock, [this] { return GStreamerOpenCV::isFrameReady_; });
-        frame = gstocv.getFrame().clone();
-    }   
+        std::unique_lock<std::mutex> lock(GStreamerPipeline::frameMutex_);
+        while (!GStreamerPipeline::isFrameReady_ && !GStreamerPipeline::isEndOfStream()) {
+            // Bus messages are dispatched from the default GLib main context and
+            // nothing else iterates it, so pump it between waits. Blocking
+            // indefinitely here would hang the caller on a pipeline that stops
+            // producing buffers, and would keep the demo application from
+            // servicing its window events.
+            lock.unlock();
+            pipeline.setMainLoopEvent(false);
+            lock.lock();
+            if (GStreamerPipeline::isFrameReady_ || GStreamerPipeline::isEndOfStream()) {
+                break;
+            }
+            GStreamerPipeline::frameAvailable_.wait_for(lock, kBusPollInterval);
+        }
+        if (!GStreamerPipeline::isFrameReady_) {
+            frame.clear();
+            return false;
+        }
+        frame = pipeline.takeFrame();
+        GStreamerPipeline::isFrameReady_ = false;
+    }
     return !frame.empty();
 }
 
 void GStreamerCapture::release() {
     // Release GStreamer resources
-    gstocv.setState(GST_STATE_NULL);
+    pipeline.setState(GST_STATE_NULL);
 
     // Reset the initialization status
     initialized = false;

@@ -1,15 +1,21 @@
 #pragma once
-#include <opencv2/core.hpp>
+
+#include "Frame.hpp"
+
+#include <string>
 
 class VideoCaptureInterface {
 public:
-    virtual ~VideoCaptureInterface() {}
+    virtual ~VideoCaptureInterface() = default;
 
     // Initialize the video capture from a source (e.g., file, camera, URL).
     virtual bool initialize(const std::string& source) = 0;
 
     // Read a frame from the video source.
-    virtual bool readFrame(cv::Mat& frame) = 0;
+    // Frames currently use packed BGR8 pixels regardless of the selected backend.
+    // Timestamp values, when available, are presentation times on the source's
+    // media timeline. Sequence values start at zero after initialization.
+    virtual bool readFrame(videocapture::Frame& frame) = 0;
 
     // Release any resources associated with the video capture.
     virtual void release() = 0;

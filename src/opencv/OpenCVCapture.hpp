@@ -1,17 +1,19 @@
 #pragma once
-#include "VideoCaptureInterface.hpp"
-#include <opencv2/highgui/highgui.hpp>
 
+#include <cstdint>
+#include <opencv2/videoio.hpp>
+#include "VideoCaptureInterface.hpp"
 
 class OpenCVCapture : public VideoCaptureInterface {
 private:
     cv::VideoCapture capture;
-    bool initialized = false; // Track initialization status
+    bool initialized = false;  // Track initialization status
+    std::uint64_t nextSequence = 0;
 
 public:
     bool initialize(const std::string& source) override;
 
-    bool readFrame(cv::Mat& frame) override;
+    bool readFrame(videocapture::Frame& frame) override;
 
     void release() override;
 };

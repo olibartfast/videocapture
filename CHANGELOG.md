@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-08-30
+
+### Added
+
+- `videocapture::Frame`, a dependency-free frame abstraction carrying explicit
+  pixel formats, multi-plane layouts, row strides, timestamps, and sequence
+  numbers (`include/Frame.hpp`)
+- SDL2 preview window in the sample application for the GStreamer and FFmpeg
+  backends, avoiding an OpenCV display dependency (`app/SdlRenderer.hpp`)
+- `scripts/check_dependency_updates.sh`, extracting the dependency comparison
+  out of the workflow so it can be run and tested locally
+
+### Changed
+
+- **Breaking:** `readFrame()` now returns a `videocapture::Frame` instead of a
+  `cv::Mat`. Capture backends currently produce packed BGR8.
+- Restricted OpenCV discovery, compilation, and linkage to the OpenCV backend;
+  FFmpeg and GStreamer builds no longer require OpenCV
+- Renamed `GStreamerOpenCV` to `GStreamerPipeline` now that the pipeline no
+  longer depends on OpenCV
+
+### Fixed
+
+- `GStreamerCapture::readFrame()` no longer hangs at end of stream. EOS is
+  reported from the appsink callback and the GLib main context is pumped
+  between short timed waits, so bus errors also break the wait; the bus watch
+  is now removed with the pipeline instead of stacking up on re-initialize.
+- CMake accepts OpenCV major versions newer than 4
+- The dependency-check workflow no longer opens duplicate issues for the same
+  pending updates
+
 ## [0.3.0] - 2026-06-07
 
 ### Added
@@ -62,7 +93,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with Google Test
 - Example application
 
-[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/olibartfast/videocapture/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/olibartfast/videocapture/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/olibartfast/videocapture/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/olibartfast/videocapture/releases/tag/v0.1.0
