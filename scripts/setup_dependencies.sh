@@ -199,7 +199,8 @@ setup_gstreamer() {
                 gstreamer1.0-gl \
                 gstreamer1.0-gtk3 \
                 gstreamer1.0-qt5 \
-                gstreamer1.0-pulseaudio
+                gstreamer1.0-pulseaudio \
+                libsdl2-dev
             ;;
         centos|rhel|fedora)
             sudo yum install -y \
@@ -209,7 +210,8 @@ setup_gstreamer() {
                 gstreamer1-plugins-bad-free \
                 gstreamer1-plugins-bad-free-devel \
                 gstreamer1-plugins-ugly-free \
-                gstreamer1-plugins-ugly-free-devel
+                gstreamer1-plugins-ugly-free-devel \
+                SDL2-devel
             ;;
         *)
             print_warning "GStreamer installation not supported on $os. Please install manually."
@@ -239,11 +241,13 @@ setup_ffmpeg() {
                 libswscale-dev \
                 libavdevice-dev \
                 libavfilter-dev \
+                libsdl2-dev \
                 pkg-config
             ;;
         centos|rhel|fedora)
             sudo yum install -y \
                 ffmpeg-devel \
+                SDL2-devel \
                 pkgconfig
             ;;
         *)

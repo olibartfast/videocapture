@@ -6,7 +6,7 @@
 #include <opencv2/core.hpp>
 #include <opencv2/highgui.hpp>
 #else
-#include "TerminalRenderer.hpp"
+#include "SdlRenderer.hpp"
 #endif
 
 int main(int argc, char* argv[]) {
@@ -25,10 +25,7 @@ int main(int argc, char* argv[]) {
     videocapture::Frame frame;
     std::size_t frameCount = 0;
 #ifndef VIDEOCAPTURE_USE_OPENCV
-    videocapture::app::TerminalRenderer renderer;
-    if (!renderer.available()) {
-        std::cerr << "Terminal preview disabled because stdout is not interactive." << std::endl;
-    }
+    videocapture::app::SdlRenderer renderer("VideoCapture");
 #endif
     while (true) {
         if (!videoInterface->readFrame(frame) || frame.empty()) {
@@ -45,7 +42,9 @@ int main(int argc, char* argv[]) {
             break;
         }
 #else
-        renderer.render(frame);
+        if (!renderer.render(frame)) {
+            break;
+        }
 #endif
     }
 
