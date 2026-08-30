@@ -1,5 +1,8 @@
 #ifdef USE_GSTREAMER
 
+#include <chrono>
+#include <thread>
+
 #include <gtest/gtest.h>
 #include "gstreamer/GStreamerCapture.hpp"
 
@@ -54,6 +57,29 @@ TEST_F(GStreamerCaptureTest, ValidTestPipeline) {
         // Pipeline construction may fail in some environments
         GTEST_SKIP() << "GStreamer pipeline construction failed: " << e.what();
     }
+}
+
+TEST_F(GStreamerCaptureTest, DrainsBufferedFinalFrameBeforeEndOfStream) {
+    std::string pipeline = "videotestsrc num-buffers=1 ! "
+                           "video/x-raw,format=BGR,width=64,height=48 ! appsink";
+
+    ASSERT_TRUE(capture->initialize(pipeline));
+
+    const auto deadline = std::chrono::steady_clock::now() + std::chrono::seconds(5);
+    while (!GStreamerPipeline::isEndOfStream() && std::chrono::steady_clock::now() < deadline) {
+        while (g_main_context_iteration(nullptr, false)) {
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
+    ASSERT_TRUE(GStreamerPipeline::isEndOfStream());
+
+    videocapture::Frame frame;
+    ASSERT_TRUE(capture->readFrame(frame));
+    EXPECT_EQ(frame.sequence(), 0U);
+    EXPECT_FALSE(frame.empty());
+
+    EXPECT_FALSE(capture->readFrame(frame));
+    EXPECT_TRUE(frame.empty());
 }
 
 TEST_F(GStreamerCaptureTest, MultipleReleaseCalls) {
