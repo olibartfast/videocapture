@@ -5,6 +5,12 @@ on:
     # Run weekly on Monday at 00:00 UTC
     - cron: '0 0 * * 1'
   workflow_dispatch:
+    inputs:
+      create_issue:
+        description: Create or update the dependency issue when updates are found
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   issues: write
@@ -14,93 +20,94 @@ jobs:
   check-dependencies:
     name: Check for Dependency Updates
     runs-on: ubuntu-24.04
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
-    - name: Check OpenCV version
-      id: opencv
+    - name: Read Ubuntu package candidates
+      id: packages
       run: |
+        set -euo pipefail
         sudo apt-get update
-        apt-cache policy libopencv-dev | grep Candidate | awk '{print $2}' > opencv_version.txt
-        echo "Latest available OpenCV version:"
-        cat opencv_version.txt
 
-    - name: Check GStreamer version
-      id: gstreamer
-      run: |
-        apt-cache policy libgstreamer1.0-dev | grep Candidate | awk '{print $2}' > gstreamer_version.txt
-        echo "Latest available GStreamer version:"
-        cat gstreamer_version.txt
+        candidate() {
+          apt-cache policy "$1" | awk '/Candidate:/ {print $2}'
+        }
 
-    - name: Check FFmpeg version
-      id: ffmpeg
-      run: |
-        apt-cache policy libavcodec-dev | grep Candidate | awk '{print $2}' > ffmpeg_version.txt
-        echo "Latest available FFmpeg version:"
-        cat ffmpeg_version.txt
+        {
+          echo "opencv=$(candidate libopencv-dev)"
+          echo "gstreamer=$(candidate libgstreamer1.0-dev)"
+          echo "ffmpeg=$(candidate libavcodec-dev)"
+          echo "cmake=$(candidate cmake)"
+        } >> "$GITHUB_OUTPUT"
 
-    - name: Check CMake version
-      id: cmake
+    - name: Compare with reviewed package versions
+      id: compare
+      env:
+        OPENCV_CANDIDATE: ${{ steps.packages.outputs.opencv }}
+        GSTREAMER_CANDIDATE: ${{ steps.packages.outputs.gstreamer }}
+        FFMPEG_CANDIDATE: ${{ steps.packages.outputs.ffmpeg }}
+        CMAKE_CANDIDATE: ${{ steps.packages.outputs.cmake }}
       run: |
-        apt-cache policy cmake | grep Candidate | awk '{print $2}' > cmake_version.txt
-        echo "Latest available CMake version:"
-        cat cmake_version.txt
-
-    - name: Compare with versions.env
-      run: |
-        echo "=== Current versions in versions.env ==="
-        cat versions.env
-        echo ""
-        echo "=== Latest available versions ==="
-        echo "OpenCV: $(cat opencv_version.txt)"
-        echo "GStreamer: $(cat gstreamer_version.txt)"
-        echo "FFmpeg: $(cat ffmpeg_version.txt)"
-        echo "CMake: $(cat cmake_version.txt)"
+        updates_available="$(scripts/check_dependency_updates.sh \
+          versions.env dependency-report.md \
+          "$OPENCV_CANDIDATE" "$GSTREAMER_CANDIDATE" \
+          "$FFMPEG_CANDIDATE" "$CMAKE_CANDIDATE")"
+        echo "updates_available=$updates_available" >> "$GITHUB_OUTPUT"
+        cat dependency-report.md
 
     - name: Create issue if updates available
-      if: success()
+      if: >-
+        steps.compare.outputs.updates_available == 'true' &&
+        (github.event_name == 'schedule' || inputs.create_issue)
       uses: actions/github-script@v9
       with:
         script: |
           const fs = require('fs');
-          const opencv = fs.readFileSync('opencv_version.txt', 'utf8').trim();
-          const gstreamer = fs.readFileSync('gstreamer_version.txt', 'utf8').trim();
-          const ffmpeg = fs.readFileSync('ffmpeg_version.txt', 'utf8').trim();
-          const cmake = fs.readFileSync('cmake_version.txt', 'utf8').trim();
-          
+          const marker = '<!-- videocapture-dependency-update-check -->';
+          const report = fs.readFileSync('dependency-report.md', 'utf8').trim();
+          const date = new Date().toISOString().split('T')[0];
+          const title = `Dependency Update Check - ${date}`;
           const body = `## Dependency Update Check
-          
-          The following versions are currently available in Ubuntu 22.04 repositories:
-          
-          - **OpenCV**: ${opencv}
-          - **GStreamer**: ${gstreamer}
-          - **FFmpeg**: ${ffmpeg}
-          - **CMake**: ${cmake}
-          
-          Please review \`versions.env\` and update if necessary.
-          
+          ${marker}
+
+          ${report}
+
+          Review the available updates. If no minimum build requirement needs to
+          change, record the reviewed package versions in \`versions.env\`.
+
           This issue was automatically created by the dependency update check workflow.`;
-          
-          // Check if a similar issue already exists
-          const issues = await github.rest.issues.listForRepo({
+
+          const issues = await github.paginate(github.rest.issues.listForRepo, {
             owner: context.repo.owner,
             repo: context.repo.repo,
             state: 'open',
-            labels: ['dependencies']
+            labels: 'dependencies',
+            per_page: 100
           });
-          
-          const existingIssue = issues.data.find(issue => 
-            issue.title.includes('Dependency Update Check')
+
+          const existingIssue = issues.find(issue =>
+            !issue.pull_request &&
+            (issue.body?.includes(marker) ||
+             (issue.title.startsWith('Dependency Update Check') &&
+              issue.labels.some(label => label.name === 'automated')))
           );
-          
-          if (!existingIssue) {
+
+          if (existingIssue) {
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: existingIssue.number,
+              title,
+              body
+            });
+          } else {
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Dependency Update Check - ${new Date().toISOString().split('T')[0]}`,
-              body: body,
+              title,
+              body,
               labels: ['dependencies', 'automated']
             });
           }
