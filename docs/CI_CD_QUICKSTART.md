@@ -233,10 +233,11 @@ cmake --build build
 
 ### Updating Dependencies
 
-1. Update `versions.env`
-2. Update workflow files if needed
-3. Test locally
-4. Create PR - CI will validate changes
+1. Update minimum build requirements in `cmake/versions.cmake` when compatibility changes
+2. Record reviewed Ubuntu package versions in `versions.env`
+3. Update workflow files if needed
+4. Test locally
+5. Create PR - CI will validate changes
 
 ### Changing Build Configuration
 
