@@ -83,20 +83,12 @@ $(document).ready(function() { init_codefold(0); });
 </div><!--header-->
 <div class="contents">
 <a href="VideoCaptureFactory_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="VideoCaptureInterface_8hpp.html">VideoCaptureInterface.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#ifdef USE_GSTREAMER</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="GStreamerCapture_8hpp.html">GStreamerCapture.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#ifdef USE_FFMPEG</span></div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &quot;<a class="code" href="FFmpegCapture_8hpp.html">FFmpegCapture.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#endif</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &quot;<a class="code" href="OpenCVCapture_8hpp.html">OpenCVCapture.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> std::unique_ptr&lt;VideoCaptureInterface&gt; <a class="code hl_function" href="VideoCaptureFactory_8hpp.html#aed05a19349826460b4620e75df0060da">createVideoInterface</a>(); </div>
-<div class="ttc" id="aFFmpegCapture_8hpp_html"><div class="ttname"><a href="FFmpegCapture_8hpp.html">FFmpegCapture.hpp</a></div></div>
-<div class="ttc" id="aGStreamerCapture_8hpp_html"><div class="ttname"><a href="GStreamerCapture_8hpp.html">GStreamerCapture.hpp</a></div></div>
-<div class="ttc" id="aOpenCVCapture_8hpp_html"><div class="ttname"><a href="OpenCVCapture_8hpp.html">OpenCVCapture.hpp</a></div></div>
-<div class="ttc" id="aVideoCaptureFactory_8hpp_html_aed05a19349826460b4620e75df0060da"><div class="ttname"><a href="VideoCaptureFactory_8hpp.html#aed05a19349826460b4620e75df0060da">createVideoInterface</a></div><div class="ttdeci">std::unique_ptr&lt; VideoCaptureInterface &gt; createVideoInterface()</div><div class="ttdef"><b>Definition</b> VideoCaptureFactory.cpp:4</div></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;<a class="code" href="VideoCaptureInterface_8hpp.html">VideoCaptureInterface.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>std::unique_ptr&lt;VideoCaptureInterface&gt; <a class="code hl_function" href="VideoCaptureFactory_8hpp.html#aed05a19349826460b4620e75df0060da">createVideoInterface</a>();</div>
+<div class="ttc" id="aVideoCaptureFactory_8hpp_html_aed05a19349826460b4620e75df0060da"><div class="ttname"><a href="VideoCaptureFactory_8hpp.html#aed05a19349826460b4620e75df0060da">createVideoInterface</a></div><div class="ttdeci">std::unique_ptr&lt; VideoCaptureInterface &gt; createVideoInterface()</div><div class="ttdef"><b>Definition</b> VideoCaptureFactory.cpp:11</div></div>
 <div class="ttc" id="aVideoCaptureInterface_8hpp_html"><div class="ttname"><a href="VideoCaptureInterface_8hpp.html">VideoCaptureInterface.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

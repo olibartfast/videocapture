@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['initgstlibrary_0',['initGstLibrary',['../classGStreamerOpenCV.html#a69fdbbfc9b659d33f2924ad52fe24327',1,'GStreamerOpenCV']]],
-  ['initialize_1',['initialize',['../classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70',1,'VideoCaptureInterface::initialize()'],['../classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268',1,'FFmpegCapture::initialize()'],['../classGStreamerCapture.html#a4bfc6b5848bcf1fa4832071ff9bd92ba',1,'GStreamerCapture::initialize()'],['../classOpenCVCapture.html#a4ec3d2bb87b46772c66f66becfb23619',1,'OpenCVCapture::initialize()']]],
-  ['isendofstream_2',['isEndOfStream',['../classGStreamerOpenCV.html#aa43c39533fdad273f79d83fe5a2a6a0a',1,'GStreamerOpenCV']]]
+  ['ffmpegcapture_0',['FFmpegCapture',['../classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982',1,'FFmpegCapture']]],
+  ['format_1',['format',['../classvideocapture_1_1Frame.html#abe98a2bfd7f1516fbcc796dbe3304f02',1,'videocapture::Frame']]],
+  ['frame_2',['frame',['../classvideocapture_1_1Frame.html#a02deff785fbaf99eb149a83c435e6816',1,'videocapture::Frame::Frame()=default'],['../classvideocapture_1_1Frame.html#ab05d58f4ae7d1f74b7d28dac1d3cb710',1,'videocapture::Frame::Frame(int width, int height, PixelFormat format=PixelFormat::BGR8)']]]
 ];

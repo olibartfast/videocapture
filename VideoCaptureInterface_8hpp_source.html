@@ -83,28 +83,36 @@ $(document).ready(function() { init_codefold(0); });
 </div><!--header-->
 <div class="contents">
 <a href="VideoCaptureInterface_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;opencv2/core.hpp&gt;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
-<div class="foldopen" id="foldopen00004" data-start="{" data-end="};">
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html">    4</a></span><span class="keyword">class </span><a class="code hl_class" href="classVideoCaptureInterface.html">VideoCaptureInterface</a> {</div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a639cf0e50e5f49e411d42e9d647cee9a">    6</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a639cf0e50e5f49e411d42e9d647cee9a">~VideoCaptureInterface</a>() {}</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>    <span class="comment">// Initialize the video capture from a source (e.g., file, camera, URL).</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70">    9</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70">initialize</a>(<span class="keyword">const</span> std::string&amp; source) = 0;</div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span> </div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;<a class="code" href="Frame_8hpp.html">Frame.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span> </div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="foldopen" id="foldopen00007" data-start="{" data-end="};">
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html">    7</a></span><span class="keyword">class </span><a class="code hl_class" href="classVideoCaptureInterface.html">VideoCaptureInterface</a> {</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#afaa8ed02cb2a65eab720303df66743ae">    9</a></span>    <span class="keyword">virtual</span> <a class="code hl_function" href="classVideoCaptureInterface.html#afaa8ed02cb2a65eab720303df66743ae">~VideoCaptureInterface</a>() = <span class="keywordflow">default</span>;</div>
 <div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span> </div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="comment">// Read a frame from the video source.</span></div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a0ed694adf36badca3fdbf9272cb1d1cd">   12</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a0ed694adf36badca3fdbf9272cb1d1cd">readFrame</a>(cv::Mat&amp; frame) = 0;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="comment">// Initialize the video capture from a source (e.g., file, camera, URL).</span></div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70">   12</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70">initialize</a>(<span class="keyword">const</span> std::string&amp; source) = 0;</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="comment">// Release any resources associated with the video capture.</span></div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71">   15</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71">release</a>() = 0;</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>};</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="comment">// Read a frame from the video source.</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    <span class="comment">// Frames currently use packed BGR8 pixels regardless of the selected backend.</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>    <span class="comment">// Timestamp values, when available, are presentation times on the source&#39;s</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="comment">// media timeline. Sequence values start at zero after initialization.</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a5022038cfbb386b9f008e4aff216156d">   18</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">bool</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a5022038cfbb386b9f008e4aff216156d">readFrame</a>(<a class="code hl_class" href="classvideocapture_1_1Frame.html">videocapture::Frame</a>&amp; frame) = 0;</div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="comment">// Release any resources associated with the video capture.</span></div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno"><a class="line" href="classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71">   21</a></span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> <a class="code hl_function" href="classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71">release</a>() = 0;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>};</div>
 </div>
-<div class="ttc" id="aclassVideoCaptureInterface_html"><div class="ttname"><a href="classVideoCaptureInterface.html">VideoCaptureInterface</a></div><div class="ttdef"><b>Definition</b> VideoCaptureInterface.hpp:4</div></div>
-<div class="ttc" id="aclassVideoCaptureInterface_html_a0ed694adf36badca3fdbf9272cb1d1cd"><div class="ttname"><a href="classVideoCaptureInterface.html#a0ed694adf36badca3fdbf9272cb1d1cd">VideoCaptureInterface::readFrame</a></div><div class="ttdeci">virtual bool readFrame(cv::Mat &amp;frame)=0</div></div>
+<div class="ttc" id="aFrame_8hpp_html"><div class="ttname"><a href="Frame_8hpp.html">Frame.hpp</a></div></div>
+<div class="ttc" id="aclassVideoCaptureInterface_html"><div class="ttname"><a href="classVideoCaptureInterface.html">VideoCaptureInterface</a></div><div class="ttdef"><b>Definition</b> VideoCaptureInterface.hpp:7</div></div>
 <div class="ttc" id="aclassVideoCaptureInterface_html_a4aa1b44fff6fe1cd0c35b6347b145a71"><div class="ttname"><a href="classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71">VideoCaptureInterface::release</a></div><div class="ttdeci">virtual void release()=0</div></div>
-<div class="ttc" id="aclassVideoCaptureInterface_html_a639cf0e50e5f49e411d42e9d647cee9a"><div class="ttname"><a href="classVideoCaptureInterface.html#a639cf0e50e5f49e411d42e9d647cee9a">VideoCaptureInterface::~VideoCaptureInterface</a></div><div class="ttdeci">virtual ~VideoCaptureInterface()</div><div class="ttdef"><b>Definition</b> VideoCaptureInterface.hpp:6</div></div>
+<div class="ttc" id="aclassVideoCaptureInterface_html_a5022038cfbb386b9f008e4aff216156d"><div class="ttname"><a href="classVideoCaptureInterface.html#a5022038cfbb386b9f008e4aff216156d">VideoCaptureInterface::readFrame</a></div><div class="ttdeci">virtual bool readFrame(videocapture::Frame &amp;frame)=0</div></div>
 <div class="ttc" id="aclassVideoCaptureInterface_html_a73d934f28a8553e3b3dc88e18b64fd70"><div class="ttname"><a href="classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70">VideoCaptureInterface::initialize</a></div><div class="ttdeci">virtual bool initialize(const std::string &amp;source)=0</div></div>
+<div class="ttc" id="aclassVideoCaptureInterface_html_afaa8ed02cb2a65eab720303df66743ae"><div class="ttname"><a href="classVideoCaptureInterface.html#afaa8ed02cb2a65eab720303df66743ae">VideoCaptureInterface::~VideoCaptureInterface</a></div><div class="ttdeci">virtual ~VideoCaptureInterface()=default</div></div>
+<div class="ttc" id="aclassvideocapture_1_1Frame_html"><div class="ttname"><a href="classvideocapture_1_1Frame.html">videocapture::Frame</a></div><div class="ttdef"><b>Definition</b> Frame.hpp:28</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

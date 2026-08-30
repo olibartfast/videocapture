@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['isframeready_5f_0',['isFrameReady_',['../classGStreamerOpenCV.html#a64acf19c679ba64de321c439635a98c2',1,'GStreamerOpenCV']]]
+  ['isframeready_5f_0',['isFrameReady_',['../classGStreamerPipeline.html#a45b698807fcca968a93f3fa0f2bf3dfa',1,'GStreamerPipeline']]]
 ];

@@ -83,15 +83,15 @@ $(document).ready(function() { init_codefold(0); });
 </div><!--header-->
 <div class="contents">
 <a href="FFmpegCapture_8hpp.html">Go to the documentation of this file.</a><div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#pragma once</span></div>
-<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &quot;<a class="code" href="VideoCaptureInterface_8hpp.html">VideoCaptureInterface.hpp</a>&quot;</span></div>
-<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;string&gt;</span></div>
-<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
-<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;libavformat/avformat.h&gt;</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#include &lt;cstdint&gt;</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;memory&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;string&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;<a class="code" href="VideoCaptureInterface_8hpp.html">VideoCaptureInterface.hpp</a>&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">extern</span> <span class="stringliteral">&quot;C&quot;</span> {</div>
 <div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;libavcodec/avcodec.h&gt;</span></div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;libswscale/swscale.h&gt;</span></div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;libavutil/imgutils.h&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;libavformat/avformat.h&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="preprocessor">#include &lt;libswscale/swscale.h&gt;</span></div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>}</div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
 <div class="foldopen" id="foldopen00013" data-start="{" data-end="};">
@@ -102,31 +102,31 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <span class="keyword">const</span> AVCodec* codec = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>    SwsContext* swsContext = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>    AVFrame* frame = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    AVFrame* frameRGB = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    AVPacket* packet = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    uint8_t* buffer = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    <span class="keywordtype">int</span> videoStreamIndex = -1;</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>    <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span> </div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>    <span class="keywordtype">void</span> cleanup();</div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span> </div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_function" href="classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982">FFmpegCapture</a>();</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>    <a class="code hl_function" href="classFFmpegCapture.html#a6f2a76034be4123ecccbd75f19c74236">~FFmpegCapture</a>();</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span> </div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268">initialize</a>(<span class="keyword">const</span> std::string&amp; source) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classFFmpegCapture.html#ae7c3c4c50b5b420270cee37ffdf936c1">readFrame</a>(cv::Mat&amp; frame) <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classFFmpegCapture.html#a43cb4e5070aca419976fa4166409f929">release</a>() <span class="keyword">override</span>;</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>};</div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    AVPacket* packet = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>    <span class="keywordtype">int</span> videoStreamIndex = -1;</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>    <span class="keywordtype">bool</span> initialized = <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>    std::uint64_t nextSequence = 0;</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span> </div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>    <span class="keywordtype">void</span> cleanup();</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>    <a class="code hl_function" href="classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982">FFmpegCapture</a>();</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>    <a class="code hl_function" href="classFFmpegCapture.html#a6f2a76034be4123ecccbd75f19c74236">~FFmpegCapture</a>();</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span> </div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268">initialize</a>(<span class="keyword">const</span> std::string&amp; source) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>    <span class="keywordtype">bool</span> <a class="code hl_function" href="classFFmpegCapture.html#a29622863a7de77ca32757ee367166748">readFrame</a>(<a class="code hl_class" href="classvideocapture_1_1Frame.html">videocapture::Frame</a>&amp; frame) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>    <span class="keywordtype">void</span> <a class="code hl_function" href="classFFmpegCapture.html#a43cb4e5070aca419976fa4166409f929">release</a>() <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>};</div>
 </div>
 <div class="ttc" id="aVideoCaptureInterface_8hpp_html"><div class="ttname"><a href="VideoCaptureInterface_8hpp.html">VideoCaptureInterface.hpp</a></div></div>
 <div class="ttc" id="aclassFFmpegCapture_html"><div class="ttname"><a href="classFFmpegCapture.html">FFmpegCapture</a></div><div class="ttdef"><b>Definition</b> FFmpegCapture.hpp:13</div></div>
-<div class="ttc" id="aclassFFmpegCapture_html_a43cb4e5070aca419976fa4166409f929"><div class="ttname"><a href="classFFmpegCapture.html#a43cb4e5070aca419976fa4166409f929">FFmpegCapture::release</a></div><div class="ttdeci">void release() override</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:209</div></div>
-<div class="ttc" id="aclassFFmpegCapture_html_a506b395b2f80c3b42d1f283a2751e268"><div class="ttname"><a href="classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268">FFmpegCapture::initialize</a></div><div class="ttdeci">bool initialize(const std::string &amp;source) override</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:46</div></div>
+<div class="ttc" id="aclassFFmpegCapture_html_a29622863a7de77ca32757ee367166748"><div class="ttname"><a href="classFFmpegCapture.html#a29622863a7de77ca32757ee367166748">FFmpegCapture::readFrame</a></div><div class="ttdeci">bool readFrame(videocapture::Frame &amp;frame) override</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:139</div></div>
+<div class="ttc" id="aclassFFmpegCapture_html_a43cb4e5070aca419976fa4166409f929"><div class="ttname"><a href="classFFmpegCapture.html#a43cb4e5070aca419976fa4166409f929">FFmpegCapture::release</a></div><div class="ttdeci">void release() override</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:198</div></div>
+<div class="ttc" id="aclassFFmpegCapture_html_a506b395b2f80c3b42d1f283a2751e268"><div class="ttname"><a href="classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268">FFmpegCapture::initialize</a></div><div class="ttdeci">bool initialize(const std::string &amp;source) override</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:39</div></div>
 <div class="ttc" id="aclassFFmpegCapture_html_a6f2a76034be4123ecccbd75f19c74236"><div class="ttname"><a href="classFFmpegCapture.html#a6f2a76034be4123ecccbd75f19c74236">FFmpegCapture::~FFmpegCapture</a></div><div class="ttdeci">~FFmpegCapture()</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:10</div></div>
 <div class="ttc" id="aclassFFmpegCapture_html_abd11f31816c7f0768982a706b3e4f982"><div class="ttname"><a href="classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982">FFmpegCapture::FFmpegCapture</a></div><div class="ttdeci">FFmpegCapture()</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:5</div></div>
-<div class="ttc" id="aclassFFmpegCapture_html_ae7c3c4c50b5b420270cee37ffdf936c1"><div class="ttname"><a href="classFFmpegCapture.html#ae7c3c4c50b5b420270cee37ffdf936c1">FFmpegCapture::readFrame</a></div><div class="ttdeci">bool readFrame(cv::Mat &amp;frame) override</div><div class="ttdef"><b>Definition</b> FFmpegCapture.cpp:162</div></div>
-<div class="ttc" id="aclassVideoCaptureInterface_html"><div class="ttname"><a href="classVideoCaptureInterface.html">VideoCaptureInterface</a></div><div class="ttdef"><b>Definition</b> VideoCaptureInterface.hpp:4</div></div>
+<div class="ttc" id="aclassVideoCaptureInterface_html"><div class="ttname"><a href="classVideoCaptureInterface.html">VideoCaptureInterface</a></div><div class="ttdef"><b>Definition</b> VideoCaptureInterface.hpp:7</div></div>
+<div class="ttc" id="aclassvideocapture_1_1Frame_html"><div class="ttname"><a href="classvideocapture_1_1Frame.html">videocapture::Frame</a></div><div class="ttdef"><b>Definition</b> Frame.hpp:28</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

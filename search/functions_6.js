@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['_7effmpegcapture_0',['~FFmpegCapture',['../classFFmpegCapture.html#a6f2a76034be4123ecccbd75f19c74236',1,'FFmpegCapture']]],
-  ['_7egstreameropencv_1',['~GStreamerOpenCV',['../classGStreamerOpenCV.html#a3a62d48b4c8fe8967cf86f33964bf1e1',1,'GStreamerOpenCV']]],
-  ['_7evideocaptureinterface_2',['~VideoCaptureInterface',['../classVideoCaptureInterface.html#a639cf0e50e5f49e411d42e9d647cee9a',1,'VideoCaptureInterface']]]
+  ['initgstlibrary_0',['initGstLibrary',['../classGStreamerPipeline.html#abcc4a31176186acf6b0b964565e41a30',1,'GStreamerPipeline']]],
+  ['initialize_1',['initialize',['../classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70',1,'VideoCaptureInterface::initialize()'],['../classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268',1,'FFmpegCapture::initialize()'],['../classGStreamerCapture.html#ade78891d230652f78a770d33c11a30dd',1,'GStreamerCapture::initialize()'],['../classOpenCVCapture.html#a4ec3d2bb87b46772c66f66becfb23619',1,'OpenCVCapture::initialize()']]],
+  ['isendofstream_2',['isEndOfStream',['../classGStreamerPipeline.html#a6ee619871eec5e5b13f7b76b6980d3e0',1,'GStreamerPipeline']]]
 ];

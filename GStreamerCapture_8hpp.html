@@ -79,38 +79,50 @@ $(function() {
   <div class="headertitle"><div class="title">GStreamerCapture.hpp File Reference</div></div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &quot;<a class="el" href="VideoCaptureInterface_8hpp_source.html">VideoCaptureInterface.hpp</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="GStreamerOpenCV_8hpp_source.html">GStreamerOpenCV.hpp</a>&quot;</code><br />
-<code>#include &lt;condition_variable&gt;</code><br />
-<code>#include &lt;mutex&gt;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="GStreamerPipeline_8hpp_source.html">GStreamerPipeline.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="VideoCaptureInterface_8hpp_source.html">VideoCaptureInterface.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for GStreamerCapture.hpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="GStreamerCapture_8hpp__incl.png" border="0" usemap="#asrc_2gstreamer_2GStreamerCapture_8hpp" alt=""/></div>
 <map name="asrc_2gstreamer_2GStreamerCapture_8hpp" id="asrc_2gstreamer_2GStreamerCapture_8hpp">
-<area shape="rect" title=" " alt="" coords="615,5,880,31"/>
-<area shape="rect" href="VideoCaptureInterface_8hpp.html" title=" " alt="" coords="191,79,387,104"/>
-<area shape="poly" title=" " alt="" coords="674,33,376,79,376,74,673,28"/>
-<area shape="rect" href="GStreamerOpenCV_8hpp.html" title=" " alt="" coords="601,79,771,104"/>
-<area shape="poly" title=" " alt="" coords="739,33,707,70,703,66,735,29"/>
-<area shape="rect" title=" " alt="" coords="816,152,959,177"/>
-<area shape="poly" title=" " alt="" coords="761,29,869,140,865,144,757,33"/>
-<area shape="rect" title=" " alt="" coords="983,152,1047,177"/>
-<area shape="poly" title=" " alt="" coords="770,29,983,143,981,148,768,33"/>
-<area shape="rect" title=" " alt="" coords="5,152,143,177"/>
-<area shape="poly" title=" " alt="" coords="255,107,123,150,121,145,253,101"/>
-<area shape="rect" title=" " alt="" coords="347,152,425,177"/>
-<area shape="poly" title=" " alt="" coords="638,107,439,154,438,148,637,101"/>
-<area shape="rect" title=" " alt="" coords="450,152,607,177"/>
-<area shape="poly" title=" " alt="" coords="662,106,568,149,566,144,660,102"/>
-<area shape="rect" title=" " alt="" coords="631,152,690,177"/>
-<area shape="poly" title=" " alt="" coords="684,105,672,140,667,138,679,103"/>
-<area shape="rect" title=" " alt="" coords="714,152,791,177"/>
-<area shape="poly" title=" " alt="" coords="699,103,734,140,731,144,695,106"/>
-<area shape="poly" title=" " alt="" coords="719,102,843,145,841,150,717,107"/>
-<area shape="poly" title=" " alt="" coords="744,101,971,149,971,149,970,155,969,155,743,107"/>
-<area shape="rect" title=" " alt="" coords="167,152,322,177"/>
-<area shape="poly" title=" " alt="" coords="616,107,330,152,329,147,615,101"/>
+<area shape="rect" title=" " alt="" coords="382,5,647,31"/>
+<area shape="rect" href="GStreamerPipeline_8hpp.html" title=" " alt="" coords="533,79,705,104"/>
+<area shape="poly" title=" " alt="" coords="533,28,592,68,589,73,530,33"/>
+<area shape="rect" href="VideoCaptureInterface_8hpp.html" title=" " alt="" coords="250,152,446,177"/>
+<area shape="poly" title=" " alt="" coords="503,33,373,145,370,141,499,29"/>
+<area shape="poly" title=" " alt="" coords="576,107,406,151,404,146,575,101"/>
+<area shape="rect" title=" " alt="" coords="436,225,495,251"/>
+<area shape="poly" title=" " alt="" coords="588,106,549,126,511,154,490,183,476,213,471,211,486,180,507,150,546,121,586,102"/>
+<area shape="rect" title=" " alt="" coords="521,152,588,177"/>
+<area shape="poly" title=" " alt="" coords="610,106,576,144,572,140,606,103"/>
+<area shape="rect" title=" " alt="" coords="613,152,755,177"/>
+<area shape="poly" title=" " alt="" coords="631,103,666,140,662,144,627,106"/>
+<area shape="rect" title=" " alt="" coords="780,152,844,177"/>
+<area shape="poly" title=" " alt="" coords="651,102,769,145,767,150,649,107"/>
+<area shape="rect" title=" " alt="" coords="868,152,1025,177"/>
+<area shape="poly" title=" " alt="" coords="672,101,881,146,880,152,671,107"/>
+<area shape="rect" title=" " alt="" coords="1050,152,1129,177"/>
+<area shape="poly" title=" " alt="" coords="705,100,856,121,1037,149,1036,155,855,126,704,106"/>
+<area shape="rect" href="Frame_8hpp.html" title=" " alt="" coords="303,225,393,251"/>
+<area shape="poly" title=" " alt="" coords="351,178,351,212,345,212,345,178"/>
+<area shape="poly" title=" " alt="" coords="368,175,436,216,433,220,365,180"/>
+<area shape="rect" title=" " alt="" coords="5,299,61,324"/>
+<area shape="poly" title=" " alt="" coords="303,251,76,301,75,296,302,246"/>
+<area shape="rect" title=" " alt="" coords="85,299,152,324"/>
+<area shape="poly" title=" " alt="" coords="312,253,166,298,165,293,310,248"/>
+<area shape="rect" title=" " alt="" coords="177,299,247,324"/>
+<area shape="poly" title=" " alt="" coords="327,253,247,295,245,290,325,248"/>
+<area shape="rect" title=" " alt="" coords="272,299,339,324"/>
+<area shape="poly" title=" " alt="" coords="343,252,321,288,317,286,339,250"/>
+<area shape="rect" title=" " alt="" coords="363,299,421,324"/>
+<area shape="poly" title=" " alt="" coords="358,250,380,286,375,288,353,252"/>
+<area shape="rect" title=" " alt="" coords="445,299,520,324"/>
+<area shape="poly" title=" " alt="" coords="371,248,450,290,447,294,368,253"/>
+<area shape="rect" title=" " alt="" coords="545,299,631,324"/>
+<area shape="poly" title=" " alt="" coords="387,248,537,292,535,297,386,253"/>
+<area shape="rect" title=" " alt="" coords="655,299,718,324"/>
+<area shape="poly" title=" " alt="" coords="394,245,642,296,641,301,393,250"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">

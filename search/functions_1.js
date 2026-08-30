@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['ffmpegcapture_0',['FFmpegCapture',['../classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982',1,'FFmpegCapture']]]
+  ['data_0',['data',['../classvideocapture_1_1Frame.html#ab375e1b42a382af3c931b7ccbe916890',1,'videocapture::Frame::data(std::size_t plane=0) noexcept'],['../classvideocapture_1_1Frame.html#a556bdf6e54ddfd755beb4a9447c4248e',1,'videocapture::Frame::data(std::size_t plane=0) const noexcept']]]
 ];

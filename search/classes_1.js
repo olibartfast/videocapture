@@ -1,5 +1,5 @@
 var searchData=
 [
   ['gstreamercapture_0',['GStreamerCapture',['../classGStreamerCapture.html',1,'']]],
-  ['gstreameropencv_1',['GStreamerOpenCV',['../classGStreamerOpenCV.html',1,'']]]
+  ['gstreamerpipeline_1',['GStreamerPipeline',['../classGStreamerPipeline.html',1,'']]]
 ];

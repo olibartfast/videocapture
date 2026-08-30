@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['getframe_0',['getFrame',['../classGStreamerOpenCV.html#a4eda6b77c64609bff102ff3ea264abaf',1,'GStreamerOpenCV']]],
-  ['getsink_1',['getSink',['../classGStreamerOpenCV.html#a0c711ff3ddc08e177da81d2aad40b4d8',1,'GStreamerOpenCV']]],
-  ['gstreameropencv_2',['GStreamerOpenCV',['../classGStreamerOpenCV.html#a54fc98f6f2f609b5e6ab3e8afaf9728a',1,'GStreamerOpenCV']]]
+  ['empty_0',['empty',['../classvideocapture_1_1Frame.html#a660d8ff1489611e20b7142b050860e73',1,'videocapture::Frame']]]
 ];
