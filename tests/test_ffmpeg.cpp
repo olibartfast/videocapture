@@ -25,7 +25,7 @@ TEST_F(FFmpegCaptureTest, InitializeWithEmptySource) {
 }
 
 TEST_F(FFmpegCaptureTest, ReadFrameBeforeInitialize) {
-    VideoFrame frame;
+    videocapture::Frame frame;
     EXPECT_FALSE(capture->readFrame(frame));
     EXPECT_TRUE(frame.empty());
 }
@@ -58,12 +58,14 @@ TEST_F(FFmpegCaptureTest, InitializeWithTestSource) {
     bool result = capture->initialize(testSource);
 
     if (result) {
-        VideoFrame frame;
+        videocapture::Frame frame;
         EXPECT_TRUE(capture->readFrame(frame));
         EXPECT_FALSE(frame.empty());
-        EXPECT_EQ(frame.width, 640);
-        EXPECT_EQ(frame.height, 480);
-        EXPECT_EQ(frame.channels(), 3);  // BGR
+        EXPECT_EQ(frame.width(), 640);
+        EXPECT_EQ(frame.height(), 480);
+        EXPECT_EQ(frame.channelCount(), 3);
+        EXPECT_EQ(frame.format(), videocapture::PixelFormat::BGR8);
+        EXPECT_EQ(frame.sequence(), 0U);
 
         capture->release();
     }
@@ -73,7 +75,7 @@ TEST_F(FFmpegCaptureTest, MultipleFrameReads) {
     std::string testSource = "lavfi:testsrc=duration=1:size=320x240:rate=10";
 
     if (capture->initialize(testSource)) {
-        VideoFrame frame;
+        videocapture::Frame frame;
         int successfulReads = 0;
 
         // Try to read multiple frames
@@ -81,8 +83,8 @@ TEST_F(FFmpegCaptureTest, MultipleFrameReads) {
             if (capture->readFrame(frame)) {
                 successfulReads++;
                 EXPECT_FALSE(frame.empty());
-                EXPECT_EQ(frame.width, 320);
-                EXPECT_EQ(frame.height, 240);
+                EXPECT_EQ(frame.width(), 320);
+                EXPECT_EQ(frame.height(), 240);
             }
         }
 

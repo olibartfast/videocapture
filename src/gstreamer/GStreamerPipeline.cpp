@@ -1,6 +1,7 @@
 #include "GStreamerPipeline.hpp"
 
 #include <cstring>
+#include <limits>
 #include <stdexcept>
 #include <utility>
 
@@ -8,8 +9,9 @@
 
 std::mutex GStreamerPipeline::frameMutex_;
 std::condition_variable GStreamerPipeline::frameAvailable_;
-VideoFrame GStreamerPipeline::frame_;
+videocapture::Frame GStreamerPipeline::frame_;
 std::atomic_bool GStreamerPipeline::endOfStream_ = false;
+std::atomic_uint64_t GStreamerPipeline::nextSequence_ = 0;
 bool GStreamerPipeline::isFrameReady_ = false;
 
 GStreamerPipeline::GStreamerPipeline() = default;
@@ -101,11 +103,19 @@ GstFlowReturn GStreamerPipeline::newSample(GstAppSink* appsink, gpointer) {
     if (sourceStride < 0 || static_cast<std::size_t>(sourceStride) < rowBytes) {
         result = GST_FLOW_ERROR;
     } else {
-        VideoFrame nextFrame;
-        nextFrame.resize(width, height);
+        videocapture::Frame nextFrame;
+        nextFrame.resize(width, height, videocapture::PixelFormat::BGR8);
         for (int row = 0; row < height; ++row) {
-            std::memcpy(nextFrame.data.data() + static_cast<std::size_t>(row) * nextFrame.stride,
+            std::memcpy(nextFrame.data() + static_cast<std::size_t>(row) * nextFrame.rowStride(),
                         source + static_cast<std::size_t>(row) * sourceStride, rowBytes);
+        }
+        nextFrame.setSequence(nextSequence_.fetch_add(1));
+        const GstClockTime presentationTimestamp = GST_BUFFER_PTS(buffer);
+        if (GST_CLOCK_TIME_IS_VALID(presentationTimestamp) &&
+            presentationTimestamp <=
+                static_cast<GstClockTime>(std::numeric_limits<std::int64_t>::max())) {
+            nextFrame.setTimestamp(
+                std::chrono::nanoseconds(static_cast<std::int64_t>(presentationTimestamp)));
         }
 
         {
@@ -194,6 +204,7 @@ void GStreamerPipeline::setState(GstState state) {
     if (state == GST_STATE_PLAYING) {
         std::lock_guard<std::mutex> lock(frameMutex_);
         endOfStream_.store(false);
+        nextSequence_.store(0);
         isFrameReady_ = false;
         frame_.clear();
     }
@@ -210,6 +221,8 @@ bool GStreamerPipeline::isEndOfStream() {
     return endOfStream_.load();
 }
 
-VideoFrame GStreamerPipeline::getFrame() const {
-    return frame_;
+videocapture::Frame GStreamerPipeline::takeFrame() {
+    videocapture::Frame result = std::move(frame_);
+    frame_.clear();
+    return result;
 }

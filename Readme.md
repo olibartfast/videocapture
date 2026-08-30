@@ -104,17 +104,29 @@ After building the project, you can run the sample application:
 ./build/bin/VideoCaptureApp <path/to/video>
 ```
 
-All backends return packed BGR24 data through `VideoFrame`. The OpenCV build
-displays those frames; GStreamer and FFmpeg builds decode the input and report
-the number of frames without linking OpenCV.
+All backends currently return packed BGR8 data through the dependency-free
+`videocapture::Frame` API. `Frame` owns reusable host storage and exposes the
+pixel format, plane dimensions, row stride, optional timestamp, and sequence
+number without leaking backend-specific types. The OpenCV build displays those
+frames; GStreamer and FFmpeg builds decode the input and report the number of
+frames without linking OpenCV. Timestamps, when a backend can provide them, are
+presentation times on the source media timeline rather than wall-clock times;
+sequence numbers start at zero for each successful initialization.
 
 ```cpp
 auto capture = createVideoInterface();
-VideoFrame frame;
+videocapture::Frame frame;
 if (capture->initialize(source) && capture->readFrame(frame)) {
-    // frame.data contains height rows of stride-byte packed BGR24 pixels.
+    const std::uint8_t* pixels = frame.data();
+    const std::size_t stride = frame.rowStride();
+    // Process frame.height() rows of packed BGR8 pixels.
 }
 ```
+
+`Frame.hpp` uses only the C++17 standard library. Standalone consumers do not
+need OpenCV, FFmpeg, GStreamer, or any Neuriplo project to use the returned
+frame. Optional interop layers can adapt its explicit pixel and plane metadata
+to framework-specific image objects.
 
 ## Using in Your Project
 

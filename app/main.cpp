@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    VideoFrame frame;
+    videocapture::Frame frame;
     std::size_t frameCount = 0;
     while (true) {
         if (!videoInterface->readFrame(frame) || frame.empty()) {
@@ -30,7 +30,8 @@ int main(int argc, char* argv[]) {
         ++frameCount;
 
 #ifdef VIDEOCAPTURE_USE_OPENCV
-        cv::Mat displayFrame(frame.height, frame.width, CV_8UC3, frame.data.data(), frame.stride);
+        cv::Mat displayFrame(frame.height(), frame.width(), CV_8UC3, frame.data(),
+                             frame.rowStride());
         cv::imshow("Frame", displayFrame);
         if (cv::waitKey(10) >= 0) {
             break;
