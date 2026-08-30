@@ -55,6 +55,7 @@ jobs:
       if: startsWith(matrix.os, 'ubuntu') && matrix.backend == 'all'
       run: |
         sudo apt-get install -y \
+          libsdl2-dev \
           libgstreamer1.0-dev \
           libgstreamer-plugins-base1.0-dev \
           libgstreamer-plugins-bad1.0-dev \
@@ -73,7 +74,7 @@ jobs:
     - name: Install all backends (macOS)
       if: startsWith(matrix.os, 'macos') && matrix.backend == 'all'
       run: |
-        brew install gstreamer gst-plugins-base gst-plugins-good ffmpeg
+        brew install gstreamer gst-plugins-base gst-plugins-good ffmpeg sdl2
 
     - name: Configure CMake (OpenCV only)
       if: matrix.backend == 'opencv'

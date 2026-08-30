@@ -1,18 +1,20 @@
 #pragma once
-#include <gst/gst.h>
-#include <gst/app/gstappsink.h>
-#include <string>
-#include <memory>
+
+#include "VideoCaptureInterface.hpp"
+
+#include <atomic>
 #include <condition_variable>
 #include <mutex>
-#include <opencv2/opencv.hpp>
+#include <string>
 
-class GStreamerOpenCV {
+#include <gst/app/gstappsink.h>
+#include <gst/gst.h>
 
-
+class GStreamerPipeline {
 public:
-    GStreamerOpenCV();
-    ~GStreamerOpenCV();
+    GStreamerPipeline();
+    ~GStreamerPipeline();
+
     void initGstLibrary(int argc, char* argv[]);
     void runPipeline(const std::string& link);
     void checkError();
@@ -20,15 +22,12 @@ public:
     void setBus();
     void setState(GstState state);
     void setMainLoopEvent(bool event);
-    cv::Mat getFrame() const;
-    void setFrame(const cv::Mat& frame);
+    videocapture::Frame takeFrame();
 
-    static void setEndOfStream(bool value);
     static bool isEndOfStream();
 
-
-    static std::mutex frameMutex_; // Mutex to protect frame access
-    static std::condition_variable frameAvailable_; // Condition variable to signal new frames
+    static std::mutex frameMutex_;
+    static std::condition_variable frameAvailable_;
     static bool isFrameReady_;
 
 private:
@@ -36,15 +35,12 @@ private:
     static GstFlowReturn newSample(GstAppSink* appsink, gpointer data);
     static gboolean myBusCallback(GstBus* bus, GstMessage* message, gpointer data);
 
+    std::string getPipelineCommand(const std::string& link) const;
+
     GError* error_ = nullptr;
     GstElement* pipeline_ = nullptr;
     GstElement* sink_ = nullptr;
-    GstBus* bus_ = nullptr;
-    static cv::Mat frame_;
-    static bool end_of_stream_;
-
-
-
-    std::string getPipelineCommand(const std::string& link) const;
-
+    static videocapture::Frame frame_;
+    static std::atomic_bool endOfStream_;
+    static std::atomic_uint64_t nextSequence_;
 };

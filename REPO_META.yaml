@@ -18,6 +18,7 @@ entrypoints:
     - ctest --test-dir build --output-on-failure
 
 owned_paths:
+  - .github/workflows/
   - include/
   - src/
   - app/
@@ -26,10 +27,14 @@ owned_paths:
   - docs/
   - scripts/
   - CMakeLists.txt
+  - CHANGELOG.md
+  - Dockerfile.full
   - Readme.md
   - AGENTS.md
+  - REPO_META.yaml
 
 allowed_change_classes:
+  - feature-implementation
   - ci-triage
   - dependency-sync
   - io-regression-fix
@@ -37,10 +42,13 @@ allowed_change_classes:
 
 forbidden_change_classes:
   - packaging-release-change
-  - large-refactor
-  - new-dependency
+  - unapproved-large-refactor
+  - unapproved-new-dependency
 
 constraints:
   preserve_source_semantics: true
   preserve_backend_priority: true
   review_stream_behavior_changes: mandatory
+  public_frame_api_dependency_free: true
+  large_refactors_require_explicit_approval: true
+  new_dependencies_require_explicit_approval: true

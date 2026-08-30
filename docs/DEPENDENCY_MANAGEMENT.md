@@ -8,6 +8,7 @@ The VideoCapture library has been enhanced with a centralized dependency managem
 
 - **Centralized Version Management**: All video processing library versions are managed in a single file
 - **Multiple Backend Support**: OpenCV (default), GStreamer, and FFmpeg backends
+- **Backend-isolated Dependencies**: OpenCV is discovered only for the OpenCV backend
 - **Dependency Validation**: Automatic validation of installed dependencies
 - **Unified Setup Scripts**: Easy installation of video processing dependencies
 - **Backward Compatibility**: Existing scripts continue to work
@@ -31,7 +32,8 @@ set(CXX_STANDARD "20" CACHE STRING "C++ standard version")
 
 ### Dependency Validation
 
-The `cmake/DependencyValidation.cmake` module provides comprehensive validation:
+The `cmake/DependencyValidation.cmake` module validates only the dependencies
+needed by the enabled backends:
 
 - **System Dependencies**: CMake version, C++ standard support
 - **Video Processing Libraries**: OpenCV, GStreamer, FFmpeg
@@ -48,10 +50,10 @@ The main setup script `scripts/setup_dependencies.sh` supports all video process
 # Setup basic dependencies (OpenCV only)
 ./scripts/setup_dependencies.sh
 
-# Setup with GStreamer support
+# Setup GStreamer without installing OpenCV
 ./scripts/setup_dependencies.sh --gstreamer
 
-# Setup with FFmpeg support
+# Setup FFmpeg without installing OpenCV
 ./scripts/setup_dependencies.sh --ffmpeg
 
 # Setup with both GStreamer and FFmpeg
@@ -81,7 +83,7 @@ include(cmake/versions.cmake)
 # Include dependency validation
 include(cmake/DependencyValidation.cmake)
 
-# Validate dependencies before proceeding
+# Validate the selected backend dependencies before proceeding
 validate_all_dependencies()
 ```
 
