@@ -10,8 +10,10 @@ include(GoogleTest)
 
 # Common test sources
 set(TEST_SOURCES
+    ${PROJECT_SOURCE_DIR}/app/TerminalRenderer.cpp
     test_main.cpp
     test_factory.cpp
+    test_terminal_renderer.cpp
     test_video_frame.cpp
 )
 
@@ -43,6 +45,7 @@ target_link_libraries(VideoCaptureTests
 target_include_directories(VideoCaptureTests
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/app
         ${PROJECT_SOURCE_DIR}/src
 )
 

@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Added a dependency-free true-color terminal preview to the sample application
+  when using the GStreamer or FFmpeg backend.
 - Replaced the public `cv::Mat` frame type with the dependency-free
   `videocapture::Frame` abstraction. Capture backends currently return packed
   BGR8 while the frame contract also represents explicit pixel formats,
