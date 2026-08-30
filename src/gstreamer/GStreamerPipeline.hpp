@@ -31,15 +31,18 @@ public:
     static bool isFrameReady_;
 
 private:
+    static void endOfStream(GstAppSink* appsink, gpointer data);
     static GstFlowReturn newPreroll(GstAppSink* appsink, gpointer data);
     static GstFlowReturn newSample(GstAppSink* appsink, gpointer data);
     static gboolean myBusCallback(GstBus* bus, GstMessage* message, gpointer data);
 
     std::string getPipelineCommand(const std::string& link) const;
+    void removeBusWatch();
 
     GError* error_ = nullptr;
     GstElement* pipeline_ = nullptr;
     GstElement* sink_ = nullptr;
+    guint busWatchId_ = 0;
     static videocapture::Frame frame_;
     static std::atomic_bool endOfStream_;
     static std::atomic_uint64_t nextSequence_;
