@@ -16,7 +16,9 @@ endfunction()
 
 # Function to validate OpenCV
 function(validate_opencv)
-    find_package(OpenCV REQUIRED)
+    if(NOT VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+        return()
+    endif()
     if(OpenCV_VERSION VERSION_LESS OPENCV_MIN_VERSION)
         message(FATAL_ERROR "OpenCV version ${OpenCV_VERSION} is too old. Minimum required: ${OPENCV_MIN_VERSION}")
     endif()
@@ -101,7 +103,7 @@ function(test_gstreamer_compilation)
         set(CMAKE_REQUIRED_LIBRARIES ${GSTREAMER_LIBRARIES})
         
         check_cxx_source_compiles(
-            "#include <gstreamer-1.0/gst/gst.h>
+             "#include <gst/gst.h>
              int main() { gst_init(NULL, NULL); return 0; }"
             GSTREAMER_COMPILES
         )
@@ -112,4 +114,4 @@ function(test_gstreamer_compilation)
             message(STATUS "✓ GStreamer compilation test passed")
         endif()
     endif()
-endfunction() 
+endfunction()

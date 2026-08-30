@@ -33,6 +33,3 @@ set(GSTREAMER_LIBRARIES
 message(STATUS "GStreamer version: ${GSTREAMER_VERSION}")
 message(STATUS "GSTREAMER_INCLUDE_DIRS: ${GSTREAMER_INCLUDE_DIRS}")
 message(STATUS "GSTREAMER_LIBRARIES: ${GSTREAMER_LIBRARIES}")
-
-# Define a compile definition to indicate GStreamer usage
-add_compile_definitions(USE_GSTREAMER)

@@ -1,13 +1,13 @@
 #pragma once
-#include "VideoCaptureInterface.hpp"
-#include <string>
+#include <cstdint>
 #include <memory>
+#include <string>
+#include "VideoCaptureInterface.hpp"
 
 extern "C" {
-#include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
 #include <libswscale/swscale.h>
-#include <libavutil/imgutils.h>
 }
 
 class FFmpegCapture : public VideoCaptureInterface {
@@ -17,11 +17,10 @@ private:
     const AVCodec* codec = nullptr;
     SwsContext* swsContext = nullptr;
     AVFrame* frame = nullptr;
-    AVFrame* frameRGB = nullptr;
     AVPacket* packet = nullptr;
-    uint8_t* buffer = nullptr;
     int videoStreamIndex = -1;
     bool initialized = false;
+    std::uint64_t nextSequence = 0;
 
     void cleanup();
 
@@ -30,6 +29,6 @@ public:
     ~FFmpegCapture();
 
     bool initialize(const std::string& source) override;
-    bool readFrame(cv::Mat& frame) override;
+    bool readFrame(videocapture::Frame& frame) override;
     void release() override;
 };

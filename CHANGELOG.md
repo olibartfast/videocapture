@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Added an SDL2 preview window to the sample application when using the
+  GStreamer or FFmpeg backend, avoiding an OpenCV display dependency.
+- Replaced the public `cv::Mat` frame type with the dependency-free
+  `videocapture::Frame` abstraction. Capture backends currently return packed
+  BGR8 while the frame contract also represents explicit pixel formats,
+  multi-plane layouts, row strides, timestamps, and sequence numbers.
+- Restricted OpenCV discovery, compilation, and linkage to the OpenCV backend;
+  FFmpeg and GStreamer builds no longer require OpenCV.
+
 ## [0.3.0] - 2026-06-07
 
 ### Added

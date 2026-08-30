@@ -12,10 +12,21 @@ include(GoogleTest)
 set(TEST_SOURCES
     test_main.cpp
     test_factory.cpp
-    test_opencv.cpp
+    test_video_frame.cpp
 )
 
+if(NOT VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    list(APPEND TEST_SOURCES
+        ${PROJECT_SOURCE_DIR}/app/SdlRenderer.cpp
+        test_sdl_renderer.cpp
+    )
+endif()
+
 # Add backend-specific tests if enabled
+if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    list(APPEND TEST_SOURCES test_opencv.cpp)
+endif()
+
 if(USE_GSTREAMER)
     list(APPEND TEST_SOURCES test_gstreamer.cpp)
 endif()
@@ -33,17 +44,25 @@ target_link_libraries(VideoCaptureTests
         VideoCapture
         GTest::GTest
         GTest::Main
-        ${OpenCV_LIBS}
-        curl  # Fix for curl library versioning issues with OpenCV dependencies
 )
 
 # Add include directories
 target_include_directories(VideoCaptureTests
     PRIVATE
         ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/app
         ${PROJECT_SOURCE_DIR}/src
-        ${PROJECT_SOURCE_DIR}/src/opencv
 )
+
+if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+    target_include_directories(VideoCaptureTests PRIVATE
+        ${PROJECT_SOURCE_DIR}/src/opencv
+        ${OpenCV_INCLUDE_DIRS}
+    )
+    target_link_libraries(VideoCaptureTests PRIVATE ${OpenCV_LIBS})
+else()
+    target_link_libraries(VideoCaptureTests PRIVATE VideoCaptureSDL2)
+endif()
 
 # Add backend-specific include directories
 if(USE_GSTREAMER)
@@ -70,13 +89,6 @@ if(USE_FFMPEG)
             ${FFMPEG_LIBRARIES}
     )
     target_compile_definitions(VideoCaptureTests PRIVATE USE_FFMPEG)
-endif()
-
-# Add OpenCV include directories
-if(OpenCV_INCLUDE_DIRS)
-    target_include_directories(VideoCaptureTests PRIVATE ${OpenCV_INCLUDE_DIRS})
-else()
-    target_include_directories(VideoCaptureTests PRIVATE /usr/include/opencv4)
 endif()
 
 # Discover tests (skip discovery if binary can't run due to library issues)
