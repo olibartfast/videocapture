@@ -25,7 +25,7 @@ Install the dependency for the backend you select:
 - OpenCV for the default backend
 - GStreamer if `USE_GSTREAMER=ON`
 - FFmpeg if `USE_FFMPEG=ON`
-- SDL2 for the sample application's GStreamer and FFmpeg preview window
+- A sample-app renderer: OpenCV HighGUI, SDL2, GLFW, or Sokol
 
 OpenCV is not required by GStreamer or FFmpeg builds.
 
@@ -38,7 +38,8 @@ Ensure you have the required dependencies installed:
 - [OpenCV](https://opencv.org/) for the default backend
 - [GStreamer](https://gstreamer.freedesktop.org/) for the GStreamer backend
 - [FFmpeg](https://ffmpeg.org/) for the FFmpeg backend
-- [SDL2](https://www.libsdl.org/) for the alternate-backend sample application
+- [SDL2](https://www.libsdl.org/), [GLFW](https://www.glfw.org/), or
+  [Sokol](https://github.com/floooh/sokol) for an explicitly selected sample renderer
 
 You can use the provided setup scripts to install dependencies:
 
@@ -91,6 +92,26 @@ You can use the provided setup scripts to install dependencies:
     cmake --build build
     ```
 
+    **Try GLFW or Sokol in the sample app:**
+    ```bash
+    cmake -B build-glfw -S . -DUSE_FFMPEG=ON \
+      -DVIDEOCAPTURE_APP_RENDERER=GLFW \
+      -DVIDEOCAPTURE_FETCH_APP_DEPENDENCIES=ON
+    cmake --build build-glfw
+
+    cmake -B build-sokol -S . -DUSE_FFMPEG=ON \
+      -DVIDEOCAPTURE_APP_RENDERER=SOKOL \
+      -DVIDEOCAPTURE_FETCH_APP_DEPENDENCIES=ON
+    cmake --build build-sokol
+    ```
+
+    `VIDEOCAPTURE_APP_RENDERER=AUTO` keeps the existing behavior: OpenCV
+    HighGUI for the default capture backend and SDL2 for FFmpeg or GStreamer.
+    Dependency fetching is off by default. Install GLFW system-wide, or set
+    `SOKOL_ROOT`, to use those renderers without configure-time network access.
+    The fetch path pins GLFW 3.5.1 and Sokol commit
+    `1847290135f95e57e6d220b0a41208306aafc0dd`.
+
 ### Backend Priority
 
 When multiple backends are enabled, the library uses the following priority order:
@@ -110,9 +131,11 @@ All backends currently return packed BGR8 data through the dependency-free
 `videocapture::Frame` API. `Frame` owns reusable host storage and exposes the
 pixel format, plane dimensions, row stride, optional timestamp, and sequence
 number without leaking backend-specific types. The OpenCV build displays frames
-with HighGUI. GStreamer and FFmpeg builds use an SDL2 window backed by a streaming
-BGR24 texture, without linking OpenCV; if SDL cannot create a video window, the
-application still decodes the input and reports the frame count. Timestamps,
+with HighGUI. GStreamer and FFmpeg builds default to SDL2, while
+`VIDEOCAPTURE_APP_RENDERER` can select GLFW or Sokol without linking OpenCV.
+The renderer interface and factory live only in `app/`; the capture library and
+public frame API do not depend on any window toolkit. SDL and GLFW disable their
+preview and continue decoding if a window cannot be created. Timestamps,
 when a backend can provide them, are presentation times on the source media
 timeline rather than wall-clock times; sequence numbers start at zero for each
 successful initialization.

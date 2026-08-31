@@ -12,15 +12,9 @@ include(GoogleTest)
 set(TEST_SOURCES
     test_main.cpp
     test_factory.cpp
+    test_renderer.cpp
     test_video_frame.cpp
 )
-
-if(NOT VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
-    list(APPEND TEST_SOURCES
-        ${PROJECT_SOURCE_DIR}/app/SdlRenderer.cpp
-        test_sdl_renderer.cpp
-    )
-endif()
 
 # Add backend-specific tests if enabled
 if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
@@ -42,6 +36,7 @@ add_executable(VideoCaptureTests ${TEST_SOURCES})
 target_link_libraries(VideoCaptureTests
     PRIVATE
         VideoCapture
+        VideoCaptureAppRenderer
         GTest::GTest
         GTest::Main
 )
@@ -49,26 +44,20 @@ target_link_libraries(VideoCaptureTests
 # Add include directories
 target_include_directories(VideoCaptureTests
     PRIVATE
-        ${PROJECT_SOURCE_DIR}/include
-        ${PROJECT_SOURCE_DIR}/app
-        ${PROJECT_SOURCE_DIR}/src
+        ${CMAKE_SOURCE_DIR}/include
+        ${CMAKE_SOURCE_DIR}/src
 )
 
 if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
-    target_include_directories(VideoCaptureTests PRIVATE
-        ${PROJECT_SOURCE_DIR}/src/opencv
-        ${OpenCV_INCLUDE_DIRS}
-    )
+    target_include_directories(VideoCaptureTests PRIVATE ${OpenCV_INCLUDE_DIRS})
     target_link_libraries(VideoCaptureTests PRIVATE ${OpenCV_LIBS})
-else()
-    target_link_libraries(VideoCaptureTests PRIVATE VideoCaptureSDL2)
 endif()
 
 # Add backend-specific include directories
 if(USE_GSTREAMER)
     target_include_directories(VideoCaptureTests
         PRIVATE
-            ${PROJECT_SOURCE_DIR}/src/gstreamer
+            ${CMAKE_SOURCE_DIR}/src/gstreamer
             ${GSTREAMER_INCLUDE_DIRS}
     )
     target_link_libraries(VideoCaptureTests
@@ -81,7 +70,7 @@ endif()
 if(USE_FFMPEG)
     target_include_directories(VideoCaptureTests
         PRIVATE
-            ${PROJECT_SOURCE_DIR}/src/ffmpeg
+            ${CMAKE_SOURCE_DIR}/src/ffmpeg
             ${FFMPEG_INCLUDE_DIRS}
     )
     target_link_libraries(VideoCaptureTests
