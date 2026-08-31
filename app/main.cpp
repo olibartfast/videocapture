@@ -1,13 +1,9 @@
 #include <iostream>
+#include <memory>
+#include <string>
 
+#include "Renderer.hpp"
 #include "VideoCaptureFactory.hpp"
-
-#ifdef VIDEOCAPTURE_USE_OPENCV
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#else
-#include "SdlRenderer.hpp"
-#endif
 
 int main(int argc, char* argv[]) {
     if (argc != 2) {
@@ -22,31 +18,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    videocapture::Frame frame;
-    std::size_t frameCount = 0;
-#ifndef VIDEOCAPTURE_USE_OPENCV
-    videocapture::app::SdlRenderer renderer("VideoCapture");
-#endif
-    while (true) {
-        if (!videoInterface->readFrame(frame) || frame.empty()) {
-            break;
-        }
-
-        ++frameCount;
-
-#ifdef VIDEOCAPTURE_USE_OPENCV
-        cv::Mat displayFrame(frame.height(), frame.width(), CV_8UC3, frame.data(),
-                             frame.rowStride());
-        cv::imshow("Frame", displayFrame);
-        if (cv::waitKey(10) >= 0) {
-            break;
-        }
-#else
-        if (!renderer.render(frame)) {
-            break;
-        }
-#endif
-    }
+    auto renderer = videocapture::app::createRenderer("VideoCapture");
+    const std::size_t frameCount = renderer->run(
+        [&videoInterface](videocapture::Frame& frame) { return videoInterface->readFrame(frame); });
 
     videoInterface->release();
     std::cout << "Decoded " << frameCount << " frame(s)." << std::endl;
