@@ -7,14 +7,14 @@
 
 namespace videocapture::app {
 
-class SdlRenderer final : public PollingRenderer {
+class SokolRenderer final : public Renderer {
 public:
-    explicit SdlRenderer(std::string title);
-    ~SdlRenderer() override;
+    explicit SokolRenderer(std::string title);
+    ~SokolRenderer() override;
+
+    std::size_t run(FrameReader readFrame) override;
 
 private:
-    bool present(const Frame& frame) override;
-
     struct Impl;
     std::unique_ptr<Impl> impl_;
 };

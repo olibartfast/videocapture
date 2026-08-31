@@ -73,22 +73,6 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     find_package(OpenCV REQUIRED COMPONENTS ${OPENCV_COMPONENTS})
 endif()
 
-# SDL2 belongs only to the top-level sample application and its tests. Library
-# consumers keep the dependency-free Frame API and do not need SDL2.
-if(PROJECT_IS_TOP_LEVEL AND NOT VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
-    find_package(SDL2 CONFIG QUIET)
-    add_library(VideoCaptureSDL2 INTERFACE)
-    if(TARGET SDL2::SDL2)
-        target_link_libraries(VideoCaptureSDL2 INTERFACE SDL2::SDL2)
-    elseif(TARGET SDL2::SDL2-static)
-        target_link_libraries(VideoCaptureSDL2 INTERFACE SDL2::SDL2-static)
-    else()
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
-        target_link_libraries(VideoCaptureSDL2 INTERFACE PkgConfig::SDL2)
-    endif()
-endif()
-
 # Validate dependencies before proceeding
 validate_all_dependencies()
 
