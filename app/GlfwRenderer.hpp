@@ -7,10 +7,10 @@
 
 namespace videocapture::app {
 
-class SdlRenderer final : public PollingRenderer {
+class GlfwRenderer final : public PollingRenderer {
 public:
-    explicit SdlRenderer(std::string title);
-    ~SdlRenderer() override;
+    explicit GlfwRenderer(std::string title);
+    ~GlfwRenderer() override;
 
 private:
     bool present(const Frame& frame) override;
