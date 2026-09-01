@@ -29,6 +29,10 @@ if(USE_FFMPEG)
     list(APPEND TEST_SOURCES test_ffmpeg.cpp)
 endif()
 
+if(USE_VIDEOWRITER)
+    list(APPEND TEST_SOURCES test_video_writer.cpp)
+endif()
+
 # Create test executable
 add_executable(VideoCaptureTests ${TEST_SOURCES})
 

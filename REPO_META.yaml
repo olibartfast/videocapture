@@ -12,6 +12,8 @@ entrypoints:
     - cmake -S . -B build -DUSE_GSTREAMER=ON
   configure_ffmpeg:
     - cmake -S . -B build -DUSE_FFMPEG=ON
+  configure_videowriter:
+    - cmake -S . -B build -DUSE_FFMPEG=ON -DUSE_VIDEOWRITER=ON
   build:
     - cmake --build build
   test:
@@ -50,5 +52,6 @@ constraints:
   preserve_backend_priority: true
   review_stream_behavior_changes: mandatory
   public_frame_api_dependency_free: true
+  writer_adds_no_new_dependency: true
   large_refactors_require_explicit_approval: true
   new_dependencies_require_explicit_approval: true
