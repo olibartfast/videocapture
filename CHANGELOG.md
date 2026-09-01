@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Optional video writer module, enabled with `-DUSE_VIDEOWRITER=ON`
+  (`include/VideoWriterInterface.hpp`, `include/VideoWriterConfig.hpp`,
+  `include/VideoWriterFactory.hpp`). `createVideoWriter()` follows the same
+  backend priority as `createVideoInterface()`, so a build encodes through the
+  backend it decodes with and the option adds no dependency in any
+  configuration: FFmpeg encodes with the already-linked libav* libraries,
+  GStreamer pushes through the `appsrc` in the already-linked `libgstapp`, and
+  the OpenCV backend uses `cv::VideoWriter` from the already-linked `videoio`.
+- Writer backends for FFmpeg, GStreamer, and OpenCV, accepting the packed 8-bit
+  `videocapture::Frame` layouts and converting to the encoder's format
+- Optional output path and frame rate arguments in the sample application
+  (`VideoCaptureApp <source> [output] [fps]`) for writer builds
+
 ## [0.4.0] - 2026-08-30
 
 ### Added

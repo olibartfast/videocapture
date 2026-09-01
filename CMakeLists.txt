@@ -39,6 +39,14 @@ if(NOT DEFINED USE_FFMPEG)
 endif()
 set(USE_FFMPEG OFF CACHE BOOL "Use FFmpeg for video capture (optional)")
 
+# Define an option to enable or disable the video writer module. The writer
+# encodes through the same backend that capture selected, so enabling it pulls
+# in no dependency the build does not already carry.
+if(NOT DEFINED USE_VIDEOWRITER)
+    unset(USE_VIDEOWRITER CACHE)
+endif()
+set(USE_VIDEOWRITER OFF CACHE BOOL "Build the video writer module (optional)")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
@@ -52,6 +60,7 @@ else()
     set(VIDEOCAPTURE_BACKEND "OpenCV")
 endif()
 message(STATUS "VideoCapture backend: ${VIDEOCAPTURE_BACKEND}")
+message(STATUS "VideoCapture writer: ${USE_VIDEOWRITER}")
 
 # Discover only the dependencies used by enabled backends. OpenCV is not part
 # of the public frame API and is needed only by the OpenCV backend and demo.
@@ -97,6 +106,29 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     )
 endif()
 
+# The writer mirrors the capture sources: one implementation per enabled
+# backend, with the factory selecting the same one capture uses.
+if(USE_VIDEOWRITER)
+    list(APPEND VIDEOCAPTURE_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/src/VideoWriterFactory.cpp
+    )
+    if(USE_GSTREAMER)
+        list(APPEND VIDEOCAPTURE_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerWriter.cpp
+        )
+    endif()
+    if(USE_FFMPEG)
+        list(APPEND VIDEOCAPTURE_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg/FFmpegWriter.cpp
+        )
+    endif()
+    if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+        list(APPEND VIDEOCAPTURE_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/src/opencv/OpenCVWriter.cpp
+        )
+    endif()
+endif()
+
 # Create the video capture library
 add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 
@@ -107,6 +139,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src
 )
+
+# Consumers need this to know whether VideoWriterFactory.hpp is usable, so it
+# is part of the target's public interface rather than a private flag.
+if(USE_VIDEOWRITER)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VIDEOCAPTURE_WITH_WRITER)
+endif()
 
 # Link against GStreamer libraries if USE_GSTREAMER is ON
 message(STATUS "USE_GSTREAMER value: ${USE_GSTREAMER}")
