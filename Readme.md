@@ -112,6 +112,12 @@ You can use the provided setup scripts to install dependencies:
     The fetch path pins GLFW 3.5.1 and Sokol commit
     `1847290135f95e57e6d220b0a41208306aafc0dd`.
 
+    **With the video writer (combines with any backend):**
+    ```bash
+    cmake -B build -S . -DUSE_FFMPEG=ON -DUSE_VIDEOWRITER=ON
+    cmake --build build
+    ```
+
 ### Backend Priority
 
 When multiple backends are enabled, the library uses the following priority order:
@@ -125,6 +131,12 @@ After building the project, you can run the sample application:
 
 ```bash
 ./build/bin/VideoCaptureApp <path/to/video>
+```
+
+Writer builds accept an output path and an optional output frame rate:
+
+```bash
+./build/bin/VideoCaptureApp <path/to/video> out.mp4 25
 ```
 
 All backends currently return packed BGR8 data through the dependency-free
@@ -154,6 +166,66 @@ if (capture->initialize(source) && capture->readFrame(frame)) {
 need OpenCV, FFmpeg, GStreamer, or any Neuriplo project to use the returned
 frame. Optional interop layers can adapt its explicit pixel and plane metadata
 to framework-specific image objects.
+
+## Writing Video
+
+`USE_VIDEOWRITER=ON` adds a sink that mirrors the capture side: `initialize` /
+`writeFrame` / `release` against the same dependency-free `videocapture::Frame`.
+`createVideoWriter()` follows the same backend priority as
+`createVideoInterface()`, so a build encodes with whatever it decodes with.
+
+```cpp
+#include "VideoWriterFactory.hpp"
+
+videocapture::VideoWriterConfig config;
+config.width = frame.width();
+config.height = frame.height();
+config.frameRate = 30.0;              // the caller owns the output timeline
+config.codec = videocapture::VideoCodec::Auto;  // or H264, HEVC, MJPEG
+
+auto writer = createVideoWriter();
+if (writer->initialize("annotated.mp4", config)) {
+    writer->writeFrame(frame);
+    writer->release();                // flushes the encoder and closes the file
+}
+```
+
+### What the writer costs
+
+Enabling the writer drops no dependency and adds none: every backend already
+links the library that encodes.
+
+| Build configuration | What `-DUSE_VIDEOWRITER=ON` links |
+| --- | --- |
+| `USE_FFMPEG=ON` | nothing new — encoding uses the `libavcodec`, `libavformat`, `libswscale` already linked for decoding |
+| `USE_GSTREAMER=ON` | nothing new — `appsrc` lives in the `libgstapp` already linked for the capture `appsink` |
+| OpenCV (default) | nothing new — `cv::VideoWriter` is in the `videoio` module already linked |
+
+What does vary is what has to be installed at runtime: a container and codec are
+only writable if the backend was built with, or can load, that encoder. The
+GStreamer writer needs the plugin for the encoder it selects (`jpegenc` from
+gst-plugins-good, `x264enc` from gst-plugins-ugly, `x265enc` and `h265parse`
+from gst-plugins-bad).
+
+### Writer contract
+
+- Frames must carry a packed 8-bit layout (`Gray8`, `RGB8`, `BGR8`, `RGBA8`,
+  `BGRA8`) and the dimensions declared in the configuration. Colour conversion
+  to the encoder's format is the backend's job. Planar layouts are rejected,
+  because their plane strides are backend-specific.
+- Output timing is the constant `frameRate` the writer was opened with. A
+  frame's own timestamp describes the *source's* timeline and is not used for
+  output timing, so sources with absent or non-monotonic timestamps still
+  produce a well-formed file.
+- `release()` flushes the encoder and finalizes the container. The destination
+  is only a complete, playable file once it returns. Calling `initialize()`
+  again performs the same finalization before opening the next destination.
+- `VideoWriterConfig::codec` states intent (`Auto`, `H264`, `HEVC`, `MJPEG`);
+  each backend maps it to its own encoder. `Auto` follows the destination's
+  container.
+- The GStreamer writer also accepts a complete pipeline description containing
+  an `appsrc` in place of a file path, mirroring how the GStreamer capture
+  backend treats sources.
 
 ## Using in Your Project
 
