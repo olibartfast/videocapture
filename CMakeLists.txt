@@ -39,6 +39,14 @@ if(NOT DEFINED USE_FFMPEG)
 endif()
 set(USE_FFMPEG OFF CACHE BOOL "Use FFmpeg for video capture (optional)")
 
+# Define an option to enable or disable the video writer module. The writer
+# encodes through the same backend that capture selected, so enabling it pulls
+# in no dependency the build does not already carry.
+if(NOT DEFINED USE_VIDEOWRITER)
+    unset(USE_VIDEOWRITER CACHE)
+endif()
+set(USE_VIDEOWRITER OFF CACHE BOOL "Build the video writer module (optional)")
+
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
 
@@ -52,6 +60,7 @@ else()
     set(VIDEOCAPTURE_BACKEND "OpenCV")
 endif()
 message(STATUS "VideoCapture backend: ${VIDEOCAPTURE_BACKEND}")
+message(STATUS "VideoCapture writer: ${USE_VIDEOWRITER}")
 
 # Discover only the dependencies used by enabled backends. OpenCV is not part
 # of the public frame API and is needed only by the OpenCV backend and demo.
@@ -71,22 +80,6 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     # for a 4.6 request). validate_opencv() performs the intended numeric
     # minimum-version check after discovery.
     find_package(OpenCV REQUIRED COMPONENTS ${OPENCV_COMPONENTS})
-endif()
-
-# SDL2 belongs only to the top-level sample application and its tests. Library
-# consumers keep the dependency-free Frame API and do not need SDL2.
-if(PROJECT_IS_TOP_LEVEL AND NOT VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
-    find_package(SDL2 CONFIG QUIET)
-    add_library(VideoCaptureSDL2 INTERFACE)
-    if(TARGET SDL2::SDL2)
-        target_link_libraries(VideoCaptureSDL2 INTERFACE SDL2::SDL2)
-    elseif(TARGET SDL2::SDL2-static)
-        target_link_libraries(VideoCaptureSDL2 INTERFACE SDL2::SDL2-static)
-    else()
-        find_package(PkgConfig REQUIRED)
-        pkg_check_modules(SDL2 REQUIRED IMPORTED_TARGET sdl2)
-        target_link_libraries(VideoCaptureSDL2 INTERFACE PkgConfig::SDL2)
-    endif()
 endif()
 
 # Validate dependencies before proceeding
@@ -113,6 +106,29 @@ if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     )
 endif()
 
+# The writer mirrors the capture sources: one implementation per enabled
+# backend, with the factory selecting the same one capture uses.
+if(USE_VIDEOWRITER)
+    list(APPEND VIDEOCAPTURE_SOURCES
+        ${CMAKE_CURRENT_LIST_DIR}/src/VideoWriterFactory.cpp
+    )
+    if(USE_GSTREAMER)
+        list(APPEND VIDEOCAPTURE_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/src/gstreamer/GStreamerWriter.cpp
+        )
+    endif()
+    if(USE_FFMPEG)
+        list(APPEND VIDEOCAPTURE_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/src/ffmpeg/FFmpegWriter.cpp
+        )
+    endif()
+    if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
+        list(APPEND VIDEOCAPTURE_SOURCES
+            ${CMAKE_CURRENT_LIST_DIR}/src/opencv/OpenCVWriter.cpp
+        )
+    endif()
+endif()
+
 # Create the video capture library
 add_library(${PROJECT_NAME} SHARED ${VIDEOCAPTURE_SOURCES})
 
@@ -123,6 +139,12 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/src
 )
+
+# Consumers need this to know whether VideoWriterFactory.hpp is usable, so it
+# is part of the target's public interface rather than a private flag.
+if(USE_VIDEOWRITER)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VIDEOCAPTURE_WITH_WRITER)
+endif()
 
 # Link against GStreamer libraries if USE_GSTREAMER is ON
 message(STATUS "USE_GSTREAMER value: ${USE_GSTREAMER}")
