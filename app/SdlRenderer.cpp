@@ -2,7 +2,6 @@
 
 #include <cstddef>
 #include <iostream>
-#include <limits>
 #include <string>
 #include <utility>
 
@@ -98,7 +97,7 @@ struct SdlRenderer::Impl {
         if (quit) {
             return false;
         }
-        if (!SdlRenderer::supports(frame)) {
+        if (!Renderer::supports(frame)) {
             warnOnce(warned, "SDL preview requires a packed BGR8 frame, preview disabled");
             return true;
         }
@@ -159,21 +158,9 @@ struct SdlRenderer::Impl {
 SdlRenderer::SdlRenderer(std::string title) : impl_(std::make_unique<Impl>(std::move(title))) {}
 
 SdlRenderer::~SdlRenderer() = default;
-SdlRenderer::SdlRenderer(SdlRenderer&&) noexcept = default;
-SdlRenderer& SdlRenderer::operator=(SdlRenderer&&) noexcept = default;
 
-bool SdlRenderer::render(const Frame& frame) {
+bool SdlRenderer::present(const Frame& frame) {
     return impl_->show(frame);
-}
-
-bool SdlRenderer::available() const noexcept {
-    return impl_->ok;
-}
-
-bool SdlRenderer::supports(const Frame& frame) noexcept {
-    return !frame.empty() && frame.format() == PixelFormat::BGR8 && frame.planeCount() == 1 &&
-           frame.rowStride() >= static_cast<std::size_t>(frame.width()) * 3U &&
-           frame.rowStride() <= static_cast<std::size_t>(std::numeric_limits<int>::max());
 }
 
 }  // namespace videocapture::app

@@ -25,7 +25,7 @@ Install the dependency for the backend you select:
 - OpenCV for the default backend
 - GStreamer if `USE_GSTREAMER=ON`
 - FFmpeg if `USE_FFMPEG=ON`
-- SDL2 for the sample application's GStreamer and FFmpeg preview window
+- A sample-app renderer: OpenCV HighGUI, SDL2, GLFW, or Sokol
 
 OpenCV is not required by GStreamer or FFmpeg builds.
 
@@ -38,7 +38,8 @@ Ensure you have the required dependencies installed:
 - [OpenCV](https://opencv.org/) for the default backend
 - [GStreamer](https://gstreamer.freedesktop.org/) for the GStreamer backend
 - [FFmpeg](https://ffmpeg.org/) for the FFmpeg backend
-- [SDL2](https://www.libsdl.org/) for the alternate-backend sample application
+- [SDL2](https://www.libsdl.org/), [GLFW](https://www.glfw.org/), or
+  [Sokol](https://github.com/floooh/sokol) for an explicitly selected sample renderer
 
 You can use the provided setup scripts to install dependencies:
 
@@ -91,6 +92,32 @@ You can use the provided setup scripts to install dependencies:
     cmake --build build
     ```
 
+    **Try GLFW or Sokol in the sample app:**
+    ```bash
+    cmake -B build-glfw -S . -DUSE_FFMPEG=ON \
+      -DVIDEOCAPTURE_APP_RENDERER=GLFW \
+      -DVIDEOCAPTURE_FETCH_APP_DEPENDENCIES=ON
+    cmake --build build-glfw
+
+    cmake -B build-sokol -S . -DUSE_FFMPEG=ON \
+      -DVIDEOCAPTURE_APP_RENDERER=SOKOL \
+      -DVIDEOCAPTURE_FETCH_APP_DEPENDENCIES=ON
+    cmake --build build-sokol
+    ```
+
+    `VIDEOCAPTURE_APP_RENDERER=AUTO` keeps the existing behavior: OpenCV
+    HighGUI for the default capture backend and SDL2 for FFmpeg or GStreamer.
+    Dependency fetching is off by default. Install GLFW system-wide, or set
+    `SOKOL_ROOT`, to use those renderers without configure-time network access.
+    The fetch path pins GLFW 3.5.1 and Sokol commit
+    `1847290135f95e57e6d220b0a41208306aafc0dd`.
+
+    **With the video writer (combines with any backend):**
+    ```bash
+    cmake -B build -S . -DUSE_FFMPEG=ON -DUSE_VIDEOWRITER=ON
+    cmake --build build
+    ```
+
 ### Backend Priority
 
 When multiple backends are enabled, the library uses the following priority order:
@@ -106,13 +133,21 @@ After building the project, you can run the sample application:
 ./build/bin/VideoCaptureApp <path/to/video>
 ```
 
+Writer builds accept an output path and an optional output frame rate:
+
+```bash
+./build/bin/VideoCaptureApp <path/to/video> out.mp4 25
+```
+
 All backends currently return packed BGR8 data through the dependency-free
 `videocapture::Frame` API. `Frame` owns reusable host storage and exposes the
 pixel format, plane dimensions, row stride, optional timestamp, and sequence
 number without leaking backend-specific types. The OpenCV build displays frames
-with HighGUI. GStreamer and FFmpeg builds use an SDL2 window backed by a streaming
-BGR24 texture, without linking OpenCV; if SDL cannot create a video window, the
-application still decodes the input and reports the frame count. Timestamps,
+with HighGUI. GStreamer and FFmpeg builds default to SDL2, while
+`VIDEOCAPTURE_APP_RENDERER` can select GLFW or Sokol without linking OpenCV.
+The renderer interface and factory live only in `app/`; the capture library and
+public frame API do not depend on any window toolkit. SDL and GLFW disable their
+preview and continue decoding if a window cannot be created. Timestamps,
 when a backend can provide them, are presentation times on the source media
 timeline rather than wall-clock times; sequence numbers start at zero for each
 successful initialization.
@@ -131,6 +166,66 @@ if (capture->initialize(source) && capture->readFrame(frame)) {
 need OpenCV, FFmpeg, GStreamer, or any Neuriplo project to use the returned
 frame. Optional interop layers can adapt its explicit pixel and plane metadata
 to framework-specific image objects.
+
+## Writing Video
+
+`USE_VIDEOWRITER=ON` adds a sink that mirrors the capture side: `initialize` /
+`writeFrame` / `release` against the same dependency-free `videocapture::Frame`.
+`createVideoWriter()` follows the same backend priority as
+`createVideoInterface()`, so a build encodes with whatever it decodes with.
+
+```cpp
+#include "VideoWriterFactory.hpp"
+
+videocapture::VideoWriterConfig config;
+config.width = frame.width();
+config.height = frame.height();
+config.frameRate = 30.0;              // the caller owns the output timeline
+config.codec = videocapture::VideoCodec::Auto;  // or H264, HEVC, MJPEG
+
+auto writer = createVideoWriter();
+if (writer->initialize("annotated.mp4", config)) {
+    writer->writeFrame(frame);
+    writer->release();                // flushes the encoder and closes the file
+}
+```
+
+### What the writer costs
+
+Enabling the writer drops no dependency and adds none: every backend already
+links the library that encodes.
+
+| Build configuration | What `-DUSE_VIDEOWRITER=ON` links |
+| --- | --- |
+| `USE_FFMPEG=ON` | nothing new — encoding uses the `libavcodec`, `libavformat`, `libswscale` already linked for decoding |
+| `USE_GSTREAMER=ON` | nothing new — `appsrc` lives in the `libgstapp` already linked for the capture `appsink` |
+| OpenCV (default) | nothing new — `cv::VideoWriter` is in the `videoio` module already linked |
+
+What does vary is what has to be installed at runtime: a container and codec are
+only writable if the backend was built with, or can load, that encoder. The
+GStreamer writer needs the plugin for the encoder it selects (`jpegenc` from
+gst-plugins-good, `x264enc` from gst-plugins-ugly, `x265enc` and `h265parse`
+from gst-plugins-bad).
+
+### Writer contract
+
+- Frames must carry a packed 8-bit layout (`Gray8`, `RGB8`, `BGR8`, `RGBA8`,
+  `BGRA8`) and the dimensions declared in the configuration. Colour conversion
+  to the encoder's format is the backend's job. Planar layouts are rejected,
+  because their plane strides are backend-specific.
+- Output timing is the constant `frameRate` the writer was opened with. A
+  frame's own timestamp describes the *source's* timeline and is not used for
+  output timing, so sources with absent or non-monotonic timestamps still
+  produce a well-formed file.
+- `release()` flushes the encoder and finalizes the container. The destination
+  is only a complete, playable file once it returns. Calling `initialize()`
+  again performs the same finalization before opening the next destination.
+- `VideoWriterConfig::codec` states intent (`Auto`, `H264`, `HEVC`, `MJPEG`);
+  each backend maps it to its own encoder. `Auto` follows the destination's
+  container.
+- The GStreamer writer also accepts a complete pipeline description containing
+  an `appsrc` in place of a file path, mirroring how the GStreamer capture
+  backend treats sources.
 
 ## Using in Your Project
 
