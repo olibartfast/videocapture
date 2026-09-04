@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-09-04
+
 ### Added
 
 - Optional video writer module, enabled with `-DUSE_VIDEOWRITER=ON`
@@ -21,6 +23,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `videocapture::Frame` layouts and converting to the encoder's format
 - Optional output path and frame rate arguments in the sample application
   (`VideoCaptureApp <source> [output] [fps]`) for writer builds
+- Selectable OpenCV HighGUI, SDL2, GLFW, and Sokol preview renderers for the
+  sample application, while keeping renderer dependencies out of the capture
+  library and its public frame API
 
 ## [0.4.0] - 2026-08-30
 
@@ -108,7 +113,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with Google Test
 - Example application
 
-[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/olibartfast/videocapture/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/olibartfast/videocapture/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/olibartfast/videocapture/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/olibartfast/videocapture/compare/v0.1.0...v0.2.0
