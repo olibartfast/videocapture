@@ -1,0 +1,37 @@
+<map id="src/gstreamer/GStreamerWriter.hpp" name="src/gstreamer/GStreamerWriter.hpp">
+<area shape="rect" id="Node000001" title=" " alt="" coords="627,5,880,31"/>
+<area shape="rect" id="Node000002" title=" " alt="" coords="652,225,719,251"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="659,33,618,51,600,64,585,80,578,96,576,120,579,148,592,176,614,200,642,217,639,222,610,204,587,179,574,149,570,120,573,95,580,77,596,60,615,46,657,28"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="793,152,852,177"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="765,30,796,77,818,138,813,140,791,80,760,32"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="856,79,1005,104"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="783,28,890,71,888,76,781,33"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="1030,79,1109,104"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="805,28,1017,76,1016,81,804,33"/>
+<area shape="rect" id="Node000006" href="$Frame_8hpp.html" title=" " alt="" coords="401,152,492,177"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="681,33,610,51,574,65,540,81,499,111,467,143,463,139,496,107,537,76,572,60,609,46,679,28"/>
+<area shape="rect" id="Node000014" href="$VideoWriterInterface_8hpp.html" title=" " alt="" coords="595,79,781,104"/>
+<area shape="poly" id="edge14_Node000001_Node000014" title=" " alt="" coords="745,33,710,70,706,67,741,29"/>
+<area shape="poly" id="edge9_Node000006_Node000002" title=" " alt="" coords="486,175,639,220,638,225,484,180"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="303,225,359,251"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="429,180,363,220,360,216,427,175"/>
+<area shape="rect" id="Node000008" title=" " alt="" coords="383,225,449,251"/>
+<area shape="poly" id="edge7_Node000006_Node000008" title=" " alt="" coords="444,179,429,214,424,212,439,177"/>
+<area shape="rect" id="Node000009" title=" " alt="" coords="474,225,545,251"/>
+<area shape="poly" id="edge8_Node000006_Node000009" title=" " alt="" coords="459,176,492,213,488,217,455,179"/>
+<area shape="rect" id="Node000010" title=" " alt="" coords="569,225,628,251"/>
+<area shape="poly" id="edge10_Node000006_Node000010" title=" " alt="" coords="472,175,563,217,561,222,470,180"/>
+<area shape="rect" id="Node000011" title=" " alt="" coords="5,225,80,251"/>
+<area shape="poly" id="edge11_Node000006_Node000011" title=" " alt="" coords="402,175,268,197,94,228,93,223,267,191,401,170"/>
+<area shape="rect" id="Node000012" title=" " alt="" coords="105,225,191,251"/>
+<area shape="poly" id="edge12_Node000006_Node000012" title=" " alt="" coords="402,179,205,226,204,221,401,174"/>
+<area shape="rect" id="Node000013" title=" " alt="" coords="215,225,278,251"/>
+<area shape="poly" id="edge13_Node000006_Node000013" title=" " alt="" coords="415,180,292,223,290,218,414,175"/>
+<area shape="poly" id="edge19_Node000014_Node000003" title=" " alt="" coords="711,102,790,143,787,148,708,106"/>
+<area shape="poly" id="edge15_Node000014_Node000006" title=" " alt="" coords="650,107,500,151,498,145,648,101"/>
+<area shape="rect" id="Node000015" href="$VideoWriterConfig_8hpp.html" title=" " alt="" coords="601,152,769,177"/>
+<area shape="poly" id="edge16_Node000014_Node000015" title=" " alt="" coords="690,104,689,139,684,138,685,104"/>
+<area shape="poly" id="edge18_Node000015_Node000002" title=" " alt="" coords="688,178,688,212,683,212,683,178"/>
+<area shape="rect" id="Node000016" title=" " alt="" coords="743,225,806,251"/>
+<area shape="poly" id="edge17_Node000015_Node000016" title=" " alt="" coords="701,175,751,214,748,219,698,179"/>
+</map>

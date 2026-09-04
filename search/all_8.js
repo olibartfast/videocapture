@@ -1,4 +1,8 @@
 var searchData=
 [
-  ['maxplanes_0',['MaxPlanes',['../classvideocapture_1_1Frame.html#ad5001346febf1545c2af69ef7b26583a',1,'videocapture::Frame']]]
+  ['initgstlibrary_0',['initGstLibrary',['../classGStreamerPipeline.html#abcc4a31176186acf6b0b964565e41a30',1,'GStreamerPipeline']]],
+  ['initialize_1',['initialize',['../classVideoCaptureInterface.html#a73d934f28a8553e3b3dc88e18b64fd70',1,'VideoCaptureInterface::initialize()'],['../classVideoWriterInterface.html#a852826f88cae7d37322a25aa31132af6',1,'VideoWriterInterface::initialize()'],['../classFFmpegCapture.html#a506b395b2f80c3b42d1f283a2751e268',1,'FFmpegCapture::initialize()'],['../classFFmpegWriter.html#a1f509b54f929d4b7a73f60b6cf152c35',1,'FFmpegWriter::initialize()'],['../classGStreamerCapture.html#ade78891d230652f78a770d33c11a30dd',1,'GStreamerCapture::initialize()'],['../classGStreamerWriter.html#aa47db2bc932241c5115983c6f3666c3e',1,'GStreamerWriter::initialize()'],['../classOpenCVCapture.html#a4ec3d2bb87b46772c66f66becfb23619',1,'OpenCVCapture::initialize()'],['../classOpenCVWriter.html#a6b6905f6c9b573b214cfbd209747063d',1,'OpenCVWriter::initialize()']]],
+  ['isendofstream_2',['isEndOfStream',['../classGStreamerPipeline.html#a6ee619871eec5e5b13f7b76b6980d3e0',1,'GStreamerPipeline']]],
+  ['isframeready_5f_3',['isFrameReady_',['../classGStreamerPipeline.html#a45b698807fcca968a93f3fa0f2bf3dfa',1,'GStreamerPipeline']]],
+  ['isopen_4',['isopen',['../classVideoWriterInterface.html#ac1af23e6f4cf5a0a7fc7cfc2cd774a39',1,'VideoWriterInterface::isOpen()'],['../classFFmpegWriter.html#ac1ffcd44f6c4736f54e31ccd277e3beb',1,'FFmpegWriter::isOpen()'],['../classGStreamerWriter.html#a298a1c2de6b08ebc0d82b0e67c323482',1,'GStreamerWriter::isOpen()'],['../classOpenCVWriter.html#a8207a4da413785893f1548ba4b8a48be',1,'OpenCVWriter::isOpen()']]]
 ];

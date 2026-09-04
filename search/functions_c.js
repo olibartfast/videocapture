@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['_7effmpegcapture_0',['~FFmpegCapture',['../classFFmpegCapture.html#a6f2a76034be4123ecccbd75f19c74236',1,'FFmpegCapture']]],
-  ['_7egstreamerpipeline_1',['~GStreamerPipeline',['../classGStreamerPipeline.html#a80f01ae320050aa51b4df25f2a22ff6b',1,'GStreamerPipeline']]],
-  ['_7evideocaptureinterface_2',['~VideoCaptureInterface',['../classVideoCaptureInterface.html#afaa8ed02cb2a65eab720303df66743ae',1,'VideoCaptureInterface']]]
+  ['valid_0',['valid',['../structvideocapture_1_1VideoWriterConfig.html#aa8990ce2f1fcdf3c170f9d1fde2828d3',1,'videocapture::VideoWriterConfig']]],
+  ['validateframe_1',['validateFrame',['../namespacevideocapture_1_1writer.html#acdde9e5fcc4ca6acd83f842a008d58fa',1,'videocapture::writer']]]
 ];

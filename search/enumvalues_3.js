@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['rgb8_0',['RGB8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7a165c6379d01617e12de274a3952efa63',1,'videocapture']]],
-  ['rgba8_1',['RGBA8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7ab4b279046a02077466fa26cabb00c642',1,'videocapture']]]
+  ['h264_0',['H264',['../namespacevideocapture.html#af4e1434a893e881e67bdb75bf058a784a8ba63b54352f7053b055235a9ec7ac09',1,'videocapture']]],
+  ['hevc_1',['HEVC',['../namespacevideocapture.html#af4e1434a893e881e67bdb75bf058a784aedc93b70a6a3d160422ba8e728919af1',1,'videocapture']]]
 ];

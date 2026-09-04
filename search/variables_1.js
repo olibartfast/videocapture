@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['isframeready_5f_0',['isFrameReady_',['../classGStreamerPipeline.html#a45b698807fcca968a93f3fa0f2bf3dfa',1,'GStreamerPipeline']]]
+  ['codec_0',['codec',['../structvideocapture_1_1VideoWriterConfig.html#a6771660ffcc797977c76daa290748abe',1,'videocapture::VideoWriterConfig']]]
 ];

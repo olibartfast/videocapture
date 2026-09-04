@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['bgr8_0',['BGR8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7ae764ec5a498470e04dd8b545427203cc',1,'videocapture']]],
-  ['bgra8_1',['BGRA8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7a508ecc95f0c676df4a7dfe11beb0d573',1,'videocapture']]]
+  ['auto_0',['Auto',['../namespacevideocapture.html#af4e1434a893e881e67bdb75bf058a784a06b9281e396db002010bde1de57262eb',1,'videocapture']]]
 ];

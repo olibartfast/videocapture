@@ -5,5 +5,6 @@ var searchData=
   ['clear_2',['clear',['../classvideocapture_1_1Frame.html#acb0eb1f856b9c8ff8048a6b1231ee021',1,'videocapture::Frame']]],
   ['clearsequence_3',['clearSequence',['../classvideocapture_1_1Frame.html#a302132df5c171046870ee46f843ab09b',1,'videocapture::Frame']]],
   ['cleartimestamp_4',['clearTimestamp',['../classvideocapture_1_1Frame.html#aee9105b31c5aa36954dee93e19a68b6b',1,'videocapture::Frame']]],
-  ['createvideointerface_5',['createvideointerface',['../VideoCaptureFactory_8hpp.html#aed05a19349826460b4620e75df0060da',1,'createVideoInterface():&#160;VideoCaptureFactory.cpp'],['../VideoCaptureFactory_8cpp.html#aed05a19349826460b4620e75df0060da',1,'createVideoInterface():&#160;VideoCaptureFactory.cpp']]]
+  ['createvideointerface_5',['createvideointerface',['../VideoCaptureFactory_8hpp.html#aed05a19349826460b4620e75df0060da',1,'createVideoInterface():&#160;VideoCaptureFactory.cpp'],['../VideoCaptureFactory_8cpp.html#aed05a19349826460b4620e75df0060da',1,'createVideoInterface():&#160;VideoCaptureFactory.cpp']]],
+  ['createvideowriter_6',['createvideowriter',['../VideoWriterFactory_8hpp.html#a2194e6392e3fffbc1f289e246469a6aa',1,'createVideoWriter():&#160;VideoWriterFactory.cpp'],['../VideoWriterFactory_8cpp.html#a2194e6392e3fffbc1f289e246469a6aa',1,'createVideoWriter():&#160;VideoWriterFactory.cpp']]]
 ];

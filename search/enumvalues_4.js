@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['yuv420p_0',['YUV420P',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7aef4f958ba8dae3886c04ab0f6cb2840b',1,'videocapture']]]
+  ['mjpeg_0',['MJPEG',['../namespacevideocapture.html#af4e1434a893e881e67bdb75bf058a784a0a5417ce14732e9bdb402be642ebe9ea',1,'videocapture']]]
 ];

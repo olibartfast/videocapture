@@ -1,6 +1,4 @@
 var searchData=
 [
-  ['planecount_0',['planeCount',['../classvideocapture_1_1Frame.html#a357e664250d98bf3df8afea084af24f6',1,'videocapture::Frame']]],
-  ['planeheight_1',['planeHeight',['../classvideocapture_1_1Frame.html#a79841458369d4744bdd0f81406e061a0',1,'videocapture::Frame']]],
-  ['planewidth_2',['planeWidth',['../classvideocapture_1_1Frame.html#aec475ce2b017108755f81a08c65d1281',1,'videocapture::Frame']]]
+  ['operator_3d_0',['operator=',['../classFFmpegWriter.html#a7f67a85f4305c4805f47dde8d1c1fb8b',1,'FFmpegWriter::operator=()'],['../classGStreamerWriter.html#aede0b9475399c66291e17a5a39ebb053',1,'GStreamerWriter::operator=()']]]
 ];

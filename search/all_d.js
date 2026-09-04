@@ -1,11 +1,10 @@
 var searchData=
 [
-  ['sequence_0',['sequence',['../classvideocapture_1_1Frame.html#ad2e814d8e5bcc2d2dc899968080684ef',1,'videocapture::Frame']]],
-  ['setbus_1',['setBus',['../classGStreamerPipeline.html#a96e5b2a0e242804ad71ac97d885d280f',1,'GStreamerPipeline']]],
-  ['setmainloopevent_2',['setMainLoopEvent',['../classGStreamerPipeline.html#a995e70be5bad9afcdebc4381d5e1db9e',1,'GStreamerPipeline']]],
-  ['setsequence_3',['setSequence',['../classvideocapture_1_1Frame.html#abae8e3b0feb349fc930d67edf7e41406',1,'videocapture::Frame']]],
-  ['setstate_4',['setState',['../classGStreamerPipeline.html#ae929e00890b8c08fc2fd5aab6708e396',1,'GStreamerPipeline']]],
-  ['settimestamp_5',['setTimestamp',['../classvideocapture_1_1Frame.html#a42c447edd23a792115a8902816e109f9',1,'videocapture::Frame']]],
-  ['sizebytes_6',['sizeBytes',['../classvideocapture_1_1Frame.html#a99e313ecdac7a3ba25f97bc802190e8b',1,'videocapture::Frame']]],
-  ['storagesizebytes_7',['storageSizeBytes',['../classvideocapture_1_1Frame.html#a8adbc65d73c35ebe24bd7fc224bb513e',1,'videocapture::Frame']]]
+  ['readframe_0',['readframe',['../classFFmpegCapture.html#a29622863a7de77ca32757ee367166748',1,'FFmpegCapture::readFrame()'],['../classGStreamerCapture.html#a409388ecfde8a243e1d18c2df1c46523',1,'GStreamerCapture::readFrame()'],['../classOpenCVCapture.html#ad792293b5c4db58bdeee4a8a11358a57',1,'OpenCVCapture::readFrame()'],['../classVideoCaptureInterface.html#a5022038cfbb386b9f008e4aff216156d',1,'VideoCaptureInterface::readFrame()']]],
+  ['release_1',['release',['../classGStreamerCapture.html#afafb27fdf9fa60706921b650c603ef4a',1,'GStreamerCapture::release()'],['../classOpenCVWriter.html#acf3e3af2d723b2c2fd1731faa59d9d5b',1,'OpenCVWriter::release()'],['../classOpenCVCapture.html#a3fbd1961b48f33e63344d4be0cb856b9',1,'OpenCVCapture::release()'],['../classGStreamerWriter.html#a1782d7e6e373a69016c2d042c61a20be',1,'GStreamerWriter::release()'],['../classFFmpegWriter.html#af6861a2b7f3752d73054defd7278db1f',1,'FFmpegWriter::release()'],['../classFFmpegCapture.html#a43cb4e5070aca419976fa4166409f929',1,'FFmpegCapture::release()'],['../classVideoWriterInterface.html#aef81928ba620cef80c5152a2653b3adc',1,'VideoWriterInterface::release()'],['../classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71',1,'VideoCaptureInterface::release()']]],
+  ['resize_2',['resize',['../classvideocapture_1_1Frame.html#a1e51a6675fe123501757e582d0802c1f',1,'videocapture::Frame']]],
+  ['rgb8_3',['RGB8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7a165c6379d01617e12de274a3952efa63',1,'videocapture']]],
+  ['rgba8_4',['RGBA8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7ab4b279046a02077466fa26cabb00c642',1,'videocapture']]],
+  ['rowstride_5',['rowStride',['../classvideocapture_1_1Frame.html#a39f5d26b143474572f0129a44eb095bd',1,'videocapture::Frame']]],
+  ['runpipeline_6',['runPipeline',['../classGStreamerPipeline.html#a2d49f6f3241a61a8c68477b4e4a8d997',1,'GStreamerPipeline']]]
 ];
