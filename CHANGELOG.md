@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `createVideoWriter()` returns a writer that encodes on its own thread behind
+  a bounded queue, so encode time no longer runs on the caller's thread
+  ([neuriplo-infer#49](https://github.com/olibartfast/neuriplo-infer/issues/49)).
+  `writeFrame()` validates the frame and hands it off; frames keep submission
+  order and are never dropped, with `writeFrame()` waiting when the encoder
+  falls behind. A frame that fails to encode fails the destination: later
+  `writeFrame()` calls and the closing `release()` return `false`.
+- **Breaking (source and ABI):** `VideoWriterInterface::release()` returns
+  `bool`, reporting whether every frame was encoded and the container was
+  finalized. Callers that ignore the result compile unchanged; custom
+  `VideoWriterInterface` implementations must update the override.
+
+### Added
+
+- `VideoWriterInterface::writeFrame(videocapture::Frame&&)`, which hands the
+  frame's pixels to the encoder thread without copying them. The default
+  implementation forwards to the copying overload.
+
 ## [0.5.0] - 2026-09-04
 
 ### Added

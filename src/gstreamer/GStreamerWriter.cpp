@@ -323,7 +323,8 @@ bool GStreamerWriter::isOpen() const {
     return initialized_;
 }
 
-void GStreamerWriter::release() {
+bool GStreamerWriter::release() {
+    bool finalized = true;
     if (initialized_ && streaming_) {
         gst_app_src_end_of_stream(GST_APP_SRC(source_));
 
@@ -338,6 +339,7 @@ void GStreamerWriter::release() {
                 std::cerr << "GStreamer writer: timed out finalizing the destination; "
                              "the output may be incomplete"
                           << std::endl;
+                finalized = false;
             } else {
                 if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_ERROR) {
                     GError* error = nullptr;
@@ -347,6 +349,7 @@ void GStreamerWriter::release() {
                               << error->message << std::endl;
                     g_error_free(error);
                     g_free(debug);
+                    finalized = false;
                 }
                 gst_message_unref(message);
             }
@@ -354,6 +357,7 @@ void GStreamerWriter::release() {
         }
     }
     cleanup();
+    return finalized;
 }
 
 void GStreamerWriter::cleanup() {

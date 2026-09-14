@@ -115,6 +115,7 @@ bool OpenCVWriter::writeFrame(const videocapture::Frame& frame) {
     if (!writer_.isOpened()) {
         std::cerr << "OpenCV writer: the encoder closed while writing a frame" << std::endl;
         initialized_ = false;
+        encoderFailed_ = true;
         return false;
     }
     return true;
@@ -124,8 +125,13 @@ bool OpenCVWriter::isOpen() const {
     return initialized_ && writer_.isOpened();
 }
 
-void OpenCVWriter::release() {
+bool OpenCVWriter::release() {
+    // cv::VideoWriter::release() reports nothing, so the only failure visible
+    // here is an encoder that already closed itself mid-stream.
+    const bool succeeded = !encoderFailed_;
     writer_.release();
     config_ = {};
     initialized_ = false;
+    encoderFailed_ = false;
+    return succeeded;
 }

@@ -17,6 +17,8 @@ public:
     GStreamerWriter(const GStreamerWriter&) = delete;
     GStreamerWriter& operator=(const GStreamerWriter&) = delete;
 
+    using VideoWriterInterface::writeFrame;
+
     // The destination is an output file path, or a complete pipeline
     // description containing an appsrc when it holds a '!', mirroring how
     // GStreamerPipeline treats capture sources.
@@ -24,7 +26,7 @@ public:
                     const videocapture::VideoWriterConfig& config) override;
     bool writeFrame(const videocapture::Frame& frame) override;
     [[nodiscard]] bool isOpen() const override;
-    void release() override;
+    bool release() override;
 
 private:
     bool buildPipelineDescription(const std::string& destination, std::string& description) const;
