@@ -341,20 +341,33 @@ bool FFmpegWriter::isOpen() const {
     return initialized_;
 }
 
-void FFmpegWriter::release() {
+bool FFmpegWriter::release() {
+    bool finalized = true;
     if (initialized_) {
         // Flush the encoder's delayed frames before the trailer, otherwise the
         // tail of the video is silently dropped.
-        encodeAndMux(nullptr);
+        finalized = encodeAndMux(nullptr);
         if (headerWritten_) {
             const int result = av_write_trailer(formatContext_);
             if (result < 0) {
                 std::cerr << "FFmpeg writer: could not finalize the container ("
                           << ffmpegError(result) << ")" << std::endl;
+                finalized = false;
+            }
+        }
+        // Output is buffered, so write errors such as a full disk can first
+        // surface when the IO context is flushed on close.
+        if (formatContext_->pb && !(formatContext_->oformat->flags & AVFMT_NOFILE)) {
+            const int result = avio_closep(&formatContext_->pb);
+            if (result < 0) {
+                std::cerr << "FFmpeg writer: could not close the destination ("
+                          << ffmpegError(result) << ")" << std::endl;
+                finalized = false;
             }
         }
     }
     cleanup();
+    return finalized;
 }
 
 void FFmpegWriter::cleanup() {

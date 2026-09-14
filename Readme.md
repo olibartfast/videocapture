@@ -185,8 +185,10 @@ config.codec = videocapture::VideoCodec::Auto;  // or H264, HEVC, MJPEG
 
 auto writer = createVideoWriter();
 if (writer->initialize("annotated.mp4", config)) {
-    writer->writeFrame(frame);
-    writer->release();                // flushes the encoder and closes the file
+    writer->writeFrame(std::move(frame));  // hands off; encoding runs on the writer's thread
+    if (!writer->release()) {              // encodes what is queued, closes the file
+        // a frame failed to encode or the container could not be finalized
+    }
 }
 ```
 
@@ -200,6 +202,9 @@ links the library that encodes.
 | `USE_FFMPEG=ON` | nothing new — encoding uses the `libavcodec`, `libavformat`, `libswscale` already linked for decoding |
 | `USE_GSTREAMER=ON` | nothing new — `appsrc` lives in the `libgstapp` already linked for the capture `appsink` |
 | OpenCV (default) | nothing new — `cv::VideoWriter` is in the `videoio` module already linked |
+
+The writer's encoder thread links the toolchain's thread library
+(`Threads::Threads`), privately.
 
 What does vary is what has to be installed at runtime: a container and codec are
 only writable if the backend was built with, or can load, that encoder. The
@@ -217,9 +222,26 @@ from gst-plugins-bad).
   frame's own timestamp describes the *source's* timeline and is not used for
   output timing, so sources with absent or non-monotonic timestamps still
   produce a well-formed file.
-- `release()` flushes the encoder and finalizes the container. The destination
-  is only a complete, playable file once it returns. Calling `initialize()`
-  again performs the same finalization before opening the next destination.
+- Encoding runs on a thread owned by the writer, so encode time does not stall
+  the caller. `writeFrame()` checks the frame, hands it to a bounded queue, and
+  returns; pass an rvalue to hand the pixels over without a copy. Frames are
+  encoded in submission order and never dropped: when the encoder falls behind,
+  `writeFrame()` waits. Throughput is therefore still bounded by the encoder,
+  but encoding no longer adds to the caller's own per-frame time.
+- Invalid frames are rejected immediately. A frame that fails to *encode* fails
+  the destination: every later `writeFrame()` returns `false`, as does the
+  closing `release()`.
+- `release()` encodes what is still queued, flushes the encoder, and finalizes
+  the container. The destination is only a complete, playable file once it
+  returns, and it returns `false` if any frame failed or the container could
+  not be finalized. Calling `initialize()` again, or destroying the writer,
+  performs the same finalization but cannot report its result, so call
+  `release()` and check it wherever a failed destination must be noticed. Frames
+  can fail after `writeFrame()` accepted them, so a caller that ignores
+  `release()` can miss a failure.
+- `release()` and destruction wait for a backend call already in progress; a
+  stalled encoder is not cancelled.
+- A writer is driven from one thread at a time.
 - `VideoWriterConfig::codec` states intent (`Auto`, `H264`, `HEVC`, `MJPEG`);
   each backend maps it to its own encoder. `Auto` follows the destination's
   container.

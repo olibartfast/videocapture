@@ -81,7 +81,10 @@ int main(int argc, char* argv[]) {
     videoInterface->release();
 #ifdef VIDEOCAPTURE_WITH_WRITER
     if (videoWriter) {
-        videoWriter->release();
+        if (!videoWriter->release()) {
+            std::cerr << "Failed to finalize output video: " << destination << std::endl;
+            writerFailed = true;
+        }
         if (!writerFailed) {
             std::cout << "Wrote " << frameCount << " frame(s) to " << destination << " at "
                       << outputFrameRate << " fps." << std::endl;
