@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #include <string>
 
 #if defined(__linux__)
@@ -182,6 +183,21 @@ TEST_F(VideoWriterTest, WritesAndReadsBackTheSameGeometry) {
     capture->release();
 
     EXPECT_EQ(decoded, kFrameCount);
+    std::remove(destination.c_str());
+}
+
+TEST_F(VideoWriterTest, ReleaseFinalizesADestinationThatReceivedNoFrames) {
+    const std::string destination = temporaryDestination("videocapture_no_frames.avi");
+    std::remove(destination.c_str());
+
+    if (!writer->initialize(destination, makeConfig())) {
+        if (writerCodecRequired()) {
+            FAIL() << "Motion JPEG encoder required by this validation environment";
+        }
+        GTEST_SKIP() << "no Motion JPEG encoder available for this backend";
+    }
+    EXPECT_TRUE(writer->release());
+    EXPECT_TRUE(std::ifstream(destination).good()) << "no file was written at " << destination;
     std::remove(destination.c_str());
 }
 

@@ -325,12 +325,22 @@ bool GStreamerWriter::isOpen() const {
 
 bool GStreamerWriter::release() {
     bool finalized = true;
+    // A destination that received no frames is still finalized. Its caps were
+    // never negotiated, so the stream is started with the default layout first.
+    if (initialized_ && !streaming_ && !startStream(streamFormat_)) {
+        finalized = false;
+    }
     if (initialized_ && streaming_) {
-        gst_app_src_end_of_stream(GST_APP_SRC(source_));
+        const GstFlowReturn endOfStream = gst_app_src_end_of_stream(GST_APP_SRC(source_));
+        if (endOfStream != GST_FLOW_OK) {
+            std::cerr << "GStreamer writer: the pipeline refused end of stream ("
+                      << gst_flow_get_name(endOfStream) << ")" << std::endl;
+            finalized = false;
+        }
 
         // Muxers write their header or index only once end of stream reaches
         // the sink, so tearing the pipeline down before then truncates the file.
-        GstBus* bus = gst_element_get_bus(pipeline_);
+        GstBus* bus = endOfStream == GST_FLOW_OK ? gst_element_get_bus(pipeline_) : nullptr;
         if (bus) {
             GstMessage* message = gst_bus_timed_pop_filtered(
                 bus, kEndOfStreamTimeout,

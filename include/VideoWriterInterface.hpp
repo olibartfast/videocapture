@@ -45,7 +45,8 @@ public:
 
     // Encode every accepted frame, flush the encoder, finalize the container,
     // and release resources. The destination is only guaranteed to be a
-    // complete, playable file after this returns. Returns false when a frame of
+    // complete, playable file after this returns; a destination that received
+    // no frames is finalized too. Returns false when a frame of
     // the destination failed to encode or the container could not be
     // finalized, and true otherwise, including when nothing was open. Safe to
     // call on a writer that was never initialized, and safe to call twice.

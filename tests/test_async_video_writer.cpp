@@ -44,6 +44,7 @@ struct EncoderScript {
     bool gateOpen = true;
     bool initializeSucceeds = true;
     bool releaseSucceeds = true;
+    bool releaseThrows = false;
     std::optional<std::size_t> failingWrite;
     bool failByThrowing = false;
 
@@ -111,6 +112,9 @@ public:
         script_->framesWrittenAtRelease.push_back(script_->writtenSequences.size());
         open_ = false;
         script_->changed.notify_all();
+        if (script_->releaseThrows) {
+            throw std::runtime_error("scripted finalization failure");
+        }
         return script_->releaseSucceeds;
     }
 
@@ -437,6 +441,21 @@ TEST_F(AsyncVideoWriterTest, FinalizationFailureIsReported) {
     open();
     ASSERT_TRUE(writer->writeFrame(makeFrame(0)));
     EXPECT_FALSE(writer->release());
+}
+
+TEST_F(AsyncVideoWriterTest, FinalizationExceptionClosesTheWriterAndIsReported) {
+    script->releaseThrows = true;
+    open();
+    ASSERT_TRUE(writer->writeFrame(makeFrame(0)));
+
+    EXPECT_FALSE(writer->release());
+    EXPECT_FALSE(writer->isOpen());
+
+    // The encoder thread was already joined; neither a second release nor the
+    // destructor may try again.
+    EXPECT_TRUE(writer->release());
+    writer.reset();
+    EXPECT_EQ(script->framesWrittenAtRelease, std::vector<std::size_t>{1});
 }
 
 TEST_F(AsyncVideoWriterTest, ReleaseIsIdempotent) {

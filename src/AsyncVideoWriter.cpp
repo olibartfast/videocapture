@@ -100,11 +100,22 @@ bool AsyncVideoWriter::release() {
         failed_ = false;
     }
 
-    // Finalize even after a failure so that the backend releases its resources
-    // and whatever was encoded is still closed properly.
-    const bool finalized = encoder_->release();
+    // The thread is joined, so the writer is closed from here on whatever the
+    // backend does; a later release() or the destructor must not join again.
     open_ = false;
     config_ = {};
+
+    // Finalize even after a failure so that the backend releases its resources
+    // and whatever was encoded is still closed properly.
+    bool finalized = false;
+    try {
+        finalized = encoder_->release();
+    } catch (const std::exception& error) {
+        std::cerr << kWriterName << ": encoder failed while finalizing: " << error.what()
+                  << std::endl;
+    } catch (...) {
+        std::cerr << kWriterName << ": encoder failed while finalizing" << std::endl;
+    }
     return finalized && succeeded;
 }
 
@@ -137,12 +148,20 @@ void AsyncVideoWriter::cancelSlot() {
 
 bool AsyncVideoWriter::commitSlot(videocapture::Frame&& frame) {
     {
-        const std::lock_guard<std::mutex> lock(mutex_);
+        std::unique_lock<std::mutex> lock(mutex_);
         --reservedSlots_;
         if (failed_) {
             return false;
         }
-        queue_.push_back(std::move(frame));
+        try {
+            queue_.push_back(std::move(frame));
+        } catch (...) {
+            // The slot is free again although nothing was queued, so a producer
+            // waiting for room must re-check.
+            lock.unlock();
+            spaceAvailable_.notify_one();
+            throw;
+        }
     }
     frameQueued_.notify_one();
     return true;
