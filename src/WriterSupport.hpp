@@ -4,6 +4,7 @@
 #include <cctype>
 #include <iostream>
 #include <string>
+#include <syncstream>
 
 #include "Frame.hpp"
 #include "VideoWriterConfig.hpp"
@@ -39,18 +40,18 @@ namespace videocapture::writer {
 [[nodiscard]] inline bool validateFrame(const Frame& frame, const VideoWriterConfig& config,
                                         const char* backend) {
     if (frame.empty()) {
-        std::cerr << backend << ": refusing to write an empty frame" << std::endl;
+        std::osyncstream(std::cerr) << backend << ": refusing to write an empty frame" << '\n';
         return false;
     }
     if (packedBytesPerPixel(frame.format()) == 0) {
-        std::cerr << backend << ": planar pixel formats are not accepted by the writer"
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << backend << ": planar pixel formats are not accepted by the writer" << '\n';
         return false;
     }
     if (frame.width() != config.width || frame.height() != config.height) {
-        std::cerr << backend << ": frame is " << frame.width() << "x" << frame.height()
-                  << " but the writer was opened for " << config.width << "x" << config.height
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << backend << ": frame is " << frame.width() << "x" << frame.height()
+            << " but the writer was opened for " << config.width << "x" << config.height << '\n';
         return false;
     }
     return true;

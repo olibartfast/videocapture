@@ -30,7 +30,7 @@ if(USE_FFMPEG)
 endif()
 
 if(USE_VIDEOWRITER)
-    list(APPEND TEST_SOURCES test_video_writer.cpp)
+    list(APPEND TEST_SOURCES test_video_writer.cpp test_async_video_writer.cpp)
 endif()
 
 # Create test executable
@@ -51,6 +51,10 @@ target_include_directories(VideoCaptureTests
         ${CMAKE_SOURCE_DIR}/include
         ${CMAKE_SOURCE_DIR}/src
 )
+
+if(USE_VIDEOWRITER)
+    target_link_libraries(VideoCaptureTests PRIVATE Threads::Threads)
+endif()
 
 if(VIDEOCAPTURE_BACKEND STREQUAL "OpenCV")
     target_include_directories(VideoCaptureTests PRIVATE ${OpenCV_INCLUDE_DIRS})
