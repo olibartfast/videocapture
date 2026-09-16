@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <cstring>
+#include <exception>
 #include <memory>
 #include <stdexcept>
 #include <utility>
@@ -98,8 +99,14 @@ GstFlowReturn GStreamerPipeline::newSample(GstAppSink* appsink, gpointer data) {
     auto& self = *static_cast<GStreamerPipeline*>(data);
     try {
         return self.receiveSample(appsink);
+    } catch (const std::exception& error) {
+        // Never unwind a C callback. Report the cause, because the reader only
+        // sees the same end of stream that a complete stream produces.
+        g_printerr("GStreamer capture: frame delivery failed: %s\n", error.what());
+        self.markEndOfStream();
+        return GST_FLOW_ERROR;
     } catch (...) {
-        // Never unwind a C callback. Allocation failure ends only this stream.
+        g_printerr("GStreamer capture: frame delivery failed\n");
         self.markEndOfStream();
         return GST_FLOW_ERROR;
     }
