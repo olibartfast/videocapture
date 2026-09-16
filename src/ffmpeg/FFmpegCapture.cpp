@@ -1,6 +1,8 @@
 #include "FFmpegCapture.hpp"
 #include <sys/stat.h>
+#include <algorithm>
 #include <iostream>
+#include <span>
 
 FFmpegCapture::FFmpegCapture() {
     // Allocate packet once
@@ -41,8 +43,8 @@ bool FFmpegCapture::initialize(const std::string& source) {
     cleanup();
 
     // Check if source is a file (not a URL or device) and if it exists
-    bool hasProtocol = (source.find("://") != std::string::npos);
-    bool isDevice = (source.length() >= 5 && source.substr(0, 5) == "/dev/");
+    const bool hasProtocol = (source.find("://") != std::string::npos);
+    const bool isDevice = source.starts_with("/dev/");
 
     if (!hasProtocol && !isDevice) {
         // Looks like a file path, check if it exists
@@ -68,11 +70,12 @@ bool FFmpegCapture::initialize(const std::string& source) {
 
     // Find the first video stream
     videoStreamIndex = -1;
-    for (unsigned int i = 0; i < formatContext->nb_streams; i++) {
-        if (formatContext->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
-            videoStreamIndex = i;
-            break;
-        }
+    const std::span streams(formatContext->streams, formatContext->nb_streams);
+    const auto video = std::ranges::find_if(streams, [](const AVStream* stream) {
+        return stream->codecpar->codec_type == AVMEDIA_TYPE_VIDEO;
+    });
+    if (video != streams.end()) {
+        videoStreamIndex = static_cast<int>(video - streams.begin());
     }
 
     if (videoStreamIndex == -1) {

@@ -66,8 +66,9 @@ namespace videocapture::writer {
         return {};
     }
     std::string extension = destination.substr(dot);
-    std::transform(extension.begin(), extension.end(), extension.begin(),
-                   [](unsigned char letter) { return static_cast<char>(std::tolower(letter)); });
+    std::ranges::transform(extension, extension.begin(), [](unsigned char letter) {
+        return static_cast<char>(std::tolower(letter));
+    });
     return extension;
 }
 
