@@ -3,6 +3,7 @@
 #include <cstring>
 #include <iostream>
 #include <string>
+#include <syncstream>
 
 #include <gst/video/video.h>
 
@@ -64,10 +65,11 @@ bool GStreamerWriter::buildPipelineDescription(const std::string& destination,
     const std::string extension = videocapture::writer::destinationExtension(destination);
     const std::string muxer = muxerForExtension(extension);
     if (muxer.empty()) {
-        std::cerr << "GStreamer writer: cannot choose a container for '" << destination
-                  << "'; use a .mp4, .mov, .m4v, .mkv or .avi destination, or pass a complete "
-                     "pipeline containing an appsrc"
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: cannot choose a container for '" << destination
+            << "'; use a .mp4, .mov, .m4v, .mkv or .avi destination, or pass a complete "
+               "pipeline containing an appsrc"
+            << '\n';
         return false;
     }
 
@@ -92,9 +94,9 @@ bool GStreamerWriter::buildPipelineDescription(const std::string& destination,
 
     if (config_.bitRateBitsPerSecond > 0) {
         if (encoder == "jpegenc") {
-            std::cerr << "GStreamer writer: jpegenc has no bit rate control; "
-                         "using the encoder default"
-                      << std::endl;
+            std::osyncstream(std::cerr) << "GStreamer writer: jpegenc has no bit rate control; "
+                                           "using the encoder default"
+                                        << '\n';
         } else {
             // x264enc and x265enc both take kbit/s.
             const std::int64_t kilobits = config_.bitRateBitsPerSecond / 1000;
@@ -138,14 +140,16 @@ bool GStreamerWriter::bindElements(bool ownsFileSink, const std::string& destina
         gst_iterator_free(iterator);
     }
     if (!source_ || !GST_IS_APP_SRC(source_)) {
-        std::cerr << "GStreamer writer: the pipeline must contain an appsrc" << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: the pipeline must contain an appsrc" << '\n';
         return false;
     }
 
     if (ownsFileSink) {
         GstElement* fileSink = gst_bin_get_by_name(GST_BIN(pipeline_), kFileSinkName);
         if (!fileSink) {
-            std::cerr << "GStreamer writer: could not find the output filesink" << std::endl;
+            std::osyncstream(std::cerr)
+                << "GStreamer writer: could not find the output filesink" << '\n';
             return false;
         }
         g_object_set(fileSink, "location", destination.c_str(), nullptr);
@@ -165,12 +169,13 @@ bool GStreamerWriter::initialize(const std::string& destination,
     release();
 
     if (destination.empty()) {
-        std::cerr << "GStreamer writer: destination is empty" << std::endl;
+        std::osyncstream(std::cerr) << "GStreamer writer: destination is empty" << '\n';
         return false;
     }
     if (!config.valid()) {
-        std::cerr << "GStreamer writer: invalid configuration (" << config.width << "x"
-                  << config.height << " @ " << config.frameRate << " fps)" << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: invalid configuration (" << config.width << "x" << config.height
+            << " @ " << config.frameRate << " fps)" << '\n';
         return false;
     }
     config_ = config;
@@ -187,14 +192,15 @@ bool GStreamerWriter::initialize(const std::string& destination,
     GError* error = nullptr;
     pipeline_ = gst_parse_launch(description.c_str(), &error);
     if (error) {
-        std::cerr << "GStreamer writer: pipeline construction failed: " << error->message
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: pipeline construction failed: " << error->message << '\n';
         g_error_free(error);
         cleanup();
         return false;
     }
     if (!pipeline_) {
-        std::cerr << "GStreamer writer: pipeline construction returned no pipeline" << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: pipeline construction returned no pipeline" << '\n';
         cleanup();
         return false;
     }
@@ -207,8 +213,8 @@ bool GStreamerWriter::initialize(const std::string& destination,
     // The pipeline stays in READY until the first frame arrives, because the
     // appsrc caps depend on that frame's pixel layout.
     if (gst_element_set_state(pipeline_, GST_STATE_READY) == GST_STATE_CHANGE_FAILURE) {
-        std::cerr << "GStreamer writer: could not prepare the pipeline for " << destination
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: could not prepare the pipeline for " << destination << '\n';
         cleanup();
         return false;
     }
@@ -221,7 +227,7 @@ bool GStreamerWriter::initialize(const std::string& destination,
 bool GStreamerWriter::startStream(videocapture::PixelFormat format) {
     const GstVideoFormat videoFormat = toGstVideoFormat(format);
     if (videoFormat == GST_VIDEO_FORMAT_UNKNOWN) {
-        std::cerr << "GStreamer writer: unsupported source pixel format" << std::endl;
+        std::osyncstream(std::cerr) << "GStreamer writer: unsupported source pixel format" << '\n';
         return false;
     }
 
@@ -237,7 +243,7 @@ bool GStreamerWriter::startStream(videocapture::PixelFormat format) {
     gst_caps_unref(caps);
 
     if (gst_element_set_state(pipeline_, GST_STATE_PLAYING) == GST_STATE_CHANGE_FAILURE) {
-        std::cerr << "GStreamer writer: could not start the pipeline" << std::endl;
+        std::osyncstream(std::cerr) << "GStreamer writer: could not start the pipeline" << '\n';
         return false;
     }
 
@@ -248,7 +254,8 @@ bool GStreamerWriter::startStream(videocapture::PixelFormat format) {
 
 bool GStreamerWriter::writeFrame(const videocapture::Frame& frame) {
     if (!initialized_) {
-        std::cerr << "GStreamer writer: writeFrame() called before initialize()" << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: writeFrame() called before initialize()" << '\n';
         return false;
     }
     if (!videocapture::writer::validateFrame(frame, config_, "GStreamer writer")) {
@@ -259,8 +266,8 @@ bool GStreamerWriter::writeFrame(const videocapture::Frame& frame) {
             return false;
         }
     } else if (frame.format() != streamFormat_) {
-        std::cerr << "GStreamer writer: the pixel format changed after the stream was negotiated"
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: the pixel format changed after the stream was negotiated" << '\n';
         return false;
     }
 
@@ -274,13 +281,14 @@ bool GStreamerWriter::writeFrame(const videocapture::Frame& frame) {
     GstBuffer* buffer = gst_buffer_new_allocate(
         nullptr, stride * static_cast<std::size_t>(frame.height()), nullptr);
     if (!buffer) {
-        std::cerr << "GStreamer writer: could not allocate an output buffer" << std::endl;
+        std::osyncstream(std::cerr)
+            << "GStreamer writer: could not allocate an output buffer" << '\n';
         return false;
     }
 
     GstMapInfo mapping;
     if (!gst_buffer_map(buffer, &mapping, GST_MAP_WRITE)) {
-        std::cerr << "GStreamer writer: could not map the output buffer" << std::endl;
+        std::osyncstream(std::cerr) << "GStreamer writer: could not map the output buffer" << '\n';
         gst_buffer_unref(buffer);
         return false;
     }
@@ -312,8 +320,8 @@ bool GStreamerWriter::writeFrame(const videocapture::Frame& frame) {
     // push_buffer takes ownership of the buffer whatever it returns.
     const GstFlowReturn flow = gst_app_src_push_buffer(GST_APP_SRC(source_), buffer);
     if (flow != GST_FLOW_OK) {
-        std::cerr << "GStreamer writer: the pipeline rejected a frame (" << gst_flow_get_name(flow)
-                  << ")" << std::endl;
+        std::osyncstream(std::cerr) << "GStreamer writer: the pipeline rejected a frame ("
+                                    << gst_flow_get_name(flow) << ")" << '\n';
         return false;
     }
     return true;
@@ -323,30 +331,45 @@ bool GStreamerWriter::isOpen() const {
     return initialized_;
 }
 
-void GStreamerWriter::release() {
+bool GStreamerWriter::release() {
+    bool finalized = true;
+    // A destination that received no frames is still finalized. Its caps were
+    // never negotiated, so the stream is started with the default layout first.
+    if (initialized_ && !streaming_ && !startStream(streamFormat_)) {
+        finalized = false;
+    }
     if (initialized_ && streaming_) {
-        gst_app_src_end_of_stream(GST_APP_SRC(source_));
+        const GstFlowReturn endOfStream = gst_app_src_end_of_stream(GST_APP_SRC(source_));
+        if (endOfStream != GST_FLOW_OK) {
+            std::osyncstream(std::cerr) << "GStreamer writer: the pipeline refused end of stream ("
+                                        << gst_flow_get_name(endOfStream) << ")" << '\n';
+            finalized = false;
+        }
 
         // Muxers write their header or index only once end of stream reaches
         // the sink, so tearing the pipeline down before then truncates the file.
-        GstBus* bus = gst_element_get_bus(pipeline_);
+        GstBus* bus = endOfStream == GST_FLOW_OK ? gst_element_get_bus(pipeline_) : nullptr;
         if (bus) {
             GstMessage* message = gst_bus_timed_pop_filtered(
                 bus, kEndOfStreamTimeout,
                 static_cast<GstMessageType>(GST_MESSAGE_EOS | GST_MESSAGE_ERROR));
             if (!message) {
-                std::cerr << "GStreamer writer: timed out finalizing the destination; "
-                             "the output may be incomplete"
-                          << std::endl;
+                std::osyncstream(std::cerr)
+                    << "GStreamer writer: timed out finalizing the destination; "
+                       "the output may be incomplete"
+                    << '\n';
+                finalized = false;
             } else {
                 if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_ERROR) {
                     GError* error = nullptr;
                     gchar* debug = nullptr;
                     gst_message_parse_error(message, &error, &debug);
-                    std::cerr << "GStreamer writer: could not finalize the destination: "
-                              << error->message << std::endl;
+                    std::osyncstream(std::cerr)
+                        << "GStreamer writer: could not finalize the destination: "
+                        << error->message << '\n';
                     g_error_free(error);
                     g_free(debug);
+                    finalized = false;
                 }
                 gst_message_unref(message);
             }
@@ -354,6 +377,7 @@ void GStreamerWriter::release() {
         }
     }
     cleanup();
+    return finalized;
 }
 
 void GStreamerWriter::cleanup() {

@@ -20,11 +20,13 @@ public:
     FFmpegWriter(const FFmpegWriter&) = delete;
     FFmpegWriter& operator=(const FFmpegWriter&) = delete;
 
+    using VideoWriterInterface::writeFrame;
+
     bool initialize(const std::string& destination,
                     const videocapture::VideoWriterConfig& config) override;
     bool writeFrame(const videocapture::Frame& frame) override;
     [[nodiscard]] bool isOpen() const override;
-    void release() override;
+    bool release() override;
 
 private:
     // Sends one frame to the encoder and muxes everything it produces. A null
