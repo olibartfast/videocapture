@@ -3,6 +3,7 @@
 #include <exception>
 #include <iostream>
 #include <stdexcept>
+#include <syncstream>
 #include <utility>
 
 #include "WriterSupport.hpp"
@@ -38,7 +39,7 @@ bool AsyncVideoWriter::initialize(const std::string& destination,
     config_ = config;
     open_ = true;
     try {
-        encoderThread_ = std::thread(&AsyncVideoWriter::encodeLoop, this);
+        encoderThread_ = std::jthread([this](std::stop_token stop) { encodeLoop(stop); });
     } catch (...) {
         open_ = false;
         config_ = {};
@@ -84,11 +85,8 @@ bool AsyncVideoWriter::release() {
         return true;
     }
 
-    {
-        const std::lock_guard<std::mutex> lock(mutex_);
-        closing_ = true;
-    }
-    frameQueued_.notify_one();
+    // Stop wakes an idle encoder; queued frames still drain before it exits.
+    encoderThread_.request_stop();
     encoderThread_.join();
 
     bool succeeded = false;
@@ -96,7 +94,6 @@ bool AsyncVideoWriter::release() {
         const std::lock_guard<std::mutex> lock(mutex_);
         succeeded = !failed_;
         queue_.clear();
-        closing_ = false;
         failed_ = false;
     }
 
@@ -111,17 +108,18 @@ bool AsyncVideoWriter::release() {
     try {
         finalized = encoder_->release();
     } catch (const std::exception& error) {
-        std::cerr << kWriterName << ": encoder failed while finalizing: " << error.what()
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << kWriterName << ": encoder failed while finalizing: " << error.what() << '\n';
     } catch (...) {
-        std::cerr << kWriterName << ": encoder failed while finalizing" << std::endl;
+        std::osyncstream(std::cerr) << kWriterName << ": encoder failed while finalizing" << '\n';
     }
     return finalized && succeeded;
 }
 
 bool AsyncVideoWriter::accepts(const videocapture::Frame& frame) const {
     if (!open_) {
-        std::cerr << kWriterName << ": writeFrame() called before initialize()" << std::endl;
+        std::osyncstream(std::cerr)
+            << kWriterName << ": writeFrame() called before initialize()" << '\n';
         return false;
     }
     return videocapture::writer::validateFrame(frame, config_, kWriterName);
@@ -167,10 +165,10 @@ bool AsyncVideoWriter::commitSlot(videocapture::Frame&& frame) {
     return true;
 }
 
-void AsyncVideoWriter::encodeLoop() {
+void AsyncVideoWriter::encodeLoop(std::stop_token stop) {
     std::unique_lock<std::mutex> lock(mutex_);
     while (true) {
-        frameQueued_.wait(lock, [this] { return closing_ || !queue_.empty(); });
+        frameQueued_.wait(lock, stop, [this] { return !queue_.empty(); });
         if (queue_.empty()) {
             // Closing with nothing left to encode.
             return;
@@ -185,10 +183,12 @@ void AsyncVideoWriter::encodeLoop() {
         try {
             written = encoder_->writeFrame(frame);
         } catch (const std::exception& error) {
-            std::cerr << kWriterName << ": encoder failed while writing a frame: " << error.what()
-                      << std::endl;
+            std::osyncstream(std::cerr)
+                << kWriterName << ": encoder failed while writing a frame: " << error.what()
+                << '\n';
         } catch (...) {
-            std::cerr << kWriterName << ": encoder failed while writing a frame" << std::endl;
+            std::osyncstream(std::cerr)
+                << kWriterName << ": encoder failed while writing a frame" << '\n';
         }
 
         lock.lock();

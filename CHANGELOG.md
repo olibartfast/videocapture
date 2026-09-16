@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Async writer shutdown uses C++20 `std::jthread` and stop-aware waits while
+  still draining accepted frames before finalization. Writer diagnostics use
+  `std::osyncstream` to keep concurrent library writer messages intact.
 - `createVideoWriter()` returns a writer that encodes on its own thread behind
   a bounded queue, so encode time no longer runs on the caller's thread
   ([neuriplo-infer#49](https://github.com/olibartfast/neuriplo-infer/issues/49)).
