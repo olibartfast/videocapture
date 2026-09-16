@@ -49,6 +49,17 @@ packet. Phase 6 onward follow the packet workflow.
 - Blocking evidence: libc++ made `std::jthread` non-experimental in LLVM 20; the `macos-14` runner SDK predates that. `cmake/WriterConcurrency.cmake` now *detects* the gap at configure time but does not close it, and `release.yml` was intentionally left unchanged.
 - Requires a feature packet when started.
 
+## Phase 8 — GStreamer instance isolation and C++20 source modernization
+
+- Status: `validated, PR pending` — independent of blocked Phase 7.
+- Outcome: concurrent captures keep their frames and lifecycle state isolated;
+  source code uses C++20 where it improves correctness or clarity.
+- Spec: `specs/2026-09-17-gstreamer-isolation-cxx20/`
+- Branch: `fix/gstreamer-isolation-cxx20`
+- Evidence: `validation.md` — backend matrix, capture-only build, downstream
+  consumer, and format gate pass. TSan over GStreamer reports only
+  GLib-internal allocation warnings; no project-code racing frames.
+
 ## Deferred / Revisit
 
 - [x] Align documentation and build requirements: C++20 and CMake 3.21 in README and build declarations. Writer standard-library support is checked by the feature gate rather than a compiler-version promise. — [Q-2], resolved 2026-09-17
