@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <syncstream>
 
 #include <opencv2/imgproc.hpp>
 
@@ -47,25 +48,28 @@ bool OpenCVWriter::initialize(const std::string& destination,
     release();
 
     if (destination.empty()) {
-        std::cerr << "OpenCV writer: destination is empty" << std::endl;
+        std::osyncstream(std::cerr) << "OpenCV writer: destination is empty" << '\n';
         return false;
     }
     if (!config.valid()) {
-        std::cerr << "OpenCV writer: invalid configuration (" << config.width << "x"
-                  << config.height << " @ " << config.frameRate << " fps)" << std::endl;
+        std::osyncstream(std::cerr)
+            << "OpenCV writer: invalid configuration (" << config.width << "x" << config.height
+            << " @ " << config.frameRate << " fps)" << '\n';
         return false;
     }
     if (config.bitRateBitsPerSecond > 0) {
         // cv::VideoWriter exposes quality, not a bit rate target.
-        std::cerr << "OpenCV writer: bit rate is not configurable through this backend; "
-                     "using the encoder default"
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << "OpenCV writer: bit rate is not configurable through this backend; "
+               "using the encoder default"
+            << '\n';
     }
 
     if (!writer_.open(destination, toFourCC(config.codec, destination), config.frameRate,
                       cv::Size(config.width, config.height), true) ||
         !writer_.isOpened()) {
-        std::cerr << "OpenCV writer: could not open " << destination << " for writing" << std::endl;
+        std::osyncstream(std::cerr)
+            << "OpenCV writer: could not open " << destination << " for writing" << '\n';
         writer_.release();
         return false;
     }
@@ -77,7 +81,8 @@ bool OpenCVWriter::initialize(const std::string& destination,
 
 bool OpenCVWriter::writeFrame(const videocapture::Frame& frame) {
     if (!initialized_) {
-        std::cerr << "OpenCV writer: writeFrame() called before initialize()" << std::endl;
+        std::osyncstream(std::cerr)
+            << "OpenCV writer: writeFrame() called before initialize()" << '\n';
         return false;
     }
     if (!videocapture::writer::validateFrame(frame, config_, "OpenCV writer")) {
@@ -113,7 +118,8 @@ bool OpenCVWriter::writeFrame(const videocapture::Frame& frame) {
     // cv::VideoWriter reports encoder failures by closing itself rather than
     // through write(), so the writer's state is what tells us the frame landed.
     if (!writer_.isOpened()) {
-        std::cerr << "OpenCV writer: the encoder closed while writing a frame" << std::endl;
+        std::osyncstream(std::cerr)
+            << "OpenCV writer: the encoder closed while writing a frame" << '\n';
         initialized_ = false;
         encoderFailed_ = true;
         return false;

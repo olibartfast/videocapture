@@ -17,8 +17,9 @@
 
 ## Requirements
 
-- CMake 3.20 or higher
-- C++17 compatible compiler
+- CMake 3.21 or higher
+- C++20 compatible compiler and standard library; writer builds also run a
+  configure-time check for the required concurrency features
 
 Install the dependency for the backend you select:
 
@@ -205,6 +206,15 @@ links the library that encodes.
 
 The writer's encoder thread links the toolchain's thread library
 (`Threads::Threads`), privately.
+
+Writer builds require standard-library support for `std::jthread`, `std::stop_token`,
+stop-aware condition-variable waits, and `std::osyncstream`. CMake checks that these
+features compile and link with the selected compiler and SDK; a C++20 language
+flag alone does not establish support. Capture-only builds do not require them.
+
+Library writer diagnostics use `std::osyncstream` to keep writer messages intact
+relative to other writer messages. Capture, application, and third-party codec
+logs that write directly to stderr can still interleave with them.
 
 What does vary is what has to be installed at runtime: a container and codec are
 only writable if the backend was built with, or can load, that encoder. The

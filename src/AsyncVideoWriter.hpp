@@ -5,6 +5,7 @@
 #include <deque>
 #include <memory>
 #include <mutex>
+#include <stop_token>
 #include <string>
 #include <thread>
 
@@ -56,7 +57,7 @@ private:
     void cancelSlot();
     // Queues the frame into the reserved slot.
     bool commitSlot(videocapture::Frame&& frame);
-    void encodeLoop();
+    void encodeLoop(std::stop_token stop);
 
     std::unique_ptr<VideoWriterInterface> encoder_;
     const std::size_t capacity_;
@@ -64,14 +65,15 @@ private:
     // Touched only by the thread driving the writer.
     videocapture::VideoWriterConfig config_{};
     bool open_ = false;
-    std::thread encoderThread_;
 
     // Shared with the encoder thread.
     mutable std::mutex mutex_;
-    std::condition_variable frameQueued_;
+    std::condition_variable_any frameQueued_;
     std::condition_variable spaceAvailable_;
     std::deque<videocapture::Frame> queue_;
     std::size_t reservedSlots_ = 0;
-    bool closing_ = false;
     bool failed_ = false;
+
+    // Destroyed first, so its RAII join precedes destruction of shared state.
+    std::jthread encoderThread_;
 };

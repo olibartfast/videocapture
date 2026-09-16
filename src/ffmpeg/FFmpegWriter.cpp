@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <string>
+#include <syncstream>
 
 #include "WriterSupport.hpp"
 
@@ -109,36 +110,37 @@ bool FFmpegWriter::initialize(const std::string& destination,
     release();
 
     if (destination.empty()) {
-        std::cerr << "FFmpeg writer: destination is empty" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: destination is empty" << '\n';
         return false;
     }
     if (!config.valid()) {
-        std::cerr << "FFmpeg writer: invalid configuration (" << config.width << "x"
-                  << config.height << " @ " << config.frameRate << " fps)" << std::endl;
+        std::osyncstream(std::cerr)
+            << "FFmpeg writer: invalid configuration (" << config.width << "x" << config.height
+            << " @ " << config.frameRate << " fps)" << '\n';
         return false;
     }
 
     int result =
         avformat_alloc_output_context2(&formatContext_, nullptr, nullptr, destination.c_str());
     if (result < 0 || !formatContext_) {
-        std::cerr << "FFmpeg writer: could not deduce an output format for " << destination << " ("
-                  << ffmpegError(result) << ")" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not deduce an output format for "
+                                    << destination << " (" << ffmpegError(result) << ")" << '\n';
         cleanup();
         return false;
     }
 
     const AVCodecID codecId = toAVCodecID(config.codec, formatContext_->oformat);
     if (codecId == AV_CODEC_ID_NONE) {
-        std::cerr << "FFmpeg writer: container " << formatContext_->oformat->name
-                  << " has no default video codec; select one explicitly" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: container " << formatContext_->oformat->name
+                                    << " has no default video codec; select one explicitly" << '\n';
         cleanup();
         return false;
     }
 
     const AVCodec* encoder = avcodec_find_encoder(codecId);
     if (!encoder) {
-        std::cerr << "FFmpeg writer: no encoder available for " << avcodec_get_name(codecId)
-                  << std::endl;
+        std::osyncstream(std::cerr)
+            << "FFmpeg writer: no encoder available for " << avcodec_get_name(codecId) << '\n';
         cleanup();
         return false;
     }
@@ -152,16 +154,17 @@ bool FFmpegWriter::initialize(const std::string& destination,
     const AVPixFmtDescriptor* descriptor = av_pix_fmt_desc_get(encoderFormat);
     if (descriptor && ((descriptor->log2_chroma_w > 0 && config.width % 2 != 0) ||
                        (descriptor->log2_chroma_h > 0 && config.height % 2 != 0))) {
-        std::cerr << "FFmpeg writer: " << avcodec_get_name(codecId) << " needs even dimensions for "
-                  << av_get_pix_fmt_name(encoderFormat) << ", got " << config.width << "x"
-                  << config.height << std::endl;
+        std::osyncstream(std::cerr)
+            << "FFmpeg writer: " << avcodec_get_name(codecId) << " needs even dimensions for "
+            << av_get_pix_fmt_name(encoderFormat) << ", got " << config.width << "x"
+            << config.height << '\n';
         cleanup();
         return false;
     }
 
     codecContext_ = avcodec_alloc_context3(encoder);
     if (!codecContext_) {
-        std::cerr << "FFmpeg writer: could not allocate encoder context" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not allocate encoder context" << '\n';
         cleanup();
         return false;
     }
@@ -183,15 +186,15 @@ bool FFmpegWriter::initialize(const std::string& destination,
 
     result = avcodec_open2(codecContext_, encoder, nullptr);
     if (result < 0) {
-        std::cerr << "FFmpeg writer: could not open encoder " << encoder->name << " ("
-                  << ffmpegError(result) << ")" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not open encoder " << encoder->name
+                                    << " (" << ffmpegError(result) << ")" << '\n';
         cleanup();
         return false;
     }
 
     stream_ = avformat_new_stream(formatContext_, nullptr);
     if (!stream_) {
-        std::cerr << "FFmpeg writer: could not create output stream" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not create output stream" << '\n';
         cleanup();
         return false;
     }
@@ -199,8 +202,8 @@ bool FFmpegWriter::initialize(const std::string& destination,
     stream_->avg_frame_rate = frameRate;
     result = avcodec_parameters_from_context(stream_->codecpar, codecContext_);
     if (result < 0) {
-        std::cerr << "FFmpeg writer: could not copy encoder parameters (" << ffmpegError(result)
-                  << ")" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not copy encoder parameters ("
+                                    << ffmpegError(result) << ")" << '\n';
         cleanup();
         return false;
     }
@@ -208,8 +211,8 @@ bool FFmpegWriter::initialize(const std::string& destination,
     if (!(formatContext_->oformat->flags & AVFMT_NOFILE)) {
         result = avio_open(&formatContext_->pb, destination.c_str(), AVIO_FLAG_WRITE);
         if (result < 0) {
-            std::cerr << "FFmpeg writer: could not open " << destination << " ("
-                      << ffmpegError(result) << ")" << std::endl;
+            std::osyncstream(std::cerr) << "FFmpeg writer: could not open " << destination << " ("
+                                        << ffmpegError(result) << ")" << '\n';
             cleanup();
             return false;
         }
@@ -217,8 +220,8 @@ bool FFmpegWriter::initialize(const std::string& destination,
 
     result = avformat_write_header(formatContext_, nullptr);
     if (result < 0) {
-        std::cerr << "FFmpeg writer: could not write container header (" << ffmpegError(result)
-                  << ")" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not write container header ("
+                                    << ffmpegError(result) << ")" << '\n';
         cleanup();
         return false;
     }
@@ -226,7 +229,7 @@ bool FFmpegWriter::initialize(const std::string& destination,
 
     encodeFrame_ = av_frame_alloc();
     if (!encodeFrame_) {
-        std::cerr << "FFmpeg writer: could not allocate encoder frame" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not allocate encoder frame" << '\n';
         cleanup();
         return false;
     }
@@ -235,8 +238,8 @@ bool FFmpegWriter::initialize(const std::string& destination,
     encodeFrame_->height = config.height;
     result = av_frame_get_buffer(encodeFrame_, 0);
     if (result < 0) {
-        std::cerr << "FFmpeg writer: could not allocate encoder frame buffer ("
-                  << ffmpegError(result) << ")" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not allocate encoder frame buffer ("
+                                    << ffmpegError(result) << ")" << '\n';
         cleanup();
         return false;
     }
@@ -254,7 +257,7 @@ bool FFmpegWriter::prepareScaler(videocapture::PixelFormat format) {
 
     const AVPixelFormat sourceFormat = toAVPixelFormat(format);
     if (sourceFormat == AV_PIX_FMT_NONE) {
-        std::cerr << "FFmpeg writer: unsupported source pixel format" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: unsupported source pixel format" << '\n';
         return false;
     }
 
@@ -266,8 +269,8 @@ bool FFmpegWriter::prepareScaler(videocapture::PixelFormat format) {
         sws_getContext(config_.width, config_.height, sourceFormat, config_.width, config_.height,
                        codecContext_->pix_fmt, SWS_BILINEAR, nullptr, nullptr, nullptr);
     if (!swsContext_) {
-        std::cerr << "FFmpeg writer: could not initialize colour conversion to "
-                  << av_get_pix_fmt_name(codecContext_->pix_fmt) << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not initialize colour conversion to "
+                                    << av_get_pix_fmt_name(codecContext_->pix_fmt) << '\n';
         return false;
     }
     scalerSourceFormat_ = format;
@@ -276,7 +279,8 @@ bool FFmpegWriter::prepareScaler(videocapture::PixelFormat format) {
 
 bool FFmpegWriter::writeFrame(const videocapture::Frame& frame) {
     if (!initialized_) {
-        std::cerr << "FFmpeg writer: writeFrame() called before initialize()" << std::endl;
+        std::osyncstream(std::cerr)
+            << "FFmpeg writer: writeFrame() called before initialize()" << '\n';
         return false;
     }
     if (!videocapture::writer::validateFrame(frame, config_, "FFmpeg writer")) {
@@ -288,8 +292,8 @@ bool FFmpegWriter::writeFrame(const videocapture::Frame& frame) {
 
     const int result = av_frame_make_writable(encodeFrame_);
     if (result < 0) {
-        std::cerr << "FFmpeg writer: encoder frame is not writable (" << ffmpegError(result) << ")"
-                  << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: encoder frame is not writable ("
+                                    << ffmpegError(result) << ")" << '\n';
         return false;
     }
 
@@ -308,8 +312,8 @@ bool FFmpegWriter::writeFrame(const videocapture::Frame& frame) {
 bool FFmpegWriter::encodeAndMux(AVFrame* frame) {
     int result = avcodec_send_frame(codecContext_, frame);
     if (result < 0) {
-        std::cerr << "FFmpeg writer: could not send frame to encoder (" << ffmpegError(result)
-                  << ")" << std::endl;
+        std::osyncstream(std::cerr) << "FFmpeg writer: could not send frame to encoder ("
+                                    << ffmpegError(result) << ")" << '\n';
         return false;
     }
 
@@ -319,8 +323,8 @@ bool FFmpegWriter::encodeAndMux(AVFrame* frame) {
             return true;
         }
         if (result < 0) {
-            std::cerr << "FFmpeg writer: could not receive packet from encoder ("
-                      << ffmpegError(result) << ")" << std::endl;
+            std::osyncstream(std::cerr) << "FFmpeg writer: could not receive packet from encoder ("
+                                        << ffmpegError(result) << ")" << '\n';
             return false;
         }
 
@@ -330,8 +334,8 @@ bool FFmpegWriter::encodeAndMux(AVFrame* frame) {
         // leaves the packet blank, whether or not it succeeds.
         result = av_interleaved_write_frame(formatContext_, packet_);
         if (result < 0) {
-            std::cerr << "FFmpeg writer: could not write packet (" << ffmpegError(result) << ")"
-                      << std::endl;
+            std::osyncstream(std::cerr)
+                << "FFmpeg writer: could not write packet (" << ffmpegError(result) << ")" << '\n';
             return false;
         }
     }
@@ -350,8 +354,8 @@ bool FFmpegWriter::release() {
         if (headerWritten_) {
             const int result = av_write_trailer(formatContext_);
             if (result < 0) {
-                std::cerr << "FFmpeg writer: could not finalize the container ("
-                          << ffmpegError(result) << ")" << std::endl;
+                std::osyncstream(std::cerr) << "FFmpeg writer: could not finalize the container ("
+                                            << ffmpegError(result) << ")" << '\n';
                 finalized = false;
             }
         }
@@ -360,8 +364,8 @@ bool FFmpegWriter::release() {
         if (formatContext_->pb && !(formatContext_->oformat->flags & AVFMT_NOFILE)) {
             const int result = avio_closep(&formatContext_->pb);
             if (result < 0) {
-                std::cerr << "FFmpeg writer: could not close the destination ("
-                          << ffmpegError(result) << ")" << std::endl;
+                std::osyncstream(std::cerr) << "FFmpeg writer: could not close the destination ("
+                                            << ffmpegError(result) << ")" << '\n';
                 finalized = false;
             }
         }

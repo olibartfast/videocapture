@@ -11,7 +11,9 @@
 #include <memory>
 #include <mutex>
 #include <optional>
+#include <sstream>
 #include <stdexcept>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -456,6 +458,99 @@ TEST_F(AsyncVideoWriterTest, FinalizationExceptionClosesTheWriterAndIsReported) 
     EXPECT_TRUE(writer->release());
     writer.reset();
     EXPECT_EQ(script->framesWrittenAtRelease, std::vector<std::size_t>{1});
+}
+
+TEST_F(AsyncVideoWriterTest, FailureDuringReleaseDiscardsQueuedFramesAndFinalizesOnce) {
+    script->failingWrite = 0;
+    script->failByThrowing = true;
+    open(2);
+    script->setGate(false);
+    ASSERT_TRUE(writer->writeFrame(makeFrame(0)));
+    ASSERT_TRUE(script->waitUntil([this] { return script->writesStarted == 1; }));
+    ASSERT_TRUE(writer->writeFrame(makeFrame(1)));
+    ASSERT_TRUE(writer->writeFrame(makeFrame(2)));
+
+    auto closing = std::async(std::launch::async, [this] { return writer->release(); });
+    EXPECT_EQ(closing.wait_for(kStillBlocked), std::future_status::timeout);
+    script->setGate(true);
+    ASSERT_EQ(closing.wait_for(kWaitLimit), std::future_status::ready);
+    EXPECT_FALSE(closing.get());
+    EXPECT_FALSE(writer->isOpen());
+    EXPECT_TRUE(writer->release());
+    EXPECT_TRUE(script->writtenSequences.empty());
+    EXPECT_EQ(script->writesStarted, 1u);
+    EXPECT_EQ(script->framesWrittenAtRelease, std::vector<std::size_t>{0});
+}
+
+TEST_F(AsyncVideoWriterTest, ConcurrentValidationAndEncoderDiagnosticsRemainWholeLines) {
+    constexpr std::size_t kWriters = 16;
+    constexpr std::size_t kRejections = 256;
+    std::vector<std::unique_ptr<AsyncVideoWriter>> writers;
+    std::vector<std::shared_ptr<EncoderScript>> scripts;
+    for (std::size_t index = 0; index < kWriters; ++index) {
+        auto state = std::make_shared<EncoderScript>();
+        state->failingWrite = 0;
+        state->failByThrowing = true;
+        state->gateOpen = false;
+        auto instance = std::make_unique<AsyncVideoWriter>(std::make_unique<FakeEncoder>(state));
+        ASSERT_TRUE(instance->initialize("scripted", makeConfig()));
+        scripts.push_back(state);
+        writers.push_back(std::move(instance));
+    }
+
+    // Capture before launching work and restore only after every worker joins.
+    // The caller validates invalid frames while multiple encoders log failures.
+    testing::internal::CaptureStderr();
+    for (auto& instance : writers) {
+        EXPECT_TRUE(instance->writeFrame(makeFrame(0)));
+    }
+    for (auto& state : scripts) {
+        state->setGate(true);
+    }
+    for (std::size_t index = 0; index < kRejections; ++index) {
+        EXPECT_FALSE(writers[index % kWriters]->writeFrame(videocapture::Frame()));
+    }
+    for (auto& instance : writers) {
+        EXPECT_FALSE(instance->release());
+    }
+    const std::string captured = testing::internal::GetCapturedStderr();
+    std::istringstream messages(captured);
+    std::string line;
+    std::size_t failures = 0;
+    std::size_t rejections = 0;
+    while (std::getline(messages, line)) {
+        if (line ==
+            "Video writer: encoder failed while writing a frame: scripted encoder failure") {
+            ++failures;
+        } else if (line == "Video writer: refusing to write an empty frame") {
+            ++rejections;
+        } else {
+            ADD_FAILURE() << "Incomplete or interleaved diagnostic: " << line;
+        }
+    }
+    EXPECT_EQ(failures, kWriters);
+    EXPECT_EQ(rejections, kRejections);
+}
+
+TEST_F(AsyncVideoWriterTest, IdleReleaseWakesEncoderAndReopeningGetsAFreshStopState) {
+    create();
+    for (std::uint64_t sequence = 0; sequence < 32; ++sequence) {
+        ASSERT_TRUE(writer->initialize("idle", makeConfig()));
+        // Give the encoder an opportunity to enter its stop-aware wait. Also
+        // exercise immediate shutdown of a fresh destination below.
+        std::this_thread::sleep_for(1ms);
+        auto closing = std::async(std::launch::async, [this] { return writer->release(); });
+        ASSERT_EQ(closing.wait_for(kWaitLimit), std::future_status::ready);
+        EXPECT_TRUE(closing.get());
+        EXPECT_FALSE(writer->isOpen());
+        EXPECT_TRUE(writer->release());
+
+        ASSERT_TRUE(writer->initialize("reopened", makeConfig()));
+        ASSERT_TRUE(writer->writeFrame(makeFrame(sequence)));
+        EXPECT_TRUE(writer->release());
+    }
+    EXPECT_EQ(script->writtenSequences, sequencesUpTo(32));
+    EXPECT_EQ(script->framesWrittenAtRelease.size(), 64u);
 }
 
 TEST_F(AsyncVideoWriterTest, ReleaseIsIdempotent) {
