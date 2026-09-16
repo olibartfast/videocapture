@@ -30,6 +30,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   frame's pixels to the encoder thread without copying them. The default
   implementation forwards to the copying overload.
 
+### Fixed
+
+- GStreamer captures no longer share frame, sequence, end-of-stream, and wakeup
+  state through static pipeline members. Each capture owns its pipeline state
+  and bus, so concurrent captures stay independent and EOS, a bus error, or
+  destruction of one capture no longer disturbs another. Bus errors and EOS are
+  still detected without an external GLib main loop.
+
 ## [0.5.0] - 2026-09-04
 
 ### Added

@@ -113,8 +113,13 @@ bool GStreamerWriter::buildPipelineDescription(const std::string& destination,
 
     // The file name is set on the element afterwards rather than embedded in
     // the description, so paths containing spaces or quotes need no escaping.
-    description = std::string("appsrc name=") + kSourceName + " ! videoconvert ! " + encoder +
-                  parser + " ! " + muxer + " ! filesink name=" + kFileSinkName;
+    // Pin the encoder input to 4:2:0. Left to negotiate, videoconvert hands the
+    // encoder 4:4:4 because that is the cheapest conversion from packed RGB,
+    // and x264enc then emits High 4:4:4 Predictive, which most players and
+    // practically every hardware decoder cannot decode correctly.
+    description = std::string("appsrc name=") + kSourceName +
+                  " ! videoconvert ! video/x-raw,format=I420 ! " + encoder + parser + " ! " +
+                  muxer + " ! filesink name=" + kFileSinkName;
     return true;
 }
 
