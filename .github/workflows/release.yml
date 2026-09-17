@@ -76,13 +76,25 @@ jobs:
       run: |
         brew install gstreamer gst-plugins-base gst-plugins-good ffmpeg sdl2
 
+    # The writer needs a C++20 standard library providing std::jthread,
+    # stop-aware waits, and std::osyncstream. The macOS release runners ship a
+    # libc++ that predates those, so their packages are capture-only; Linux
+    # packages include the writer. See specs/roadmap.md Phase 7.
+    - name: Select writer support
+      id: writer
+      run: |
+        case "${{ matrix.os }}" in
+          macos*) echo "enabled=OFF" >> "$GITHUB_OUTPUT" ;;
+          *) echo "enabled=ON" >> "$GITHUB_OUTPUT" ;;
+        esac
+
     - name: Configure CMake (OpenCV only)
       if: matrix.backend == 'opencv'
       run: |
         cmake -B build -G Ninja \
           -DCMAKE_BUILD_TYPE=Release \
           -DBUILD_TESTS=OFF \
-          -DUSE_VIDEOWRITER=ON
+          -DUSE_VIDEOWRITER=${{ steps.writer.outputs.enabled }}
 
     - name: Configure CMake (All backends)
       if: matrix.backend == 'all'
@@ -92,7 +104,7 @@ jobs:
           -DBUILD_TESTS=OFF \
           -DUSE_GSTREAMER=ON \
           -DUSE_FFMPEG=ON \
-          -DUSE_VIDEOWRITER=ON
+          -DUSE_VIDEOWRITER=${{ steps.writer.outputs.enabled }}
 
     - name: Build
       run: cmake --build build --config Release

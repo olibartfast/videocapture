@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.21)
 
 # Read version from VERSION file
 file(READ "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" PROJECT_VERSION_RAW)
@@ -46,6 +46,11 @@ if(NOT DEFINED USE_VIDEOWRITER)
     unset(USE_VIDEOWRITER CACHE)
 endif()
 set(USE_VIDEOWRITER OFF CACHE BOOL "Build the video writer module (optional)")
+
+if(USE_VIDEOWRITER)
+    include(cmake/WriterConcurrency.cmake)
+    validate_writer_concurrency()
+endif()
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake)
 message(STATUS "Videocapture Cmake module path: ${CMAKE_MODULE_PATH}")
@@ -111,6 +116,7 @@ endif()
 if(USE_VIDEOWRITER)
     list(APPEND VIDEOCAPTURE_SOURCES
         ${CMAKE_CURRENT_LIST_DIR}/src/VideoWriterFactory.cpp
+        ${CMAKE_CURRENT_LIST_DIR}/src/AsyncVideoWriter.cpp
     )
     if(USE_GSTREAMER)
         list(APPEND VIDEOCAPTURE_SOURCES
@@ -144,6 +150,10 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 # is part of the target's public interface rather than a private flag.
 if(USE_VIDEOWRITER)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VIDEOCAPTURE_WITH_WRITER)
+    # The writer encodes on a thread of its own; the platform thread library is
+    # part of the toolchain rather than a new dependency.
+    find_package(Threads REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
 endif()
 
 # Link against GStreamer libraries if USE_GSTREAMER is ON

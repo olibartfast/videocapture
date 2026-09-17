@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-09-17
+
+### Changed
+
+- Async writer shutdown uses C++20 `std::jthread` and stop-aware waits while
+  still draining accepted frames before finalization. Writer diagnostics use
+  `std::osyncstream` to keep concurrent library writer messages intact.
+- `createVideoWriter()` returns a writer that encodes on its own thread behind
+  a bounded queue, so encode time no longer runs on the caller's thread
+  ([neuriplo-infer#49](https://github.com/olibartfast/neuriplo-infer/issues/49)).
+  `writeFrame()` validates the frame and hands it off; frames keep submission
+  order and are never dropped, with `writeFrame()` waiting when the encoder
+  falls behind. A frame that fails to encode fails the destination: later
+  `writeFrame()` calls and the closing `release()` return `false`.
+- **Breaking (source and ABI):** `VideoWriterInterface::release()` returns
+  `bool`, reporting whether every frame was encoded and the container was
+  finalized. Callers that ignore the result compile unchanged; custom
+  `VideoWriterInterface` implementations must update the override.
+- Capture and shared writer-support code now use C++20 range algorithms,
+  `std::span`, `string::starts_with`, and checked integer conversions; behavior
+  is unchanged.
+- Packaged macOS release builds are capture-only. The writer needs a C++20
+  standard library providing `std::jthread`, stop-aware waits, and
+  `std::osyncstream`, which the current macOS release runners do not ship;
+  Linux packages include the writer. Tracked as roadmap Phase 7.
+
+### Added
+
+- `VideoWriterInterface::writeFrame(videocapture::Frame&&)`, which hands the
+  frame's pixels to the encoder thread without copying them. The default
+  implementation forwards to the copying overload.
+
+### Fixed
+
+- GStreamer captures no longer share frame, sequence, end-of-stream, and wakeup
+  state through static pipeline members. Each capture owns its pipeline state
+  and bus, so concurrent captures stay independent and EOS, a bus error, or
+  destruction of one capture no longer disturbs another. Bus errors and EOS are
+  still detected without an external GLib main loop.
+- The GStreamer writer now encodes 4:2:0 (`yuv420p`) instead of negotiating
+  4:4:4, so its files play correctly in players and hardware decoders that
+  reject High 4:4:4 Predictive; AVI output uses baseline MJPEG. A failing
+  capture callback now reports its cause before ending the stream.
+
 ## [0.5.0] - 2026-09-04
 
 ### Added
@@ -113,7 +157,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Unit tests with Google Test
 - Example application
 
-[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/olibartfast/videocapture/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/olibartfast/videocapture/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/olibartfast/videocapture/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/olibartfast/videocapture/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/olibartfast/videocapture/compare/v0.2.0...v0.3.0

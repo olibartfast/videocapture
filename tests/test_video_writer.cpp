@@ -4,7 +4,12 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <fstream>
 #include <string>
+
+#if defined(__linux__)
+#include <unistd.h>
+#endif
 
 #include "VideoCaptureFactory.hpp"
 #include "VideoWriterFactory.hpp"
@@ -160,7 +165,7 @@ TEST_F(VideoWriterTest, WritesAndReadsBackTheSameGeometry) {
     for (int index = 0; index < kFrameCount; ++index) {
         ASSERT_TRUE(writer->writeFrame(makeFrame(index))) << "frame " << index;
     }
-    writer->release();
+    EXPECT_TRUE(writer->release());
     EXPECT_FALSE(writer->isOpen());
 
     auto capture = createVideoInterface();
@@ -178,6 +183,21 @@ TEST_F(VideoWriterTest, WritesAndReadsBackTheSameGeometry) {
     capture->release();
 
     EXPECT_EQ(decoded, kFrameCount);
+    std::remove(destination.c_str());
+}
+
+TEST_F(VideoWriterTest, ReleaseFinalizesADestinationThatReceivedNoFrames) {
+    const std::string destination = temporaryDestination("videocapture_no_frames.avi");
+    std::remove(destination.c_str());
+
+    if (!writer->initialize(destination, makeConfig())) {
+        if (writerCodecRequired()) {
+            FAIL() << "Motion JPEG encoder required by this validation environment";
+        }
+        GTEST_SKIP() << "no Motion JPEG encoder available for this backend";
+    }
+    EXPECT_TRUE(writer->release());
+    EXPECT_TRUE(std::ifstream(destination).good()) << "no file was written at " << destination;
     std::remove(destination.c_str());
 }
 
@@ -201,7 +221,7 @@ TEST_F(VideoWriterTest, ReinitializeFinalizesThePreviousDestination) {
     for (int index = 0; index < 3; ++index) {
         ASSERT_TRUE(writer->writeFrame(makeFrame(index + 3)));
     }
-    writer->release();
+    EXPECT_TRUE(writer->release());
 
     const auto decodedFrameCount = [](const std::string& destination) {
         auto capture = createVideoInterface();
@@ -222,6 +242,27 @@ TEST_F(VideoWriterTest, ReinitializeFinalizesThePreviousDestination) {
     std::remove(firstDestination.c_str());
     std::remove(secondDestination.c_str());
 }
+
+#if defined(USE_FFMPEG) && defined(__linux__)
+// /dev/full opens normally and fails every write with ENOSPC. The FFmpeg writer
+// buffers its output, so for a short clip every writeFrame() is accepted and the
+// error first appears when release() finalizes the destination, which has to
+// report it.
+TEST_F(VideoWriterTest, ReleaseReportsWriteErrorsSurfacingOnClose) {
+    const std::string destination = temporaryDestination("videocapture_full_device.avi");
+    std::remove(destination.c_str());
+    if (symlink("/dev/full", destination.c_str()) != 0) {
+        GTEST_SKIP() << "cannot link " << destination << " to /dev/full";
+    }
+
+    ASSERT_TRUE(writer->initialize(destination, makeConfig()));
+    for (int index = 0; index < 3; ++index) {
+        ASSERT_TRUE(writer->writeFrame(makeFrame(index))) << "frame " << index;
+    }
+    EXPECT_FALSE(writer->release());
+    std::remove(destination.c_str());
+}
+#endif
 
 TEST_F(VideoWriterTest, AcceptsEveryPackedPixelLayout) {
     const std::string destination = temporaryDestination("videocapture_layouts.avi");
