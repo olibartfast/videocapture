@@ -1,35 +1,45 @@
 #include "GStreamerPipeline.hpp"
 
+#include <chrono>
 #include <cstring>
-#include <limits>
+#include <exception>
+#include <memory>
 #include <stdexcept>
 #include <utility>
 
 #include <gst/video/video.h>
 
-std::mutex GStreamerPipeline::frameMutex_;
-std::condition_variable GStreamerPipeline::frameAvailable_;
-videocapture::Frame GStreamerPipeline::frame_;
-std::atomic_bool GStreamerPipeline::endOfStream_ = false;
-std::atomic_uint64_t GStreamerPipeline::nextSequence_ = 0;
-bool GStreamerPipeline::isFrameReady_ = false;
-
-GStreamerPipeline::GStreamerPipeline() = default;
-
 GStreamerPipeline::~GStreamerPipeline() {
-    removeBusWatch();
+    reset();
+}
+
+void GStreamerPipeline::reset() {
+    // NULL stops and joins streaming tasks before callback userdata or frame
+    // state can be destroyed. No bus watch is registered on a shared context.
     if (pipeline_) {
         gst_element_set_state(pipeline_, GST_STATE_NULL);
     }
     if (sink_) {
-        gst_object_unref(sink_);
+        GstAppSinkCallbacks callbacks{};
+        if (GST_IS_APP_SINK(sink_)) {
+            gst_app_sink_set_callbacks(GST_APP_SINK(sink_), &callbacks, nullptr, nullptr);
+        }
+        gst_object_unref(std::exchange(sink_, nullptr));
+    }
+    if (bus_) {
+        gst_object_unref(std::exchange(bus_, nullptr));
     }
     if (pipeline_) {
-        gst_object_unref(pipeline_);
+        gst_object_unref(std::exchange(pipeline_, nullptr));
     }
     if (error_) {
-        g_error_free(error_);
+        g_error_free(std::exchange(error_, nullptr));
     }
+    const std::lock_guard lock(frameMutex_);
+    frame_.clear();
+    isFrameReady_ = false;
+    endOfStream_ = false;
+    nextSequence_ = 0;
 }
 
 void GStreamerPipeline::initGstLibrary(int argc, char* argv[]) {
@@ -37,6 +47,7 @@ void GStreamerPipeline::initGstLibrary(int argc, char* argv[]) {
 }
 
 void GStreamerPipeline::runPipeline(const std::string& link) {
+    reset();
     const std::string pipelineCommand = getPipelineCommand(link);
     pipeline_ = gst_parse_launch(pipelineCommand.c_str(), &error_);
     checkError();
@@ -68,40 +79,61 @@ std::string GStreamerPipeline::getPipelineCommand(const std::string& link) const
            " ! appsink name=videocapture_sink";
 }
 
-void GStreamerPipeline::endOfStream(GstAppSink*, gpointer) {
-    // The appsink reports end of stream on the streaming thread, so consumers
-    // learn about it without depending on anyone iterating the main context.
+void GStreamerPipeline::markEndOfStream() {
     {
-        std::lock_guard<std::mutex> lock(frameMutex_);
-        endOfStream_.store(true);
+        const std::lock_guard lock(frameMutex_);
+        endOfStream_ = true;
     }
     frameAvailable_.notify_all();
+}
+
+void GStreamerPipeline::endOfStream(GstAppSink*, gpointer data) {
+    static_cast<GStreamerPipeline*>(data)->markEndOfStream();
 }
 
 GstFlowReturn GStreamerPipeline::newPreroll(GstAppSink*, gpointer) {
     return GST_FLOW_OK;
 }
 
-GstFlowReturn GStreamerPipeline::newSample(GstAppSink* appsink, gpointer) {
-    GstSample* sample = gst_app_sink_pull_sample(appsink);
+GstFlowReturn GStreamerPipeline::newSample(GstAppSink* appsink, gpointer data) {
+    auto& self = *static_cast<GStreamerPipeline*>(data);
+    try {
+        return self.receiveSample(appsink);
+    } catch (const std::exception& error) {
+        // Never unwind a C callback. Report the cause, because the reader only
+        // sees the same end of stream that a complete stream produces.
+        g_printerr("GStreamer capture: frame delivery failed: %s\n", error.what());
+        self.markEndOfStream();
+        return GST_FLOW_ERROR;
+    } catch (...) {
+        g_printerr("GStreamer capture: frame delivery failed\n");
+        self.markEndOfStream();
+        return GST_FLOW_ERROR;
+    }
+}
+
+GstFlowReturn GStreamerPipeline::receiveSample(GstAppSink* appsink) {
+    const std::unique_ptr<GstSample, decltype(&gst_sample_unref)> sample(
+        gst_app_sink_pull_sample(appsink), gst_sample_unref);
     if (!sample) {
         return GST_FLOW_EOS;
     }
 
-    GstCaps* caps = gst_sample_get_caps(sample);
-    GstBuffer* buffer = gst_sample_get_buffer(sample);
+    GstCaps* caps = gst_sample_get_caps(sample.get());
+    GstBuffer* buffer = gst_sample_get_buffer(sample.get());
     GstVideoInfo videoInfo;
     if (!caps || !buffer || !gst_video_info_from_caps(&videoInfo, caps) ||
         GST_VIDEO_INFO_FORMAT(&videoInfo) != GST_VIDEO_FORMAT_BGR) {
-        gst_sample_unref(sample);
         return GST_FLOW_NOT_NEGOTIATED;
     }
 
     GstVideoFrame mappedFrame;
     if (!gst_video_frame_map(&mappedFrame, &videoInfo, buffer, GST_MAP_READ)) {
-        gst_sample_unref(sample);
         return GST_FLOW_ERROR;
     }
+
+    const auto unmap = [](GstVideoFrame* mapped) { gst_video_frame_unmap(mapped); };
+    const std::unique_ptr<GstVideoFrame, decltype(unmap)> mapping(&mappedFrame, unmap);
 
     const int width = static_cast<int>(GST_VIDEO_INFO_WIDTH(&videoInfo));
     const int height = static_cast<int>(GST_VIDEO_INFO_HEIGHT(&videoInfo));
@@ -120,56 +152,41 @@ GstFlowReturn GStreamerPipeline::newSample(GstAppSink* appsink, gpointer) {
             std::memcpy(nextFrame.data() + static_cast<std::size_t>(row) * nextFrame.rowStride(),
                         source + static_cast<std::size_t>(row) * sourceStride, rowBytes);
         }
-        nextFrame.setSequence(nextSequence_.fetch_add(1));
         const GstClockTime presentationTimestamp = GST_BUFFER_PTS(buffer);
         if (GST_CLOCK_TIME_IS_VALID(presentationTimestamp) &&
-            presentationTimestamp <=
-                static_cast<GstClockTime>(std::numeric_limits<std::int64_t>::max())) {
+            std::in_range<std::int64_t>(presentationTimestamp)) {
             nextFrame.setTimestamp(
                 std::chrono::nanoseconds(static_cast<std::int64_t>(presentationTimestamp)));
         }
 
         {
-            std::lock_guard<std::mutex> lock(frameMutex_);
+            const std::lock_guard lock(frameMutex_);
+            nextFrame.setSequence(nextSequence_++);
             frame_ = std::move(nextFrame);
             isFrameReady_ = true;
         }
         frameAvailable_.notify_one();
     }
 
-    gst_video_frame_unmap(&mappedFrame);
-    gst_sample_unref(sample);
     return result;
 }
 
-gboolean GStreamerPipeline::myBusCallback(GstBus*, GstMessage* message, gpointer) {
-    switch (GST_MESSAGE_TYPE(message)) {
-        case GST_MESSAGE_ERROR: {
+void GStreamerPipeline::pollBus() {
+    // Pop only our bus; unlike a default-context watch, this never dispatches
+    // callbacks belonging to another capture or to the embedding application.
+    while (GstMessage* message = gst_bus_pop_filtered(
+               bus_, static_cast<GstMessageType>(GST_MESSAGE_ERROR | GST_MESSAGE_EOS))) {
+        if (GST_MESSAGE_TYPE(message) == GST_MESSAGE_ERROR) {
             GError* error = nullptr;
             gchar* debug = nullptr;
             gst_message_parse_error(message, &error, &debug);
             g_printerr("GStreamer error: %s\n", error->message);
             g_error_free(error);
             g_free(debug);
-            {
-                std::lock_guard<std::mutex> lock(frameMutex_);
-                endOfStream_.store(true);
-            }
-            frameAvailable_.notify_all();
-            break;
         }
-        case GST_MESSAGE_EOS: {
-            {
-                std::lock_guard<std::mutex> lock(frameMutex_);
-                endOfStream_.store(true);
-            }
-            frameAvailable_.notify_all();
-            break;
-        }
-        default:
-            break;
+        markEndOfStream();
+        gst_message_unref(message);
     }
-    return TRUE;
 }
 
 void GStreamerPipeline::getSink() {
@@ -201,21 +218,18 @@ void GStreamerPipeline::getSink() {
     gst_app_sink_set_emit_signals(GST_APP_SINK(sink_), true);
     gst_app_sink_set_drop(GST_APP_SINK(sink_), true);
     gst_app_sink_set_max_buffers(GST_APP_SINK(sink_), 1);
-    GstAppSinkCallbacks callbacks = {endOfStream, newPreroll, newSample};
-    gst_app_sink_set_callbacks(GST_APP_SINK(sink_), &callbacks, nullptr, nullptr);
+    GstAppSinkCallbacks callbacks{
+        .eos = endOfStream, .new_preroll = newPreroll, .new_sample = newSample};
+    gst_app_sink_set_callbacks(GST_APP_SINK(sink_), &callbacks, this, nullptr);
 }
 
 void GStreamerPipeline::setBus() {
-    removeBusWatch();
-    GstBus* bus = gst_pipeline_get_bus(GST_PIPELINE(pipeline_));
-    busWatchId_ = gst_bus_add_watch(bus, myBusCallback, nullptr);
-    gst_object_unref(bus);
-}
-
-void GStreamerPipeline::removeBusWatch() {
-    if (busWatchId_ != 0) {
-        g_source_remove(busWatchId_);
-        busWatchId_ = 0;
+    if (bus_) {
+        gst_object_unref(std::exchange(bus_, nullptr));
+    }
+    bus_ = gst_element_get_bus(pipeline_);
+    if (!bus_) {
+        throw std::runtime_error("GStreamer pipeline has no bus");
     }
 }
 
@@ -224,9 +238,9 @@ void GStreamerPipeline::setState(GstState state) {
         return;
     }
     if (state == GST_STATE_PLAYING) {
-        std::lock_guard<std::mutex> lock(frameMutex_);
-        endOfStream_.store(false);
-        nextSequence_.store(0);
+        const std::lock_guard lock(frameMutex_);
+        endOfStream_ = false;
+        nextSequence_ = 0;
         isFrameReady_ = false;
         frame_.clear();
     }
@@ -235,16 +249,31 @@ void GStreamerPipeline::setState(GstState state) {
     }
 }
 
-void GStreamerPipeline::setMainLoopEvent(bool event) {
-    g_main_context_iteration(nullptr, event);
+bool GStreamerPipeline::isEndOfStream() const {
+    const std::lock_guard lock(frameMutex_);
+    return endOfStream_;
 }
 
-bool GStreamerPipeline::isEndOfStream() {
-    return endOfStream_.load();
-}
-
-videocapture::Frame GStreamerPipeline::takeFrame() {
-    videocapture::Frame result = std::move(frame_);
-    frame_.clear();
-    return result;
+bool GStreamerPipeline::readFrame(videocapture::Frame& frame) {
+    if (!bus_) {
+        frame.clear();
+        return false;
+    }
+    pollBus();
+    constexpr auto busPollInterval = std::chrono::milliseconds(5);
+    std::unique_lock lock(frameMutex_);
+    while (!isFrameReady_ && !endOfStream_) {
+        lock.unlock();
+        pollBus();
+        lock.lock();
+        frameAvailable_.wait_for(lock, busPollInterval,
+                                 [this] { return isFrameReady_ || endOfStream_; });
+    }
+    if (!isFrameReady_) {
+        frame.clear();
+        return false;
+    }
+    frame = std::exchange(frame_, {});
+    isFrameReady_ = false;
+    return !frame.empty();
 }

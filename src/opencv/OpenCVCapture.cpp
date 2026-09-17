@@ -10,7 +10,9 @@
 
 bool OpenCVCapture::initialize(const std::string& source) {
     // Check if source is a numeric camera index
-    bool isNumeric = !source.empty() && std::all_of(source.begin(), source.end(), ::isdigit);
+    const bool isNumeric = !source.empty() && std::ranges::all_of(source, [](unsigned char c) {
+        return std::isdigit(c) != 0;
+    });
 
     if (isNumeric) {
         // Treat as camera device index
