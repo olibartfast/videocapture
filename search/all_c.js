@@ -1,8 +1,10 @@
 var searchData=
 [
-  ['packedbytesperpixel_0',['packedBytesPerPixel',['../namespacevideocapture_1_1writer.html#ab31f309227adfbcac5775ca5a2af56b9',1,'videocapture::writer']]],
-  ['pixelformat_1',['PixelFormat',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7',1,'videocapture']]],
-  ['planecount_2',['planeCount',['../classvideocapture_1_1Frame.html#a357e664250d98bf3df8afea084af24f6',1,'videocapture::Frame']]],
-  ['planeheight_3',['planeHeight',['../classvideocapture_1_1Frame.html#a79841458369d4744bdd0f81406e061a0',1,'videocapture::Frame']]],
-  ['planewidth_4',['planeWidth',['../classvideocapture_1_1Frame.html#aec475ce2b017108755f81a08c65d1281',1,'videocapture::Frame']]]
+  ['opencvcapture_0',['OpenCVCapture',['../classOpenCVCapture.html',1,'']]],
+  ['opencvcapture_2ecpp_1',['OpenCVCapture.cpp',['../OpenCVCapture_8cpp.html',1,'']]],
+  ['opencvcapture_2ehpp_2',['OpenCVCapture.hpp',['../OpenCVCapture_8hpp.html',1,'']]],
+  ['opencvwriter_3',['OpenCVWriter',['../classOpenCVWriter.html',1,'']]],
+  ['opencvwriter_2ecpp_4',['OpenCVWriter.cpp',['../OpenCVWriter_8cpp.html',1,'']]],
+  ['opencvwriter_2ehpp_5',['OpenCVWriter.hpp',['../OpenCVWriter_8hpp.html',1,'']]],
+  ['operator_3d_6',['operator=',['../classAsyncVideoWriter.html#a05eeb6d46054d38e60a9aa570fe96643',1,'AsyncVideoWriter::operator=()'],['../classFFmpegWriter.html#a7f67a85f4305c4805f47dde8d1c1fb8b',1,'FFmpegWriter::operator=()'],['../classGStreamerPipeline.html#a107fab9016feddb8c374ac1bcdf3eba2',1,'GStreamerPipeline::operator=()'],['../classGStreamerWriter.html#aede0b9475399c66291e17a5a39ebb053',1,'GStreamerWriter::operator=()']]]
 ];

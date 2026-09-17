@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['getsink_0',['getSink',['../classGStreamerPipeline.html#a99435a43f276f0bbbf37aa4c315235f1',1,'GStreamerPipeline']]],
-  ['gstreamerpipeline_1',['GStreamerPipeline',['../classGStreamerPipeline.html#a653113ac50f9cf20eb78b072cd260873',1,'GStreamerPipeline']]],
-  ['gstreamerwriter_2',['gstreamerwriter',['../classGStreamerWriter.html#abc92b6ed197ce5fd1b67e672ad19770e',1,'GStreamerWriter::GStreamerWriter()=default'],['../classGStreamerWriter.html#a50d0054a8e3f83c128dd6bedce9e97cb',1,'GStreamerWriter::GStreamerWriter(const GStreamerWriter &amp;)=delete']]]
+  ['ffmpegcapture_0',['FFmpegCapture',['../classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982',1,'FFmpegCapture']]],
+  ['ffmpegwriter_1',['ffmpegwriter',['../classFFmpegWriter.html#a0894a96e3d8b1ec5ebb3f2b99fc00a71',1,'FFmpegWriter::FFmpegWriter()'],['../classFFmpegWriter.html#a7c48c90520f9c7e4cf05710a56e4e4f7',1,'FFmpegWriter::FFmpegWriter(const FFmpegWriter &amp;)=delete']]],
+  ['format_2',['format',['../classvideocapture_1_1Frame.html#abe98a2bfd7f1516fbcc796dbe3304f02',1,'videocapture::Frame']]],
+  ['frame_3',['frame',['../classvideocapture_1_1Frame.html#a02deff785fbaf99eb149a83c435e6816',1,'videocapture::Frame::Frame()=default'],['../classvideocapture_1_1Frame.html#ab05d58f4ae7d1f74b7d28dac1d3cb710',1,'videocapture::Frame::Frame(int width, int height, PixelFormat format=PixelFormat::BGR8)']]]
 ];

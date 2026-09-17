@@ -5,7 +5,7 @@ var searchData=
   ['gstreamercapture_2',['GStreamerCapture',['../classGStreamerCapture.html',1,'']]],
   ['gstreamercapture_2ecpp_3',['GStreamerCapture.cpp',['../GStreamerCapture_8cpp.html',1,'']]],
   ['gstreamercapture_2ehpp_4',['GStreamerCapture.hpp',['../GStreamerCapture_8hpp.html',1,'']]],
-  ['gstreamerpipeline_5',['gstreamerpipeline',['../classGStreamerPipeline.html',1,'GStreamerPipeline'],['../classGStreamerPipeline.html#a653113ac50f9cf20eb78b072cd260873',1,'GStreamerPipeline::GStreamerPipeline()']]],
+  ['gstreamerpipeline_5',['gstreamerpipeline',['../classGStreamerPipeline.html',1,'GStreamerPipeline'],['../classGStreamerPipeline.html#a265bbe2e24eb29b3b6b51c42ef14f21f',1,'GStreamerPipeline::GStreamerPipeline()=default'],['../classGStreamerPipeline.html#acd12524906d8c4a77776f62117148b9a',1,'GStreamerPipeline::GStreamerPipeline(const GStreamerPipeline &amp;)=delete']]],
   ['gstreamerpipeline_2ecpp_6',['GStreamerPipeline.cpp',['../GStreamerPipeline_8cpp.html',1,'']]],
   ['gstreamerpipeline_2ehpp_7',['GStreamerPipeline.hpp',['../GStreamerPipeline_8hpp.html',1,'']]],
   ['gstreamerwriter_8',['gstreamerwriter',['../classGStreamerWriter.html',1,'GStreamerWriter'],['../classGStreamerWriter.html#abc92b6ed197ce5fd1b67e672ad19770e',1,'GStreamerWriter::GStreamerWriter()=default'],['../classGStreamerWriter.html#a50d0054a8e3f83c128dd6bedce9e97cb',1,'GStreamerWriter::GStreamerWriter(const GStreamerWriter &amp;)=delete']]],

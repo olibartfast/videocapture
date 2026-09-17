@@ -84,6 +84,7 @@ $(function() {
 <code>#include &lt;cctype&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
+<code>#include &lt;syncstream&gt;</code><br />
 <code>#include &quot;<a class="el" href="Frame_8hpp_source.html">Frame.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="VideoWriterConfig_8hpp_source.html">VideoWriterConfig.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
@@ -91,38 +92,40 @@ Include dependency graph for WriterSupport.hpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="WriterSupport_8hpp__incl.png" border="0" usemap="#asrc_2WriterSupport_8hpp" alt=""/></div>
 <map name="asrc_2WriterSupport_8hpp" id="asrc_2WriterSupport_8hpp">
-<area shape="rect" title=" " alt="" coords="211,5,373,31"/>
+<area shape="rect" title=" " alt="" coords="257,5,420,31"/>
 <area shape="rect" title=" " alt="" coords="5,79,91,104"/>
-<area shape="poly" title=" " alt="" coords="254,33,101,77,100,72,252,28"/>
+<area shape="poly" title=" " alt="" coords="293,33,105,79,103,74,291,28"/>
 <area shape="rect" title=" " alt="" coords="115,79,181,104"/>
-<area shape="poly" title=" " alt="" coords="270,33,185,75,183,70,268,28"/>
+<area shape="poly" title=" " alt="" coords="309,33,193,76,191,71,307,28"/>
 <area shape="rect" title=" " alt="" coords="205,79,285,104"/>
-<area shape="poly" title=" " alt="" coords="287,32,263,69,258,66,282,30"/>
+<area shape="poly" title=" " alt="" coords="325,33,273,72,270,68,322,29"/>
 <area shape="rect" title=" " alt="" coords="309,79,368,104"/>
-<area shape="poly" title=" " alt="" coords="302,30,326,66,321,69,297,32"/>
-<area shape="rect" href="Frame_8hpp.html" title=" " alt="" coords="392,79,483,104"/>
-<area shape="poly" title=" " alt="" coords="317,28,403,70,400,75,314,33"/>
-<area shape="rect" href="VideoWriterConfig_8hpp.html" title=" " alt="" coords="647,79,815,104"/>
-<area shape="poly" title=" " alt="" coords="363,28,647,74,646,79,362,33"/>
-<area shape="rect" title=" " alt="" coords="51,152,107,177"/>
-<area shape="poly" title=" " alt="" coords="392,104,380,107,252,129,121,155,119,149,251,123,380,101,391,99"/>
-<area shape="rect" title=" " alt="" coords="131,152,197,177"/>
-<area shape="poly" title=" " alt="" coords="394,107,211,154,210,149,393,101"/>
-<area shape="rect" title=" " alt="" coords="222,152,293,177"/>
-<area shape="poly" title=" " alt="" coords="409,107,300,149,298,144,407,102"/>
-<area shape="rect" title=" " alt="" coords="697,152,764,177"/>
-<area shape="poly" title=" " alt="" coords="484,101,685,149,683,154,482,106"/>
-<area shape="rect" title=" " alt="" coords="317,152,376,177"/>
-<area shape="poly" title=" " alt="" coords="424,106,374,145,371,141,421,102"/>
-<area shape="rect" title=" " alt="" coords="400,152,475,177"/>
-<area shape="poly" title=" " alt="" coords="440,104,440,138,435,138,435,104"/>
-<area shape="rect" title=" " alt="" coords="499,152,586,177"/>
-<area shape="poly" title=" " alt="" coords="456,102,516,142,513,147,453,106"/>
-<area shape="rect" title=" " alt="" coords="610,152,673,177"/>
-<area shape="poly" title=" " alt="" coords="471,102,598,146,596,151,469,107"/>
-<area shape="poly" title=" " alt="" coords="733,104,733,138,728,138,728,104"/>
-<area shape="rect" title=" " alt="" coords="789,152,851,177"/>
-<area shape="poly" title=" " alt="" coords="747,102,796,141,793,145,743,106"/>
+<area shape="poly" title=" " alt="" coords="341,31,341,65,336,65,336,31"/>
+<area shape="rect" title=" " alt="" coords="392,79,491,104"/>
+<area shape="poly" title=" " alt="" coords="357,28,415,68,412,73,354,33"/>
+<area shape="rect" href="Frame_8hpp.html" title=" " alt="" coords="515,79,605,104"/>
+<area shape="poly" title=" " alt="" coords="375,28,512,72,511,77,373,33"/>
+<area shape="rect" href="VideoWriterConfig_8hpp.html" title=" " alt="" coords="769,79,937,104"/>
+<area shape="poly" title=" " alt="" coords="421,28,757,74,757,79,420,33"/>
+<area shape="rect" title=" " alt="" coords="173,152,229,177"/>
+<area shape="poly" title=" " alt="" coords="515,104,503,107,375,129,243,155,242,149,374,123,502,101,514,99"/>
+<area shape="rect" title=" " alt="" coords="253,152,320,177"/>
+<area shape="poly" title=" " alt="" coords="517,107,334,154,332,149,515,101"/>
+<area shape="rect" title=" " alt="" coords="345,152,415,177"/>
+<area shape="poly" title=" " alt="" coords="532,107,423,149,421,144,530,102"/>
+<area shape="rect" title=" " alt="" coords="820,152,887,177"/>
+<area shape="poly" title=" " alt="" coords="606,101,807,149,806,154,605,106"/>
+<area shape="rect" title=" " alt="" coords="440,152,499,177"/>
+<area shape="poly" title=" " alt="" coords="547,106,497,145,493,141,544,102"/>
+<area shape="rect" title=" " alt="" coords="523,152,597,177"/>
+<area shape="poly" title=" " alt="" coords="563,104,563,138,557,138,557,104"/>
+<area shape="rect" title=" " alt="" coords="622,152,709,177"/>
+<area shape="poly" title=" " alt="" coords="578,102,638,142,636,147,575,106"/>
+<area shape="rect" title=" " alt="" coords="733,152,795,177"/>
+<area shape="poly" title=" " alt="" coords="594,102,721,146,719,151,592,107"/>
+<area shape="poly" title=" " alt="" coords="856,104,856,138,851,138,851,104"/>
+<area shape="rect" title=" " alt="" coords="911,152,974,177"/>
+<area shape="poly" title=" " alt="" coords="869,102,919,141,916,145,866,106"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -130,13 +133,15 @@ This graph shows which files directly or indirectly include this file:</div>
 <div class="dyncontent">
 <div class="center"><img src="WriterSupport_8hpp__dep__incl.png" border="0" usemap="#asrc_2WriterSupport_8hppdep" alt=""/></div>
 <map name="asrc_2WriterSupport_8hppdep" id="asrc_2WriterSupport_8hppdep">
-<area shape="rect" title=" " alt="" coords="289,5,451,31"/>
-<area shape="rect" href="FFmpegWriter_8cpp.html" title=" " alt="" coords="5,79,220,104"/>
-<area shape="poly" title=" " alt="" coords="316,37,155,81,154,76,315,32"/>
-<area shape="rect" href="GStreamerWriter_8cpp.html" title=" " alt="" coords="244,79,496,104"/>
-<area shape="poly" title=" " alt="" coords="373,44,373,79,367,79,367,44"/>
-<area shape="rect" href="OpenCVWriter_8cpp.html" title=" " alt="" coords="520,79,735,104"/>
-<area shape="poly" title=" " alt="" coords="425,32,586,76,585,81,424,37"/>
+<area shape="rect" title=" " alt="" coords="371,5,533,31"/>
+<area shape="rect" href="AsyncVideoWriter_8cpp.html" title=" " alt="" coords="5,79,192,104"/>
+<area shape="poly" title=" " alt="" coords="383,36,156,81,155,76,381,31"/>
+<area shape="rect" href="FFmpegWriter_8cpp.html" title=" " alt="" coords="217,79,431,104"/>
+<area shape="poly" title=" " alt="" coords="421,40,346,81,344,76,418,35"/>
+<area shape="rect" href="GStreamerWriter_8cpp.html" title=" " alt="" coords="455,79,707,104"/>
+<area shape="poly" title=" " alt="" coords="486,35,561,76,559,81,484,40"/>
+<area shape="rect" href="OpenCVWriter_8cpp.html" title=" " alt="" coords="731,79,946,104"/>
+<area shape="poly" title=" " alt="" coords="528,31,777,76,776,81,527,36"/>
 </map>
 </div>
 </div>

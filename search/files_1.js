@@ -1,9 +1,8 @@
 var searchData=
 [
-  ['gstreamercapture_2ecpp_0',['GStreamerCapture.cpp',['../GStreamerCapture_8cpp.html',1,'']]],
-  ['gstreamercapture_2ehpp_1',['GStreamerCapture.hpp',['../GStreamerCapture_8hpp.html',1,'']]],
-  ['gstreamerpipeline_2ecpp_2',['GStreamerPipeline.cpp',['../GStreamerPipeline_8cpp.html',1,'']]],
-  ['gstreamerpipeline_2ehpp_3',['GStreamerPipeline.hpp',['../GStreamerPipeline_8hpp.html',1,'']]],
-  ['gstreamerwriter_2ecpp_4',['GStreamerWriter.cpp',['../GStreamerWriter_8cpp.html',1,'']]],
-  ['gstreamerwriter_2ehpp_5',['GStreamerWriter.hpp',['../GStreamerWriter_8hpp.html',1,'']]]
+  ['ffmpegcapture_2ecpp_0',['FFmpegCapture.cpp',['../FFmpegCapture_8cpp.html',1,'']]],
+  ['ffmpegcapture_2ehpp_1',['FFmpegCapture.hpp',['../FFmpegCapture_8hpp.html',1,'']]],
+  ['ffmpegwriter_2ecpp_2',['FFmpegWriter.cpp',['../FFmpegWriter_8cpp.html',1,'']]],
+  ['ffmpegwriter_2ehpp_3',['FFmpegWriter.hpp',['../FFmpegWriter_8hpp.html',1,'']]],
+  ['frame_2ehpp_4',['Frame.hpp',['../Frame_8hpp.html',1,'']]]
 ];

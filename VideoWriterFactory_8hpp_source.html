@@ -95,8 +95,13 @@ $(document).ready(function() { init_codefold(0); });
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="comment">// same priority as createVideoInterface(): FFmpeg, then GStreamer, then OpenCV.</span></div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="comment">// The writer therefore reuses the capture backend&#39;s dependency and introduces</span></div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="comment">// none of its own.</span></div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>std::unique_ptr&lt;VideoWriterInterface&gt; <a class="code hl_function" href="VideoWriterFactory_8hpp.html#a2194e6392e3fffbc1f289e246469a6aa">createVideoWriter</a>();</div>
-<div class="ttc" id="aVideoWriterFactory_8hpp_html_a2194e6392e3fffbc1f289e246469a6aa"><div class="ttname"><a href="VideoWriterFactory_8hpp.html#a2194e6392e3fffbc1f289e246469a6aa">createVideoWriter</a></div><div class="ttdeci">std::unique_ptr&lt; VideoWriterInterface &gt; createVideoWriter()</div><div class="ttdef"><b>Definition</b> VideoWriterFactory.cpp:11</div></div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="comment">//</span></div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="comment">// The returned writer encodes on a thread of its own, so writeFrame() costs the</span></div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="comment">// caller a validation and a hand-off rather than an encode; pass frames by</span></div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span><span class="comment">// rvalue to avoid copying their pixels. See VideoWriterInterface for the</span></div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span><span class="comment">// ordering, back-pressure, and failure contract.</span></div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>std::unique_ptr&lt;VideoWriterInterface&gt; <a class="code hl_function" href="VideoWriterFactory_8hpp.html#a2194e6392e3fffbc1f289e246469a6aa">createVideoWriter</a>();</div>
+<div class="ttc" id="aVideoWriterFactory_8hpp_html_a2194e6392e3fffbc1f289e246469a6aa"><div class="ttname"><a href="VideoWriterFactory_8hpp.html#a2194e6392e3fffbc1f289e246469a6aa">createVideoWriter</a></div><div class="ttdeci">std::unique_ptr&lt; VideoWriterInterface &gt; createVideoWriter()</div><div class="ttdef"><b>Definition</b> VideoWriterFactory.cpp:27</div></div>
 <div class="ttc" id="aVideoWriterInterface_8hpp_html"><div class="ttname"><a href="VideoWriterInterface_8hpp.html">VideoWriterInterface.hpp</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->

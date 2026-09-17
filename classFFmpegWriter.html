@@ -115,8 +115,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a819f1ce4d11ef541b7c04498c4901880"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac1ffcd44f6c4736f54e31ccd277e3beb" id="r_ac1ffcd44f6c4736f54e31ccd277e3beb"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFFmpegWriter.html#ac1ffcd44f6c4736f54e31ccd277e3beb">isOpen</a> () const override</td></tr>
 <tr class="separator:ac1ffcd44f6c4736f54e31ccd277e3beb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6861a2b7f3752d73054defd7278db1f" id="r_af6861a2b7f3752d73054defd7278db1f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFFmpegWriter.html#af6861a2b7f3752d73054defd7278db1f">release</a> () override</td></tr>
-<tr class="separator:af6861a2b7f3752d73054defd7278db1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a62a758cc7c28501612cb3ed71e87744a" id="r_a62a758cc7c28501612cb3ed71e87744a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFFmpegWriter.html#a62a758cc7c28501612cb3ed71e87744a">release</a> () override</td></tr>
+<tr class="separator:a62a758cc7c28501612cb3ed71e87744a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a002c7f3e3e90e691db76d2171d6ccadb" id="r_a002c7f3e3e90e691db76d2171d6ccadb"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFFmpegWriter.html#a002c7f3e3e90e691db76d2171d6ccadb">writeFrame</a> (const <a class="el" href="classvideocapture_1_1Frame.html">videocapture::Frame</a> &amp;frame)=0</td></tr>
+<tr class="separator:a002c7f3e3e90e691db76d2171d6ccadb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebe9f5af16690aaafa34f6cf20b13458" id="r_aebe9f5af16690aaafa34f6cf20b13458"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFFmpegWriter.html#aebe9f5af16690aaafa34f6cf20b13458">writeFrame</a> (<a class="el" href="classvideocapture_1_1Frame.html">videocapture::Frame</a> &amp;&amp;frame)</td></tr>
+<tr class="separator:aebe9f5af16690aaafa34f6cf20b13458"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classVideoWriterInterface"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classVideoWriterInterface')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classVideoWriterInterface.html">VideoWriterInterface</a></td></tr>
 <tr class="memitem:ae616911825b9a234b9dd2b03c4710769 inherit pub_methods_classVideoWriterInterface" id="r_ae616911825b9a234b9dd2b03c4710769"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classVideoWriterInterface.html#ae616911825b9a234b9dd2b03c4710769">~VideoWriterInterface</a> ()=default</td></tr>
 <tr class="separator:ae616911825b9a234b9dd2b03c4710769 inherit pub_methods_classVideoWriterInterface"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -282,8 +286,8 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
-<a id="af6861a2b7f3752d73054defd7278db1f" name="af6861a2b7f3752d73054defd7278db1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af6861a2b7f3752d73054defd7278db1f">&#9670;&#160;</a></span>release()</h2>
+<a id="a62a758cc7c28501612cb3ed71e87744a" name="a62a758cc7c28501612cb3ed71e87744a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a62a758cc7c28501612cb3ed71e87744a">&#9670;&#160;</a></span>release()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -292,7 +296,7 @@ Public Member Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void FFmpegWriter::release </td>
+          <td class="memname">bool FFmpegWriter::release </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -305,12 +309,12 @@ Public Member Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Implements <a class="el" href="classVideoWriterInterface.html#aef81928ba620cef80c5152a2653b3adc">VideoWriterInterface</a>.</p>
+<p>Implements <a class="el" href="classVideoWriterInterface.html#a0dbda8d8fc2560d8c6ced38c0c0103f1">VideoWriterInterface</a>.</p>
 
 </div>
 </div>
 <a id="a819f1ce4d11ef541b7c04498c4901880" name="a819f1ce4d11ef541b7c04498c4901880"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a819f1ce4d11ef541b7c04498c4901880">&#9670;&#160;</a></span>writeFrame()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a819f1ce4d11ef541b7c04498c4901880">&#9670;&#160;</a></span>writeFrame() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -334,6 +338,62 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Implements <a class="el" href="classVideoWriterInterface.html#a002c7f3e3e90e691db76d2171d6ccadb">VideoWriterInterface</a>.</p>
+
+</div>
+</div>
+<a id="a002c7f3e3e90e691db76d2171d6ccadb" name="a002c7f3e3e90e691db76d2171d6ccadb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a002c7f3e3e90e691db76d2171d6ccadb">&#9670;&#160;</a></span>writeFrame() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool VideoWriterInterface::writeFrame </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classvideocapture_1_1Frame.html">videocapture::Frame</a> &amp;&#160;</td>
+          <td class="paramname"><em>frame</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Implements <a class="el" href="classVideoWriterInterface.html#a002c7f3e3e90e691db76d2171d6ccadb">VideoWriterInterface</a>.</p>
+
+</div>
+</div>
+<a id="aebe9f5af16690aaafa34f6cf20b13458" name="aebe9f5af16690aaafa34f6cf20b13458"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebe9f5af16690aaafa34f6cf20b13458">&#9670;&#160;</a></span>writeFrame() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual bool VideoWriterInterface::writeFrame </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classvideocapture_1_1Frame.html">videocapture::Frame</a> &amp;&amp;&#160;</td>
+          <td class="paramname"><em>frame</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Reimplemented from <a class="el" href="classVideoWriterInterface.html#aebe9f5af16690aaafa34f6cf20b13458">VideoWriterInterface</a>.</p>
 
 </div>
 </div>

@@ -1,7 +1,9 @@
 var searchData=
 [
-  ['opencvcapture_2ecpp_0',['OpenCVCapture.cpp',['../OpenCVCapture_8cpp.html',1,'']]],
-  ['opencvcapture_2ehpp_1',['OpenCVCapture.hpp',['../OpenCVCapture_8hpp.html',1,'']]],
-  ['opencvwriter_2ecpp_2',['OpenCVWriter.cpp',['../OpenCVWriter_8cpp.html',1,'']]],
-  ['opencvwriter_2ehpp_3',['OpenCVWriter.hpp',['../OpenCVWriter_8hpp.html',1,'']]]
+  ['gstreamercapture_2ecpp_0',['GStreamerCapture.cpp',['../GStreamerCapture_8cpp.html',1,'']]],
+  ['gstreamercapture_2ehpp_1',['GStreamerCapture.hpp',['../GStreamerCapture_8hpp.html',1,'']]],
+  ['gstreamerpipeline_2ecpp_2',['GStreamerPipeline.cpp',['../GStreamerPipeline_8cpp.html',1,'']]],
+  ['gstreamerpipeline_2ehpp_3',['GStreamerPipeline.hpp',['../GStreamerPipeline_8hpp.html',1,'']]],
+  ['gstreamerwriter_2ecpp_4',['GStreamerWriter.cpp',['../GStreamerWriter_8cpp.html',1,'']]],
+  ['gstreamerwriter_2ehpp_5',['GStreamerWriter.hpp',['../GStreamerWriter_8hpp.html',1,'']]]
 ];

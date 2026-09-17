@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['nv12_0',['NV12',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7a202f5d8c2c70d31048154d8b8b28e755',1,'videocapture']]]
+  ['maxplanes_0',['MaxPlanes',['../classvideocapture_1_1Frame.html#ad5001346febf1545c2af69ef7b26583a',1,'videocapture::Frame']]],
+  ['mjpeg_1',['MJPEG',['../namespacevideocapture.html#af4e1434a893e881e67bdb75bf058a784a0a5417ce14732e9bdb402be642ebe9ea',1,'videocapture']]]
 ];

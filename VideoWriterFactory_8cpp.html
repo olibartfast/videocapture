@@ -80,49 +80,68 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 <div class="textblock"><code>#include &quot;<a class="el" href="VideoWriterFactory_8hpp_source.html">VideoWriterFactory.hpp</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="AsyncVideoWriter_8hpp_source.html">AsyncVideoWriter.hpp</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="OpenCVWriter_8hpp_source.html">opencv/OpenCVWriter.hpp</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for VideoWriterFactory.cpp:</div>
 <div class="dyncontent">
 <div class="center"><img src="VideoWriterFactory_8cpp__incl.png" border="0" usemap="#asrc_2VideoWriterFactory_8cpp" alt=""/></div>
 <map name="asrc_2VideoWriterFactory_8cpp" id="asrc_2VideoWriterFactory_8cpp">
-<area shape="rect" title=" " alt="" coords="607,5,801,31"/>
-<area shape="rect" href="VideoWriterFactory_8hpp.html" title=" " alt="" coords="515,79,687,104"/>
-<area shape="poly" title=" " alt="" coords="689,33,631,73,628,68,686,28"/>
-<area shape="rect" href="OpenCVWriter_8hpp.html" title=" " alt="" coords="712,79,904,104"/>
-<area shape="poly" title=" " alt="" coords="722,28,781,68,778,73,719,33"/>
-<area shape="rect" title=" " alt="" coords="491,152,568,177"/>
-<area shape="poly" title=" " alt="" coords="591,106,553,144,549,140,588,102"/>
-<area shape="rect" href="VideoWriterInterface_8hpp.html" title=" " alt="" coords="593,152,778,177"/>
-<area shape="poly" title=" " alt="" coords="617,102,663,141,659,145,613,106"/>
-<area shape="rect" href="Frame_8hpp.html" title=" " alt="" coords="347,225,437,251"/>
-<area shape="poly" title=" " alt="" coords="639,180,451,225,450,220,638,175"/>
-<area shape="rect" href="VideoWriterConfig_8hpp.html" title=" " alt="" coords="601,225,769,251"/>
-<area shape="poly" title=" " alt="" coords="688,178,688,212,683,212,683,178"/>
-<area shape="rect" title=" " alt="" coords="793,225,852,251"/>
-<area shape="poly" title=" " alt="" coords="709,175,789,217,787,221,706,180"/>
-<area shape="rect" title=" " alt="" coords="5,299,61,324"/>
-<area shape="poly" title=" " alt="" coords="347,249,228,270,76,301,74,296,227,264,346,244"/>
-<area shape="rect" title=" " alt="" coords="85,299,152,324"/>
-<area shape="poly" title=" " alt="" coords="349,253,166,301,164,295,347,248"/>
-<area shape="rect" title=" " alt="" coords="177,299,247,324"/>
-<area shape="poly" title=" " alt="" coords="364,253,255,296,253,291,362,248"/>
-<area shape="rect" title=" " alt="" coords="652,299,719,324"/>
-<area shape="poly" title=" " alt="" coords="438,248,639,296,640,296,638,301,638,301,437,253"/>
-<area shape="rect" title=" " alt="" coords="272,299,331,324"/>
-<area shape="poly" title=" " alt="" coords="379,253,329,292,325,288,376,249"/>
-<area shape="rect" title=" " alt="" coords="355,299,429,324"/>
-<area shape="poly" title=" " alt="" coords="395,251,395,285,389,285,389,251"/>
-<area shape="rect" title=" " alt="" coords="454,299,541,324"/>
-<area shape="poly" title=" " alt="" coords="410,248,470,289,468,293,407,253"/>
-<area shape="rect" title=" " alt="" coords="565,299,627,324"/>
-<area shape="poly" title=" " alt="" coords="426,248,553,292,551,297,424,253"/>
-<area shape="poly" title=" " alt="" coords="688,251,688,285,683,285,683,251"/>
-<area shape="rect" title=" " alt="" coords="743,299,806,324"/>
-<area shape="poly" title=" " alt="" coords="701,249,751,288,748,292,698,253"/>
-<area shape="poly" title=" " alt="" coords="790,106,718,147,716,143,787,102"/>
-<area shape="rect" title=" " alt="" coords="803,152,960,177"/>
-<area shape="poly" title=" " alt="" coords="822,102,861,140,858,144,818,106"/>
+<area shape="rect" title=" " alt="" coords="339,5,533,31"/>
+<area shape="rect" href="VideoWriterFactory_8hpp.html" title=" " alt="" coords="350,79,522,104"/>
+<area shape="poly" title=" " alt="" coords="439,31,439,65,433,65,433,31"/>
+<area shape="rect" href="AsyncVideoWriter_8hpp.html" title=" " alt="" coords="593,79,759,104"/>
+<area shape="poly" title=" " alt="" coords="475,28,625,72,623,77,474,33"/>
+<area shape="rect" href="OpenCVWriter_8hpp.html" title=" " alt="" coords="133,79,325,104"/>
+<area shape="poly" title=" " alt="" coords="404,33,277,77,275,72,402,28"/>
+<area shape="rect" title=" " alt="" coords="397,152,475,177"/>
+<area shape="poly" title=" " alt="" coords="439,104,439,138,433,138,433,104"/>
+<area shape="rect" href="VideoWriterInterface_8hpp.html" title=" " alt="" coords="187,152,373,177"/>
+<area shape="poly" title=" " alt="" coords="412,106,319,149,317,144,410,102"/>
+<area shape="rect" href="Frame_8hpp.html" title=" " alt="" coords="628,225,719,251"/>
+<area shape="poly" title=" " alt="" coords="344,175,615,223,614,229,343,180"/>
+<area shape="rect" href="VideoWriterConfig_8hpp.html" title=" " alt="" coords="237,225,405,251"/>
+<area shape="poly" title=" " alt="" coords="289,176,310,212,305,215,285,179"/>
+<area shape="rect" title=" " alt="" coords="501,225,560,251"/>
+<area shape="poly" title=" " alt="" coords="321,175,489,222,487,227,320,180"/>
+<area shape="rect" title=" " alt="" coords="800,299,856,324"/>
+<area shape="poly" title=" " alt="" coords="699,248,791,290,789,295,697,253"/>
+<area shape="rect" title=" " alt="" coords="880,299,947,324"/>
+<area shape="poly" title=" " alt="" coords="713,248,867,294,866,299,711,253"/>
+<area shape="rect" title=" " alt="" coords="971,299,1042,324"/>
+<area shape="poly" title=" " alt="" coords="719,246,959,296,957,301,718,251"/>
+<area shape="rect" title=" " alt="" coords="329,299,396,324"/>
+<area shape="poly" title=" " alt="" coords="628,252,410,301,409,296,627,247"/>
+<area shape="rect" title=" " alt="" coords="420,299,479,324"/>
+<area shape="poly" title=" " alt="" coords="638,253,492,299,491,294,637,248"/>
+<area shape="rect" title=" " alt="" coords="503,299,577,324"/>
+<area shape="poly" title=" " alt="" coords="653,253,575,294,573,290,651,248"/>
+<area shape="rect" title=" " alt="" coords="602,299,689,324"/>
+<area shape="poly" title=" " alt="" coords="671,252,657,287,652,285,666,250"/>
+<area shape="rect" title=" " alt="" coords="713,299,775,324"/>
+<area shape="poly" title=" " alt="" coords="687,249,725,287,721,291,683,253"/>
+<area shape="poly" title=" " alt="" coords="330,250,351,285,347,288,326,252"/>
+<area shape="rect" title=" " alt="" coords="242,299,305,324"/>
+<area shape="poly" title=" " alt="" coords="316,253,291,289,286,286,311,250"/>
+<area shape="poly" title=" " alt="" coords="638,107,489,151,487,145,637,101"/>
+<area shape="poly" title=" " alt="" coords="613,107,358,152,357,147,612,101"/>
+<area shape="poly" title=" " alt="" coords="678,105,676,212,671,212,673,104"/>
+<area shape="poly" title=" " alt="" coords="759,96,823,103,889,114,946,129,968,139,983,150,1003,182,1013,219,1015,255,1013,285,1008,285,1010,255,1008,219,999,184,979,154,965,143,944,134,888,119,823,108,759,101"/>
+<area shape="poly" title=" " alt="" coords="649,106,538,154,488,180,371,223,369,218,486,175,536,150,647,102"/>
+<area shape="poly" title=" " alt="" coords="674,105,656,140,627,179,599,203,569,221,566,217,596,198,623,176,651,138,669,103"/>
+<area shape="rect" title=" " alt="" coords="739,152,882,177"/>
+<area shape="poly" title=" " alt="" coords="699,102,778,143,775,148,696,106"/>
+<area shape="rect" title=" " alt="" coords="906,152,969,177"/>
+<area shape="poly" title=" " alt="" coords="719,101,893,149,892,154,717,107"/>
+<area shape="rect" title=" " alt="" coords="1044,152,1108,177"/>
+<area shape="poly" title=" " alt="" coords="750,101,1026,149,1031,150,1030,156,1025,155,749,107"/>
+<area shape="rect" title=" " alt="" coords="1132,152,1225,177"/>
+<area shape="poly" title=" " alt="" coords="759,100,921,120,1119,149,1118,155,921,126,759,105"/>
+<area shape="rect" title=" " alt="" coords="549,152,613,177"/>
+<area shape="poly" title=" " alt="" coords="662,106,609,146,606,141,659,102"/>
+<area shape="poly" title=" " alt="" coords="240,103,266,139,262,142,236,106"/>
+<area shape="rect" title=" " alt="" coords="5,152,163,177"/>
+<area shape="poly" title=" " alt="" coords="207,106,121,148,119,144,205,102"/>
 </map>
 </div>
 </div><table class="memberdecls">
