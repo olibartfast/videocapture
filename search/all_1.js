@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['ffmpegcapture_0',['ffmpegcapture',['../classFFmpegCapture.html',1,'FFmpegCapture'],['../classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982',1,'FFmpegCapture::FFmpegCapture()']]],
-  ['ffmpegcapture_2ecpp_1',['FFmpegCapture.cpp',['../FFmpegCapture_8cpp.html',1,'']]],
-  ['ffmpegcapture_2ehpp_2',['FFmpegCapture.hpp',['../FFmpegCapture_8hpp.html',1,'']]],
-  ['frameavailable_5f_3',['frameAvailable_',['../classGStreamerOpenCV.html#a8e005f99290779aa35bfc10ad13f6ce9',1,'GStreamerOpenCV']]],
-  ['framemutex_5f_4',['frameMutex_',['../classGStreamerOpenCV.html#a19a477e8aeab243ce050a918aae7063b',1,'GStreamerOpenCV']]]
+  ['bgr8_0',['BGR8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7ae764ec5a498470e04dd8b545427203cc',1,'videocapture']]],
+  ['bgra8_1',['BGRA8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7a508ecc95f0c676df4a7dfe11beb0d573',1,'videocapture']]],
+  ['bitratebitspersecond_2',['bitRateBitsPerSecond',['../structvideocapture_1_1VideoWriterConfig.html#af145c6b0efc8b1dd917823a4d79a9c65',1,'videocapture::VideoWriterConfig']]]
 ];

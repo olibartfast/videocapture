@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['readframe_0',['readframe',['../classVideoCaptureInterface.html#a0ed694adf36badca3fdbf9272cb1d1cd',1,'VideoCaptureInterface::readFrame()'],['../classFFmpegCapture.html#ae7c3c4c50b5b420270cee37ffdf936c1',1,'FFmpegCapture::readFrame()'],['../classGStreamerCapture.html#a405e8e3399c7ddd91a321e94bc8e620e',1,'GStreamerCapture::readFrame()'],['../classOpenCVCapture.html#a1e9603f00f6319ae2d9152b596952797',1,'OpenCVCapture::readFrame()']]],
-  ['release_1',['release',['../classVideoCaptureInterface.html#a4aa1b44fff6fe1cd0c35b6347b145a71',1,'VideoCaptureInterface::release()'],['../classFFmpegCapture.html#a43cb4e5070aca419976fa4166409f929',1,'FFmpegCapture::release()'],['../classGStreamerCapture.html#afafb27fdf9fa60706921b650c603ef4a',1,'GStreamerCapture::release()'],['../classOpenCVCapture.html#a3fbd1961b48f33e63344d4be0cb856b9',1,'OpenCVCapture::release()']]],
-  ['runpipeline_2',['runPipeline',['../classGStreamerOpenCV.html#a47e6dde1d073e3d51ba79a783e35af6f',1,'GStreamerOpenCV']]]
+  ['ffmpegcapture_0',['FFmpegCapture',['../classFFmpegCapture.html#abd11f31816c7f0768982a706b3e4f982',1,'FFmpegCapture']]],
+  ['ffmpegwriter_1',['ffmpegwriter',['../classFFmpegWriter.html#a0894a96e3d8b1ec5ebb3f2b99fc00a71',1,'FFmpegWriter::FFmpegWriter()'],['../classFFmpegWriter.html#a7c48c90520f9c7e4cf05710a56e4e4f7',1,'FFmpegWriter::FFmpegWriter(const FFmpegWriter &amp;)=delete']]],
+  ['format_2',['format',['../classvideocapture_1_1Frame.html#abe98a2bfd7f1516fbcc796dbe3304f02',1,'videocapture::Frame']]],
+  ['frame_3',['frame',['../classvideocapture_1_1Frame.html#a02deff785fbaf99eb149a83c435e6816',1,'videocapture::Frame::Frame()=default'],['../classvideocapture_1_1Frame.html#ab05d58f4ae7d1f74b7d28dac1d3cb710',1,'videocapture::Frame::Frame(int width, int height, PixelFormat format=PixelFormat::BGR8)']]]
 ];

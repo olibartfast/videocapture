@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['setbus_0',['setBus',['../classGStreamerOpenCV.html#a96839ca8a57d1da2998660d799f0c325',1,'GStreamerOpenCV']]],
-  ['setendofstream_1',['setEndOfStream',['../classGStreamerOpenCV.html#a8e770ebe8c652c53a70aa88493b873d3',1,'GStreamerOpenCV']]],
-  ['setframe_2',['setFrame',['../classGStreamerOpenCV.html#a94d6fd108b08fb12f8db8068963d72e3',1,'GStreamerOpenCV']]],
-  ['setmainloopevent_3',['setMainLoopEvent',['../classGStreamerOpenCV.html#a931ab58aef312de7d94b452833632f97',1,'GStreamerOpenCV']]],
-  ['setstate_4',['setState',['../classGStreamerOpenCV.html#a511a7bd256575c26b436e319c02108da',1,'GStreamerOpenCV']]]
+  ['getsink_0',['getSink',['../classGStreamerPipeline.html#a99435a43f276f0bbbf37aa4c315235f1',1,'GStreamerPipeline']]],
+  ['gstreamerpipeline_1',['gstreamerpipeline',['../classGStreamerPipeline.html#a265bbe2e24eb29b3b6b51c42ef14f21f',1,'GStreamerPipeline::GStreamerPipeline()=default'],['../classGStreamerPipeline.html#acd12524906d8c4a77776f62117148b9a',1,'GStreamerPipeline::GStreamerPipeline(const GStreamerPipeline &amp;)=delete']]],
+  ['gstreamerwriter_2',['gstreamerwriter',['../classGStreamerWriter.html#abc92b6ed197ce5fd1b67e672ad19770e',1,'GStreamerWriter::GStreamerWriter()=default'],['../classGStreamerWriter.html#a50d0054a8e3f83c128dd6bedce9e97cb',1,'GStreamerWriter::GStreamerWriter(const GStreamerWriter &amp;)=delete']]]
 ];

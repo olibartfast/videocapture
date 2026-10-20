@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['opencvcapture_0',['OpenCVCapture',['../classOpenCVCapture.html',1,'']]]
+  ['gstreamercapture_0',['GStreamerCapture',['../classGStreamerCapture.html',1,'']]],
+  ['gstreamerpipeline_1',['GStreamerPipeline',['../classGStreamerPipeline.html',1,'']]],
+  ['gstreamerwriter_2',['GStreamerWriter',['../classGStreamerWriter.html',1,'']]]
 ];
