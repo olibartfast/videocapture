@@ -1,4 +1,6 @@
 var searchData=
 [
-  ['empty_0',['empty',['../classvideocapture_1_1Frame.html#a660d8ff1489611e20b7142b050860e73',1,'videocapture::Frame']]]
+  ['opencvcapture_0',['OpenCVCapture',['../classOpenCVCapture.html',1,'']]],
+  ['opencvcapture_2ecpp_1',['OpenCVCapture.cpp',['../OpenCVCapture_8cpp.html',1,'']]],
+  ['opencvcapture_2ehpp_2',['OpenCVCapture.hpp',['../OpenCVCapture_8hpp.html',1,'']]]
 ];

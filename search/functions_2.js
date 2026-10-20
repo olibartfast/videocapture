@@ -1,5 +1,6 @@
 var searchData=
 [
-  ['data_0',['data',['../classvideocapture_1_1Frame.html#ab375e1b42a382af3c931b7ccbe916890',1,'videocapture::Frame::data(std::size_t plane=0) noexcept'],['../classvideocapture_1_1Frame.html#a556bdf6e54ddfd755beb4a9447c4248e',1,'videocapture::Frame::data(std::size_t plane=0) const noexcept']]],
-  ['destinationextension_1',['destinationExtension',['../namespacevideocapture_1_1writer.html#ab5dde37295a4be982a6878818301619d',1,'videocapture::writer']]]
+  ['getframe_0',['getFrame',['../classGStreamerOpenCV.html#a4eda6b77c64609bff102ff3ea264abaf',1,'GStreamerOpenCV']]],
+  ['getsink_1',['getSink',['../classGStreamerOpenCV.html#a0c711ff3ddc08e177da81d2aad40b4d8',1,'GStreamerOpenCV']]],
+  ['gstreameropencv_2',['GStreamerOpenCV',['../classGStreamerOpenCV.html#a54fc98f6f2f609b5e6ab3e8afaf9728a',1,'GStreamerOpenCV']]]
 ];

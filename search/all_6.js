@@ -1,14 +1,8 @@
 var searchData=
 [
-  ['getsink_0',['getSink',['../classGStreamerPipeline.html#a99435a43f276f0bbbf37aa4c315235f1',1,'GStreamerPipeline']]],
-  ['gray8_1',['Gray8',['../namespacevideocapture.html#ac7fb8081846a2cb07d2bf34f4a41b9f7ac8cfe3d00282445878661f32adca48ef',1,'videocapture']]],
-  ['gstreamercapture_2',['GStreamerCapture',['../classGStreamerCapture.html',1,'']]],
-  ['gstreamercapture_2ecpp_3',['GStreamerCapture.cpp',['../GStreamerCapture_8cpp.html',1,'']]],
-  ['gstreamercapture_2ehpp_4',['GStreamerCapture.hpp',['../GStreamerCapture_8hpp.html',1,'']]],
-  ['gstreamerpipeline_5',['gstreamerpipeline',['../classGStreamerPipeline.html',1,'GStreamerPipeline'],['../classGStreamerPipeline.html#a265bbe2e24eb29b3b6b51c42ef14f21f',1,'GStreamerPipeline::GStreamerPipeline()=default'],['../classGStreamerPipeline.html#acd12524906d8c4a77776f62117148b9a',1,'GStreamerPipeline::GStreamerPipeline(const GStreamerPipeline &amp;)=delete']]],
-  ['gstreamerpipeline_2ecpp_6',['GStreamerPipeline.cpp',['../GStreamerPipeline_8cpp.html',1,'']]],
-  ['gstreamerpipeline_2ehpp_7',['GStreamerPipeline.hpp',['../GStreamerPipeline_8hpp.html',1,'']]],
-  ['gstreamerwriter_8',['gstreamerwriter',['../classGStreamerWriter.html',1,'GStreamerWriter'],['../classGStreamerWriter.html#abc92b6ed197ce5fd1b67e672ad19770e',1,'GStreamerWriter::GStreamerWriter()=default'],['../classGStreamerWriter.html#a50d0054a8e3f83c128dd6bedce9e97cb',1,'GStreamerWriter::GStreamerWriter(const GStreamerWriter &amp;)=delete']]],
-  ['gstreamerwriter_2ecpp_9',['GStreamerWriter.cpp',['../GStreamerWriter_8cpp.html',1,'']]],
-  ['gstreamerwriter_2ehpp_10',['GStreamerWriter.hpp',['../GStreamerWriter_8hpp.html',1,'']]]
+  ['setbus_0',['setBus',['../classGStreamerOpenCV.html#a96839ca8a57d1da2998660d799f0c325',1,'GStreamerOpenCV']]],
+  ['setendofstream_1',['setEndOfStream',['../classGStreamerOpenCV.html#a8e770ebe8c652c53a70aa88493b873d3',1,'GStreamerOpenCV']]],
+  ['setframe_2',['setFrame',['../classGStreamerOpenCV.html#a94d6fd108b08fb12f8db8068963d72e3',1,'GStreamerOpenCV']]],
+  ['setmainloopevent_3',['setMainLoopEvent',['../classGStreamerOpenCV.html#a931ab58aef312de7d94b452833632f97',1,'GStreamerOpenCV']]],
+  ['setstate_4',['setState',['../classGStreamerOpenCV.html#a511a7bd256575c26b436e319c02108da',1,'GStreamerOpenCV']]]
 ];
