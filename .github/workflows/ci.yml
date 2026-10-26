@@ -210,20 +210,25 @@ jobs:
 
   cross-platform:
     name: Cross-Platform Build (${{ matrix.os }})
+    timeout-minutes: 25
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, macos-14]
+        os: [macos-latest, macos-15]
         
     steps:
     - name: Checkout code
       uses: actions/checkout@v6
 
     - name: Install dependencies (macOS)
+      timeout-minutes: 15
       run: |
         brew update
-        brew install cmake ninja opencv googletest
+        # Use the runner-provided build tools instead of upgrading them from source.
+        cmake --version
+        ninja --version
+        brew install opencv googletest
 
     - name: Configure CMake
       run: |

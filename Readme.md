@@ -75,6 +75,17 @@ You can use the provided setup scripts to install dependencies:
     cmake --build build
     ```
 
+    **With a local OpenCV 5 installation (OpenCV 4.6+ also supported):**
+    ```bash
+    cmake -B build-opencv5 -S . \
+      -DOpenCV_DIR="$HOME/dependencies/opencv-5.0.0/install/lib/cmake/opencv5"
+    cmake --build build-opencv5
+    ```
+
+    Use the directory containing `OpenCVConfig.cmake`, rather than the source
+    directory. See [OpenCV validation](docs/opencv5/validation.md) for the
+    capture/writer compatibility check.
+
     **With GStreamer:**
     ```bash
     cmake -B build -S . -DUSE_GSTREAMER=ON
