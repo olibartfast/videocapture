@@ -69,3 +69,8 @@ This updates the tested/packaged platform matrix, not the library's minimum OS.
 Validation: YAML parsing, embedded shell syntax, matrix/timeout assertions, and
 `git diff --check` pass locally. Hosted execution is required to validate macOS
 package installation and builds; the release workflow runs when the release is tagged.
+
+Hosted result: PR #16 run `40295545071` passed all backend, sanitizer,
+quality, coverage, and macOS checks. macOS 15 finished in 5m04s using bottles
+(including OpenCV 5.0.0), with 21/21 tests passing; macOS latest finished in
+5m16s. Two Ubuntu jobs were retried after slow package downloads, then passed.
