@@ -51,3 +51,21 @@ directories to avoid cached settings from other configurations.
 Local logs (temporary artifacts): `/tmp/videocapture-opencv5-validation.log`,
 `/tmp/videocapture-opencv4-validation.log`, and
 `/tmp/videocapture-opencv5-consumer.log`.
+
+## Hosted CI dependency repair
+
+Run `40289134758` failed before compiling VideoCapture: Homebrew on macOS 14
+built dependencies from source and Python's build rejected the runner compiler's
+missing efficient tail-call support. A preceding macOS 14 run (`39499271640`)
+took 4 hours 22 minutes. All Linux backend/sanitizer jobs and macOS latest passed.
+
+The repair moves CI and release jobs to macOS 15, reuses runner CMake/Ninja,
+and bounds macOS dependency installation to 15 minutes. CI jobs have a 25-minute
+limit and release jobs a 30-minute limit. Additional release backend installation
+has a separate 10-minute limit. Bottle availability is not forced: if Homebrew
+falls back to a slow source build, the timeout prevents another multi-hour run.
+This updates the tested/packaged platform matrix, not the library's minimum OS.
+
+Validation: YAML parsing, embedded shell syntax, matrix/timeout assertions, and
+`git diff --check` pass locally. Hosted execution is required to validate macOS
+package installation and builds; the release workflow runs when the release is tagged.

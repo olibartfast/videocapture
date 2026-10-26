@@ -17,11 +17,12 @@ permissions:
 jobs:
   build-release:
     name: Build Release (${{ matrix.os }}, ${{ matrix.backend }})
+    timeout-minutes: 30
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-24.04, macos-14, macos-latest]
+        os: [ubuntu-24.04, macos-15, macos-latest]
         backend: [opencv, all]
 
     steps:
@@ -66,12 +67,17 @@ jobs:
           libavdevice-dev
 
     - name: Install dependencies (macOS)
+      timeout-minutes: 15
       if: startsWith(matrix.os, 'macos')
       run: |
         brew update
-        brew install cmake ninja opencv googletest
+        # Use the runner-provided build tools instead of upgrading them from source.
+        cmake --version
+        ninja --version
+        brew install opencv googletest
 
     - name: Install all backends (macOS)
+      timeout-minutes: 10
       if: startsWith(matrix.os, 'macos') && matrix.backend == 'all'
       run: |
         brew install gstreamer gst-plugins-base gst-plugins-good ffmpeg sdl2
