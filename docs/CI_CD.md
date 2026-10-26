@@ -34,9 +34,16 @@ This document describes the continuous integration and continuous deployment (CI
 - Helps detect memory leaks, undefined behavior, and threading issues
 
 #### Cross-Platform
-- **Matrix Strategy:** Tests on macOS (Intel and Apple Silicon)
+- **Matrix Strategy:** Tests on `macos-15` and `macos-latest`
 - Ensures compatibility across different platforms
-- Uses Homebrew for dependency management on macOS
+- Uses Homebrew for OpenCV and GoogleTest; CMake and Ninja come from the runner.
+- macOS 14 was retired from the hosted matrix after Homebrew stopped providing
+  bottles and dependency source builds took hours, then failed in Python's build.
+  This changes hosted validation and artifact platforms; it does not establish a
+  new minimum macOS version for library consumers.
+- macOS dependency installation is capped at 15 minutes and CI jobs at 25 minutes.
+  A slow or unexpected source build fails within that bound instead of running
+  for hours.
 
 ### 2. Release Workflow (`.github/workflows/release.yml`)
 
@@ -51,7 +58,9 @@ This document describes the continuous integration and continuous deployment (CI
 - Creates a GitHub release with changelog
 
 #### Build Release
-- **Matrix Strategy:** Builds for Ubuntu 22.04, 24.04, macOS 13, and latest macOS with OpenCV and full backends
+- **Matrix Strategy:** Builds for Ubuntu 24.04, `macos-15`, and `macos-latest` with OpenCV and full backends
+- Release jobs are capped at 30 minutes; macOS base dependencies at 15 minutes
+  and additional backend dependencies at 10 minutes.
 - Packages library, headers, and binaries
 - Uploads release artifacts as compressed archives
 - Attaches artifacts to the GitHub release
