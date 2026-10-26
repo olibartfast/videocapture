@@ -51,4 +51,3 @@ directories to avoid cached settings from other configurations.
 Local logs (temporary artifacts): `/tmp/videocapture-opencv5-validation.log`,
 `/tmp/videocapture-opencv4-validation.log`, and
 `/tmp/videocapture-opencv5-consumer.log`.
-
