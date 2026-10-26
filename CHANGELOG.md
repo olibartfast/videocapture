@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-10-26
+
+### Added
+
+- Documented local OpenCV 5 package selection and a repeatable compatibility
+  check covering capture, writing, and preview builds. OpenCV 5.0.0 and 4.6.0
+  each passed all 55 local tests; no API adaptation was required.
+
+### Fixed
+
+- macOS CI and release jobs now use macOS 15 instead of macOS 14, where
+  Homebrew dependency source builds took hours and failed while building
+  Python. Runner-provided CMake and Ninja avoid unnecessary tool upgrades.
+  Dependency installation and job time limits prevent multi-hour macOS runs.
+  macOS release artifacts now target macOS 15 and latest; this does not change
+  the library's declared minimum OS requirements. macOS packages remain
+  capture-only.
+
 ## [0.6.0] - 2026-09-17
 
 ### Changed
