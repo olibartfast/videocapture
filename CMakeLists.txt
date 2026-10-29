@@ -16,6 +16,10 @@ include(cmake/versions.cmake)
 # Include dependency validation
 include(cmake/DependencyValidation.cmake)
 
+# Fetch coldpac and validate the deps.yaml baseline (offline override:
+# -DFETCHCONTENT_SOURCE_DIR_COLDPAC=/path/to/coldpac)
+include(cmake/ColdpacFetch.cmake)
+
 # Unset cache variables
 unset(GSTREAMER_INCLUDE_DIRS CACHE)
 unset(GST_APP_INCLUDE_DIRS CACHE)
