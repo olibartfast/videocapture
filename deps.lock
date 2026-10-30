@@ -1,0 +1,22 @@
+schema_version: 1
+resolved:
+  - name: opencv
+    provider: apt
+    version: 4.6.0+dfsg-13.1ubuntu1
+    package: libopencv-dev
+    env_var: OPENCV_REVIEWED_VERSION
+  - name: gstreamer
+    provider: apt
+    version: 1.24.2-1ubuntu0.1
+    package: libgstreamer1.0-dev
+    env_var: GSTREAMER_REVIEWED_VERSION
+  - name: ffmpeg
+    provider: apt
+    version: "7:6.1.1-3ubuntu5"
+    package: libavcodec-dev
+    env_var: FFMPEG_REVIEWED_VERSION
+  - name: cmake
+    provider: apt
+    version: 3.28.3-1build7
+    package: cmake
+    env_var: CMAKE_REVIEWED_VERSION

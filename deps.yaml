@@ -1,0 +1,32 @@
+# VideoCapture third-party baseline, managed by coldpac.
+#
+# wanted tracks the reviewed apt baselines in versions.env (repository
+# snapshots, not minimum supported versions). Build minimums stay in
+# cmake/versions.cmake. Regenerate the lockfile with:
+#   python3 <coldpac> --manifest deps.yaml --lock deps.lock resolve
+schema_version: 1
+packages:
+  - name: opencv
+    kind: system-library
+    wanted: ==4.6.0+dfsg-13.1ubuntu1
+    providers: [apt]
+    package: libopencv-dev
+    env_var: OPENCV_REVIEWED_VERSION
+  - name: gstreamer
+    kind: system-library
+    wanted: ==1.24.2-1ubuntu0.1
+    providers: [apt]
+    package: libgstreamer1.0-dev
+    env_var: GSTREAMER_REVIEWED_VERSION
+  - name: ffmpeg
+    kind: system-library
+    wanted: "==7:6.1.1-3ubuntu5"
+    providers: [apt]
+    package: libavcodec-dev
+    env_var: FFMPEG_REVIEWED_VERSION
+  - name: cmake
+    kind: tool
+    wanted: ==3.28.3-1build7
+    providers: [apt]
+    package: cmake
+    env_var: CMAKE_REVIEWED_VERSION

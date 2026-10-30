@@ -289,6 +289,28 @@ The VideoCapture library is designed to be integrated into the main object-detec
 - **OpenCV**: Lower memory footprint for simple operations
 - **GStreamer**: Higher memory usage but better for complex pipelines
 
+## Coldpac baseline
+
+`deps.yaml` declares the reviewed apt baseline (same versions as
+`versions.env`), `deps.lock` pins the resolution. Both are managed by
+[coldpac](https://github.com/olibartfast/coldpac), fetched at configure
+time via `cmake/ColdpacFetch.cmake` pinned to tag `v0.1.2`:
+
+```bash
+# validate only (also runs automatically at configure time)
+python3 <coldpac> --manifest deps.yaml --lock deps.lock validate
+
+# wanted vs installed vs candidate (exit 0 clean, 2 updates, 1 drift)
+cmake --build build --target coldpac-status
+
+# after a reviewed baseline bump
+python3 <coldpac> --manifest deps.yaml --lock deps.lock resolve
+```
+
+Build minimums stay in `cmake/versions.cmake`; `cmake -D` still overrides
+`versions.env`. Air-gapped configure:
+`cmake -DFETCHCONTENT_SOURCE_DIR_COLDPAC=/path/to/coldpac ..`.
+
 ## Contributing
 
 When adding new video processing features:
