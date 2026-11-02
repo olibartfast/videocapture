@@ -84,7 +84,9 @@ You can use the provided setup scripts to install dependencies:
 
     Use the directory containing `OpenCVConfig.cmake`, rather than the source
     directory. See [OpenCV validation](docs/opencv5/validation.md) for the
-    capture/writer compatibility check.
+    capture/writer compatibility check, and the
+    [OpenCV 4 to 5 migration reference](docs/opencv5/opencv-4-to-5-migration.md)
+    (upstream wiki copy) for the API changes affecting OpenCV 5 builds.
 
     **With GStreamer:**
     ```bash
