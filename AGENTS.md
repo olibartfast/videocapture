@@ -16,6 +16,7 @@
 - Before committing and again immediately before pushing any C or C++ change, run the full-tree `clang-format` check implemented by `.github/workflows/format.yml`. Do not commit or push if it fails.
 - Pull requests produced by agents must state the validation performed and any downstream or cross-repository impact.
 - During branch closure, synchronize local `develop` with `origin/develop`, then remove the merged feature branch locally and remotely.
+- After a `release/*` or `hotfix/*` is merged to `master` (tagged) and back-merged to `develop`, delete the topic branch locally and on `origin`; the `master` tag (`vX.Y.Z`) is the immutable release ref. Do not push `release/*` just to watch CI when `develop` CI covers the same commits.
 
 ## Review focus
 
